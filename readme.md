@@ -132,7 +132,7 @@ The following endpoints are available to you once the routes have been added:
 | GET       | /api/report               | report.index       |
 | POST      | /api/report/{report}      | report.show        |
 
-### Manage Routes
+#### Manage Routes
 
 | Method    | URI                           | Name                      |
 | ---       | ---                           | ---                       |
