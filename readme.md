@@ -135,11 +135,12 @@ POST    /api/report/{report}            (report.show)
 
 ### Manage Routes
 
-```php
+```
 Method  URI                             Name
 GET     /api/report/manage              (report.manage.index)
 POST    /api/report/manage              (report.manage.store)
 GET     /api/report/manage/{report}     (report.manage.show)
 PATCH   /api/report/manage/{report}     (report.manage.update)
 DELETE  /api/report/manage/{report}     (report.manage.destroy)
+GET     /api/report/model               (report.model.list)
 ```
