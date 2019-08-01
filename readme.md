@@ -127,24 +127,18 @@ The following endpoints are available to you once the routes have been added:
 
 #### View Routes
 
-```
-Mehthod URI                             Name
-GET     /api/report                     (report.index)
-POST    /api/report/{report}            (report.show)
-```
-
 | Method    | URI                       | Name               |
 | ---       | ---                       | ---                |
-| GET       | /api/report               | (report.index)     |
-| POST      | /api/report/{report}      | (report.show)      |
+| GET       | /api/report               | report.index       |
+| POST      | /api/report/{report}      | report.show        |
 
 ### Manage Routes
 
 | Method    | URI                           | Name                      |
 | ---       | ---                           | ---                       |
-| GET       | /api/report/manage            | (report.manage.index)     |
-| POST      | /api/report/manage            | (report.manage.store)     |
-| GET       | /api/report/manage/{report}   | (report.manage.show)      |
-| PATCH     | /api/report/manage/{report}   | (report.manage.update)    |
-| DELETE    | /api/report/manage/{report}   | (report.manage.destroy)   |
-| GET       | /api/report/model             | (report.model.list)       |
+| GET       | /api/report/manage            | report.manage.index       |
+| POST      | /api/report/manage            | report.manage.store       |
+| GET       | /api/report/manage/{report}   | report.manage.show        |
+| PATCH     | /api/report/manage/{report}   | report.manage.update      |
+| DELETE    | /api/report/manage/{report}   | report.manage.destroy     |
+| GET       | /api/report/model             | report.model.list         |
