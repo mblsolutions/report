@@ -3,19 +3,19 @@
 namespace MBLSolutions\Report\Http\Controllers;
 
 use Illuminate\Support\Collection;
-use MBLSolutions\Report\Models\SelectFieldModel;
+use MBLSolutions\Report\Models\SelectConnectionModel;
 
-class ModelController
+class ConnectionController
 {
 
     /**
-     * Get a list of selectable models
+     * Get a list of available connections
      *
      * @return Collection
      */
     public function index(): Collection
     {
-        return (new SelectFieldModel)->all();
+        return (new SelectConnectionModel())->all();
     }
 
 }

@@ -2,24 +2,22 @@
 
 namespace MBLSolutions\Report\Http\Controllers;
 
+use Exception;
+use Illuminate\Http\Request;
+use MBLSolutions\Report\Exceptions\RenderReportException;
 use MBLSolutions\Report\Http\Resources\ReportResource;
 use MBLSolutions\Report\Models\Report;
+use MBLSolutions\Report\Repositories\ManageReportRepository;
+use MBLSolutions\Report\Services\TestReport;
 
 class ManageReportController
 {
+    /** @var ManageReportRepository $repository */
+    protected $repository;
 
-    public function index(): array
+    public function __construct()
     {
-        // TODO implement method
-
-        return [];
-    }
-
-    public function store(): array
-    {
-        // TODO implement method
-
-        return [];
+        $this->repository = new ManageReportRepository;
     }
 
     /**
@@ -30,20 +28,28 @@ class ManageReportController
      */
     public function show($id = null): ReportResource
     {
-        if ($id === null) {
+        if ($id !== 'null' && $id !== null) {
             $report = Report::findOrFail($id);
-        } else {
-            $report = new Report();
         }
 
-        return new ReportResource($report);
+        return new ReportResource($report ?? new Report());
     }
 
-    public function update(): array
+    /**
+     * Create a Report
+     *
+     * @param Request $request
+     * @return mixed
+     * @throws Exception
+     */
+    public function store(Request $request)
     {
-        // TODO implement method
+        return $this->repository->create($request);
+    }
 
-        return [];
+    public function update(Report $report, Request $request): array
+    {
+        return $this->repository->update($request);
     }
 
     public function destroy(): array
@@ -53,6 +59,34 @@ class ManageReportController
         return [];
     }
 
+    /**
+     * Test Report Config
+     *
+     * @param Request $request
+     * @return mixed
+     */
+    public function test(Request $request)
+    {
+        try {
+            $start = microtime(true);
+
+            $service = new TestReport($request);
+
+            return [
+                'success' => true,
+                'results' => $service->run(),
+                'request' => $request->all(),
+                'time' => number_format(microtime(true) - $start, 6)
+            ];
+        } catch (RenderReportException $exception) {
+            return [
+                'success' => false,
+                'code' => $exception->getCode(),
+                'message' => $exception->getMessage(),
+                'raw' => $exception->getService()->getRawQuery()
+            ];
+        }
+    }
 
 
 }

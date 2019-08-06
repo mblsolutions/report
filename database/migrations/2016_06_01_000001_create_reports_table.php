@@ -17,6 +17,8 @@ class CreateReportsTable extends Migration
         Schema::create('reports', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 100);
+            $table->string('description');
+            $table->string('connection', 100);
             $table->string('table', 128);
             $table->text('where')->nullable();
             $table->text('groupby')->nullable();

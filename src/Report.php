@@ -42,6 +42,8 @@ class Report
                     'manage' => 'report'
                 ]
             ]);
+            Route::post('report/manage/test', 'ManageReportController@test')->name('manage.test');
+            Route::get('report/connection', 'ConnectionController@index')->name('connection.list');
             Route::get('report/model', 'ModelController@index')->name('model.list');
         });
     }
@@ -64,7 +66,8 @@ class Report
 
         Route::group($options, static function () {
             Route::get('report', 'ReportController@index')->name('index');
-            Route::post('report/{report}', 'ReportController@show')->name('show');
+            Route::get('report/{report}', 'ReportController@show')->name('show');
+            Route::post('report/{report}', 'ReportController@render')->name('render');
         });
     }
 

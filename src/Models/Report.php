@@ -46,4 +46,24 @@ class Report extends Model
         return $this->hasMany(ReportJoin::class);
     }
 
+    /**
+     * Should Data be shown on Report
+     *
+     * @return bool
+     */
+    public function shouldShowData(): bool
+    {
+        return $this->show_data;
+    }
+
+    /**
+     * Should Totals be shown on Report
+     *
+     * @return bool
+     */
+    public function shouldShowTotals(): bool
+    {
+        return $this->show_totals;
+    }
+
 }

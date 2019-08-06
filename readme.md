@@ -130,7 +130,8 @@ The following endpoints are available to you once the routes have been added:
 | Method    | URI                       | Name               |
 | ---       | ---                       | ---                |
 | GET       | /api/report               | report.index       |
-| POST      | /api/report/{report}      | report.show        |
+| GET       | /api/report/{report}      | report.show        |
+| POST      | /api/report/{report}      | report.render      |
 
 #### Manage Routes
 
@@ -138,7 +139,9 @@ The following endpoints are available to you once the routes have been added:
 | ---       | ---                           | ---                       |
 | GET       | /api/report/manage            | report.manage.index       |
 | POST      | /api/report/manage            | report.manage.store       |
+| POST      | /api/report/test              | report.manage.test        |
 | GET       | /api/report/manage/{report}   | report.manage.show        |
 | PATCH     | /api/report/manage/{report}   | report.manage.update      |
 | DELETE    | /api/report/manage/{report}   | report.manage.destroy     |
+| GET       | /api/report/connection        | report.connection.list    |
 | GET       | /api/report/model             | report.model.list         |

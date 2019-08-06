@@ -1,5 +1,5 @@
 <template>
-    <div :id="'report-field-' + index" class="report-field-label" v-if="loaded">
+    <div :id="'report-field-' + index" class="report-field" v-if="loaded">
 
         <hr class="col-xs-12">
 
@@ -52,7 +52,7 @@
                     <label for="model">Model</label>
                     <select name="type" id="model" class="form-control" v-model="data.model">
                         <option :value="null">Select Model</option>
-                        <option :value="model" v-for="model in models">{{ model }}</option>
+                        <option :value="model.value" v-for="model in models">{{ model.name }}</option>
                     </select>
                 </div>
 
@@ -114,9 +114,9 @@
                 }
             },
             models: {
-                type: Array,
+                type: Object,
                 default: function () {
-                    return [];
+                    return {};
                 }
             },
             'show_add_button': {

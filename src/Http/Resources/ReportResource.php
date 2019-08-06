@@ -24,8 +24,15 @@ class ReportResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'connection' => $this->connection ?? config('database.default'),
+            'description' => $this->description,
             'show_data' => $this->show_data ?? true,
             'show_totals' =>  $this->show_totals ?? false,
+            'table' => $this->table,
+            'where' => $this->where,
+            'groupby' => $this->groupby,
+            'having' => $this->having,
+            'orderby' => $this->orderby,
             'active' =>  $this->active ?? true,
             'fields' => new ReportFieldCollection($this->getReportFields()),
             'selects' => new ReportSelectCollection($this->getReportSelects()),
@@ -38,17 +45,9 @@ class ReportResource extends JsonResource
      *
      * @return mixed
      */
-    public function getReportFields(): Collection
+    protected function getReportFields(): Collection
     {
-        $fields = $this->fields;
-
-        if ($fields->count() === 0) {
-            $fields = collect([
-                new ReportField()
-            ]);
-        }
-
-        return $fields;
+        return $this->fields;
     }
 
 
@@ -57,17 +56,9 @@ class ReportResource extends JsonResource
      *
      * @return mixed
      */
-    public function getReportSelects()
+    protected function getReportSelects()
     {
-        $selects = $this->selects;
-
-        if ($selects->count() === 0) {
-            $selects = collect([
-                new ReportSelect()
-            ]);
-        }
-
-        return $selects;
+        return $this->selects;
     }
 
     /**
@@ -75,17 +66,9 @@ class ReportResource extends JsonResource
      *
      * @return mixed
      */
-    public function getReportJoins()
+    protected function getReportJoins()
     {
-        $joins = $this->joins;
-
-        if ($joins->count() === 0) {
-            $joins = collect([
-                new ReportJoin()
-            ]);
-        }
-
-        return $joins;
+        return $this->joins;
     }
 
 }
