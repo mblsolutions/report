@@ -4,11 +4,16 @@ namespace MBLSolutions\Report\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Report extends Model
 {
+    use SoftDeletes;
+
     /** {@inheritDoc} */
-    protected $guarded = [];
+    protected $guarded = [
+        'id'
+    ];
 
     protected $casts = [
         'show_data' => 'boolean',
@@ -33,7 +38,7 @@ class Report extends Model
      */
     public function selects(): HasMany
     {
-        return $this->hasMany(ReportSelect::class);
+        return $this->hasMany(ReportSelect::class)->orderBy('column_order');
     }
 
     /**

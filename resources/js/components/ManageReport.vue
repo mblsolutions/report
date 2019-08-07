@@ -17,21 +17,27 @@
                     <div class="col-xs-12 col-md-6">
                         <div class="form-group">
                             <label for="report_name">Report Name</label>
-                            <input id="report_name" type="text" name="name" class="form-control" placeholder="Report Name" v-model="report.data.name">
+                            <input id="report_name" type="text" name="name" class="form-control" placeholder="Report Name" :class="{ 'is-invalid': report.hasError('name') }" v-model="report.data.name">
+
+                            <div v-if="report.hasError('name')" class="invalid-feedback">{{ report.getError('name') }}</div>
                         </div>
                     </div>
                     <div class="col-xs-12 col-md-6">
                         <label for="connection">Connection</label>
-                        <select name="type" id="connection" class="form-control" v-model="report.data.connection">
+                        <select name="type" id="connection" class="form-control" :class="{ 'is-invalid': report.hasError('connection') }" v-model="report.data.connection">
                             <option :value="null">Select Connection</option>
                             <option :value="connection.value" v-for="connection in report.connections">{{ connection.name }}</option>
                         </select>
+
+                        <div v-if="report.hasError('connection')" class="invalid-feedback">{{ report.getError('connection') }}</div>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="report_description">Report Description</label>
-                    <input id="report_description" type="text" name="description" class="form-control" placeholder="Description" v-model="report.data.description">
+                    <input id="report_description" type="text" name="description" class="form-control" placeholder="Description" :class="{ 'is-invalid': report.hasError('description') }" v-model="report.data.description">
+
+                    <div v-if="report.hasError('description')" class="invalid-feedback">{{ report.getError('description') }}</div>
                 </div>
 
                 <hr class="col-xs-12">
@@ -42,6 +48,8 @@
                         <label class="form-check-label" for="show_data">
                             Display Report Data
                         </label>
+
+                        <div v-if="report.hasError('show_data')" class="invalid-feedback">{{ report.getError('show_data') }}</div>
                     </div>
 
                     <small class="text-muted">
@@ -55,6 +63,8 @@
                         <label class="form-check-label" for="show_totals">
                             Display Report Totals
                         </label>
+
+                        <div v-if="report.hasError('show_totals')" class="invalid-feedback">{{ report.getError('show_totals') }}</div>
                     </div>
 
                     <small class="text-muted">
@@ -68,6 +78,8 @@
                         <label class="form-check-label" for="active">
                             Active
                         </label>
+
+                        <div v-if="report.hasError('active')" class="invalid-feedback">{{ report.getError('active') }}</div>
                     </div>
                 </div>
             </div>
@@ -124,8 +136,9 @@
                     <div v-for="(select, index) in report.data.selects">
                         <transition name="fade">
                             <ReportSelect
-                                    :index="index" :show_add_button="isLastSelect(index)"
+                                    :key="select.id ? select.id : select" :index="index" :show_add_button="isLastSelect(index)"
                                     v-model="report.data.selects[index]"
+                                    @move-select-up="moveReportSelectUp" @move-select-down="moveReportSelectDown"
                                     @remove-select="removeReportSelect" @add-select="addNewReportSelect"
                             ></ReportSelect>
                         </transition>
@@ -149,7 +162,9 @@
 
                 <div class="form-group">
                     <label for="report_table">Table</label>
-                    <input id="report_table" type="text" name="table" class="form-control" placeholder="Table" v-model="report.data.table">
+                    <input id="report_table" type="text" name="table" class="form-control" placeholder="Table" :class="{ 'is-invalid': report.hasError('table') }" v-model="report.data.table">
+
+                    <div v-if="report.hasError('table')" class="invalid-feedback">{{ report.getError('table') }}</div>
                 </div>
 
                 <hr class="col-xs-12">
@@ -195,7 +210,25 @@
 
                 <div class="form-group">
                     <label for="report_where">Where</label>
-                    <textarea id="report_where" name="where" rows="8" class="form-control"></textarea>
+                    <div class="autocomplete">
+                        <transition name="fade">
+                            <div class="autocomplete-list" v-if="show_suggestions && report.data.fields.length > 0">
+                                <div class="list-group">
+                                    <a class="list-group-item" @click="dismissSuggestions">Available Fields <small>(click to dismiss suggestions)</small></a>
+                                    <span v-for="(field, index) in report.data.fields">
+                                        <a href="#" class="list-group-item list-group-item-action"
+                                           v-if="field.alias" @click.prevent="selectSuggestion(report.data.fields[index].alias, 'report_where')"
+                                        >{{ field.alias }} ({{ field.type }})</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </transition>
+                        <textarea id="report_where" name="where" rows="8" class="form-control"
+                                  :class="{ 'is-invalid': report.hasError('where') }" v-model="report.data.where" @keyup="checkForSuggestions"
+                        ></textarea>
+                    </div>
+
+                    <div v-if="report.hasError('where')" class="invalid-feedback">{{ report.getError('where') }}</div>
                 </div>
 
                 <hr class="col-xs-12">
@@ -210,17 +243,23 @@
 
                 <div class="form-group">
                     <label for="report_groupby">Group By</label>
-                    <input id="report_groupby" type="text" name="groupby" class="form-control" placeholder="Group By (e.g. users.role)" v-model="report.data.groupby">
+                    <input id="report_groupby" type="text" name="groupby" class="form-control" placeholder="Group By (e.g. users.role)" :class="{ 'is-invalid': report.hasError('groupby') }" v-model="report.data.groupby">
+
+                    <div v-if="report.hasError('groupby')" class="invalid-feedback">{{ report.getError('groupby') }}</div>
                 </div>
 
                 <div class="form-group">
                     <label for="report_having">Having</label>
-                    <input id="report_having" type="text" name="having" class="form-control" placeholder="Having (e.g. users.id > 100)" v-model="report.data.having">
+                    <input id="report_having" type="text" name="having" class="form-control" placeholder="Having (e.g. users.id > 100)" :class="{ 'is-invalid': report.hasError('having') }" v-model="report.data.having">
+
+                    <div v-if="report.hasError('having')" class="invalid-feedback">{{ report.getError('having') }}</div>
                 </div>
 
                 <div class="form-group">
                     <label for="report_orderby">Order By</label>
-                    <input id="report_orderby" type="text" name="orderby" class="form-control" placeholder="Order By (e.g. users.created_at DESC)" v-model="report.data.groupby">
+                    <input id="report_orderby" type="text" name="orderby" class="form-control" placeholder="Order By (e.g. users.created_at DESC)" :class="{ 'is-invalid': report.hasError('orderby') }" v-model="report.data.groupby">
+
+                    <div v-if="report.hasError('orderby')" class="invalid-feedback">{{ report.getError('orderby') }}</div>
                 </div>
 
                 <hr class="col-xs-12">
@@ -259,11 +298,15 @@
             },
             action: {
                 type: String,
-                default: '/api/report/manage'
+                required: true
             },
             method: {
                 type: String,
-                default: 'post'
+                required: true
+            },
+            redirect_location: {
+                type: String,
+                default: '/report/manage'
             }
         },
         components: {
@@ -274,7 +317,14 @@
         data() {
             return {
                 report: null,
-                loaded: false
+                loaded: false,
+                show_suggestions: false,
+                suggestions: [
+                    'sug 1',
+                    'sug 4',
+                    'sug 3',
+                    'sug 2',
+                ]
             }
         },
         methods: {
@@ -309,6 +359,22 @@
                 this.report.removeSelect(index);
 
                 this.$emit('remove-report-select', index);
+            },
+            /**
+             * Move Report Select Column Up
+             */
+            moveReportSelectUp(index) {
+                let select = this.report.moveSelectUp(index);
+
+                this.$emit('move-report-select-up', select);
+            },
+            /**
+             * Move Report Select Column Down
+             */
+            moveReportSelectDown(index) {
+                let select = this.report.moveSelectDown(index);
+
+                this.$emit('move-report-select-down', select);
             },
             /**
              * Add New Select
@@ -366,6 +432,10 @@
 
                 vm.report.submit(vm.action, vm.method).then(result => {
                     vm.$emit('report-submitted', result);
+
+                    window.location.href = this.redirect_location;
+                }).catch(error => {
+                    console.error(error)
                 });
             },
             /**
@@ -377,6 +447,39 @@
                 vm.report.test().then(result => {
                     vm.$emit('report-test-results', result);
                 });
+            },
+            /**
+             * Check for suggestions when typing
+             *
+             * @param event
+             */
+            checkForSuggestions(event) {
+                if (event.key === '{') {
+                    this.show_suggestions = true;
+                }
+            },
+            /**
+             * Select a Suggestion
+             */
+            selectSuggestion(suggestion, id) {
+                let vm = this;
+                let where = vm.report.data.where;
+
+                if (where != null) {
+                    vm.report.data.where = where + suggestion + '} ';
+                } else {
+                    vm.report.data.where = suggestion + '} ';
+                }
+
+                this.dismissSuggestions();
+
+                document.getElementById(id).focus();
+            },
+            /**
+             * Dismiss Suggestions
+             */
+            dismissSuggestions() {
+                this.show_suggestions = false;
             }
         },
         mounted() {
@@ -397,6 +500,16 @@
 </script>
 
 <style scoped>
+    .autocomplete {
+        position: relative;
+    }
+
+    .autocomplete-list {
+        position: absolute;
+        display: block;
+        width: 100%;
+    }
+
     .fade-enter-active, .fade-leave-active {
         transition: opacity 0.7s;
     }

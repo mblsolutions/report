@@ -1,5 +1,5 @@
 <template>
-    <div :id="'report-field-' + index" class="report-field" v-if="loaded">
+    <div :id="'report-field-' + index" class="report-field" v-if="loaded && data.deleted_at === null">
 
         <hr class="col-xs-12">
 

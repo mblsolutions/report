@@ -5,30 +5,46 @@ namespace MBLSolutions\Report\Http\Controllers;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use MBLSolutions\Report\Http\Resources\ReportCollection;
+use MBLSolutions\Report\Http\Resources\ReportResource;
 use MBLSolutions\Report\Models\Report;
+use MBLSolutions\Report\Repositories\ReportRepository;
 use MBLSolutions\Report\Services\RenderReport;
 
 class ReportController
 {
+    /** @var ReportRepository $repository */
+    protected $repository;
+
+    /**
+     * Report Controller
+     *
+     */
+    public function __construct()
+    {
+        $this->repository = new ReportRepository;
+    }
+
     /**
      * Report Index
      *
-     * @return LengthAwarePaginator
+     * @param Request $request
+     * @return ReportCollection
      */
-    public function index(Request $request): LengthAwarePaginator
+    public function index(Request $request): ReportCollection
     {
-        return Report::paginate($request->get('limit', 25));
+        return new ReportCollection($this->repository->paginate($request->get('limit')));
     }
 
     /**
      * Show a Report
      *
      * @param Report $report
-     * @return array
+     * @return ReportResource
      */
-    public function show(Report $report): array
+    public function show(Report $report): ReportResource
     {
-        return $report->toArray();
+        return new ReportResource($report);
     }
 
     /**

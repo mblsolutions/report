@@ -23,6 +23,7 @@ class ReportSelectResource extends JsonResource
             'alias' => $this->alias,
             'type' => $this->type ?? ReportSelectType::STRING,
             'column_order' => $this->column_order,
+            'deleted_at' => $this->deleted_at
         ];
     }
 

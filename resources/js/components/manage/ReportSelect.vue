@@ -1,12 +1,12 @@
 <template>
-    <div :id="'report-select-' + index" class="report-select" v-if="loaded">
+    <div :id="'report-select-' + index" class="report-select" v-if="loaded && data.deleted_at === null">
 
         <hr class="col-xs-12">
 
         <h4>
             {{ columnLabel }} <span class="badge badge-primary"><small>#</small>{{ (index + 1) }}</span>
             <div class="pull-right float-right">
-                <button class="btn btn-sm btn-danger mr-2" @click.prevent="removeSelect">Remove Column</button>
+                <button class="btn btn-sm btn-danger mr-2" @click.prevent="removeSelect(index)">Remove Column</button>
                 <button v-if="show_add_button" class="btn btn-sm btn-success" @click.prevent="addSelect">Add Column</button>
             </div>
         </h4>
@@ -35,8 +35,13 @@
             </div>
             <div class="col-4 col-xs-4 col-md-3">
                 <div class="form-group">
-                    <label for="column_order">Column Order</label>
-                    <input id="column_order" type="text" name="column_order" class="form-control text-center" placeholder="Order" readonly v-model="data.column_order">
+                    <label>Column Order {{ data.column_order }}</label>
+                    <div class="block-buttons">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-primary btn-up" @click.prevent="moveUp(index)" :disabled="index === 0">Move Up</button>
+                            <button class="btn btn-sm btn-primary btn-down" @click.prevent="moveDown(index)" :disabled="show_add_button">Move Down</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -96,7 +101,11 @@
              * @return {string}
              */
             columnLabel() {
-                return 'Column';
+                if (!this.data.alias) {
+                    return 'Label';
+                }
+
+                return this.data.alias;
             }
         },
         methods: {
@@ -105,6 +114,18 @@
              */
             removeSelect(index) {
                 this.$emit('remove-select', index);
+            },
+            /**
+             * Move Column Up
+             */
+            moveUp(index) {
+                this.$emit('move-select-up', index);
+            },
+            /**
+             * Move Column Down
+             */
+            moveDown(index) {
+                this.$emit('move-select-down', index);
             },
             /**
              * Add New Select
@@ -128,5 +149,18 @@
 </script>
 
 <style scoped>
+    .block-buttons {
+        position: relative;
+    }
+    .block-buttons .btn-group {
+        width: 100%;
+    }
 
+    .block-buttons button {
+        width: 50%;
+    }
+
+    .btn-down {
+        border-left: 2px solid white !important;
+    }
 </style>

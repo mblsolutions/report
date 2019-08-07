@@ -22,6 +22,7 @@ class CreateReportSelectsTable extends Migration
             $table->string('type', 12)->default('string');
             $table->unsignedTinyInteger('column_order')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
     /**

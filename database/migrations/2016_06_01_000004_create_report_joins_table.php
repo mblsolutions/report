@@ -23,6 +23,7 @@ class CreateReportJoinsTable extends Migration
             $table->string('operator', 2);
             $table->string('second', 128);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
     /**

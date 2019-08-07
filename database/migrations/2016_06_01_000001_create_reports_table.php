@@ -28,6 +28,7 @@ class CreateReportsTable extends Migration
             $table->boolean('show_totals')->default(1);
             $table->boolean('active')->default(1);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
     /**

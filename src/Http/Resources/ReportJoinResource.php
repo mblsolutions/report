@@ -24,6 +24,7 @@ class ReportJoinResource extends JsonResource
             'first' => $this->first,
             'operator' => $this->operator,
             'second' => $this->second,
+            'deleted_at' => $this->deleted_at
         ];
     }
 

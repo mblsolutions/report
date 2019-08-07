@@ -24,6 +24,7 @@ class CreateReportFieldsTable extends Migration
             $table->string('model_select_value')->nullable();
             $table->string('model_select_name')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
     /**

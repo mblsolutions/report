@@ -1,12 +1,12 @@
 <template>
-    <div :id="'report-join-' + index" class="join" v-if="loaded">
+    <div :id="'report-join-' + index" class="join" v-if="loaded && data.deleted_at === null">
 
         <hr class="col-xs-12">
 
         <h4>
             Join <span class="badge badge-primary"><small>#</small>{{ (index + 1) }}</span>
             <div class="pull-right float-right">
-                <button class="btn btn-sm btn-danger mr-2" @click.prevent="removeJoin">Remove Join</button>
+                <button class="btn btn-sm btn-danger mr-2" @click.prevent="removeJoin(index)">Remove Join</button>
                 <button v-if="show_add_button" class="btn btn-sm btn-success" @click.prevent="addJoin">Add Join</button>
             </div>
         </h4>

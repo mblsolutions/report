@@ -2,8 +2,7 @@
     <div id="show-report">
 
         <div v-if="loaded">
-
-            <ParameterSelection v-model="report" v-if="report.report.fields">
+            <ParameterSelection v-model="report" v-if="report.report.fields.length > 0">
                 <slot name="loading"></slot>
             </ParameterSelection>
 
@@ -69,7 +68,7 @@
             new Promise((resolve) => {
                 vm.report = new Report();
 
-                vm.report.getReport(this.id).then(report => {
+                vm.report.getReport(vm.id).then(report => {
                     vm.$emit('load-show-report', report);
                     resolve(true);
                 })

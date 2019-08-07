@@ -4,6 +4,7 @@ namespace MBLSolutions\Report\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use MBLSolutions\Report\Exceptions\RenderReportException;
 use MBLSolutions\Report\Http\Resources\ReportResource;
 use MBLSolutions\Report\Models\Report;
@@ -15,6 +16,9 @@ class ManageReportController
     /** @var ManageReportRepository $repository */
     protected $repository;
 
+    /**
+     * Manage Report Controller
+     */
     public function __construct()
     {
         $this->repository = new ManageReportRepository;
@@ -28,11 +32,7 @@ class ManageReportController
      */
     public function show($id = null): ReportResource
     {
-        if ($id !== 'null' && $id !== null) {
-            $report = Report::findOrFail($id);
-        }
-
-        return new ReportResource($report ?? new Report());
+        return new ReportResource($this->repository->findOrNew($id));
     }
 
     /**
@@ -44,19 +44,54 @@ class ManageReportController
      */
     public function store(Request $request)
     {
-        return $this->repository->create($request);
+        $validator = $this->repository->validateReportRequest($request);
+
+        if ($validator->fails()) {
+            return new Response([
+                'message' => 'An error occurred',
+                'errors' => $validator->errors()
+            ], 422, [
+                'Content-Type' => 'application/json',
+            ]);
+        }
+
+        return new ReportResource($this->repository->create($request));
     }
 
-    public function update(Report $report, Request $request): array
+    /**
+     * Update a Report
+     *
+     * @param Report $report
+     * @param Request $request
+     * @return mixed
+     * @throws Exception
+     */
+    public function update(Report $report, Request $request)
     {
-        return $this->repository->update($request);
+        $validator = $this->repository->validateReportRequest($request);
+
+        if ($validator->fails()) {
+            return new Response([
+                'message' => 'An error occurred',
+                'errors' => $validator->errors()
+            ], 422, [
+                'Content-Type' => 'application/json',
+            ]);
+        }
+
+        return new ReportResource($this->repository->update($report, $request));
     }
 
-    public function destroy(): array
+    /**
+     * Delete a Report
+     *
+     * @param Report $report
+     * @return ReportResource
+     * @throws Exception
+     */
+    public function destroy(Report $report): ReportResource
     {
-        // TODO implement method
-
-        return [];
+        return new ReportResource($this->repository->delete($report));
     }
 
     /**

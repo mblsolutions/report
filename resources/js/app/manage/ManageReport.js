@@ -37,15 +37,13 @@ export class ManageReport extends Form {
     submit(action, method = 'post') {
         let self = this;
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             self.request(action, method)
                 .then(response => {
                     resolve(response.data);
                 }).catch(error => {
-                    resolve(error);
+                    reject(error);
                 });
-
-            resolve(true);
         });
     }
 
@@ -120,7 +118,11 @@ export class ManageReport extends Form {
      * Remove a Report Field
      */
     removeField(index) {
-        this.data.fields.splice(index,1)
+    if (this.data.fields[index].id) {
+        this.data.fields[index].deleted_at = new Date().toISOString();
+        } else {
+        this.data.fields.splice(index, 1);
+        }
     }
 
     /**
@@ -137,13 +139,21 @@ export class ManageReport extends Form {
                 model: null,
                 alias: null,
                 model_select_value: null,
-                model_select_name: null
+                model_select_name: null,
+                deleted_at: null
             });
 
             resolve(id);
         }).then(id => {
             setTimeout(function() {
-                document.getElementById('report-field-' + id).scrollIntoView();
+
+                setTimeout(function() {
+                    let element = document.getElementById('report-field-' + id);
+
+                    if (element) {
+                        element.scrollIntoView();
+                    }
+                }, 100);
             }, 100);
         })
     }
@@ -152,7 +162,51 @@ export class ManageReport extends Form {
      * Remove the report Select
      */
     removeSelect(index) {
-        this.data.selects.splice(index,1)
+    if (this.data.selects[index].id) {
+            this.data.selects[index].deleted_at = new Date().toISOString();
+        } else {
+            this.data.selects.splice(index, 1);
+        }
+    }
+
+    /**
+     * Move Report Select Up
+     *
+     * @param index
+     */
+    moveSelectUp(index) {
+        let previousSelect = this.data.selects[index - 1];
+        let select = this.data.selects[index];
+
+        if (previousSelect && select) {
+            this.data.selects[index - 1].column_order = previousSelect.column_order + 1;
+            this.data.selects[index].column_order = select.column_order - 1;
+
+            let element = this.data.selects[index];
+            this.data.selects.splice(index, 1);
+            this.data.selects.splice(index - 1, 0, element);
+        }
+    }
+
+    /**
+     * Move Report Select Down
+     *
+     * @param index
+     */
+    moveSelectDown(index) {
+        let nextSelect = this.data.selects[index + 1];
+        let select = this.data.selects[index];
+
+        if (nextSelect && select) {
+            this.data.selects[index + 1].column_order = nextSelect.column_order - 1;
+            this.data.selects[index].column_order = select.column_order + 1;
+
+            let element = this.data.selects[index];
+            this.data.selects.splice(index, 1);
+            this.data.selects.splice(index + 1, 0, element);
+
+            return this.data.selects[index + 1];
+        }
     }
 
     /**
@@ -167,13 +221,18 @@ export class ManageReport extends Form {
                 column: null,
                 alias: null,
                 type: 'string',
-                column_order: null
+                column_order: null,
+                deleted_at: null
             });
 
             resolve(id);
         }).then(id => {
             setTimeout(function() {
-                document.getElementById('report-select-' + id).scrollIntoView();
+                let element = document.getElementById('report-select-' + id);
+
+                if (element) {
+                    element.scrollIntoView();
+                }
             }, 100);
         })
     }
@@ -182,7 +241,11 @@ export class ManageReport extends Form {
      * Remove the report Join
      */
     removeJoin(index) {
-        this.data.joins.splice(index,1)
+        if (this.data.joins[index].id) {
+            this.data.joins[index].deleted_at = new Date().toISOString();
+        } else {
+            this.data.joins.splice(index, 1);
+        }
     }
 
     /**
@@ -198,13 +261,18 @@ export class ManageReport extends Form {
                 table: null,
                 first: null,
                 operator: null,
-                second: null
+                second: null,
+                deleted_at: null
             });
 
             resolve(id);
         }).then(id => {
             setTimeout(function() {
-                document.getElementById('report-join-' + id).scrollIntoView();
+                let element = document.getElementById('report-join-' + id);
+
+                if (element) {
+                    element.scrollIntoView();
+                }
             }, 100);
         })
     }

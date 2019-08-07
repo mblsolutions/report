@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report\Repositories;
 
 use Exception;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -10,23 +11,29 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use MBLSolutions\Report\Models\Report;
 
-class ManageReportRepository
+class ReportRepository
 {
 
+    /**
+     * All Reports
+     *
+     * @param int $limit
+     * @return LengthAwarePaginator
+     */
+    public function paginate($limit = 25): LengthAwarePaginator
+    {
+        return Report::paginate($limit);
+    }
 
     /**
-     * Get a Report or make a New One
+     * Get a Report
      *
-     * @param null $id
+     * @param $id
      * @return Report
      */
-    public function findOrNew($id = null): Report
+    public function find($id): Report
     {
-        if ($id !== 'null' && $id !== null) {
-            $report = Report::findOrFail($id);
-        }
-
-        return $report ?? new Report;
+        return Report::findOrFail($id);
     }
 
     /**

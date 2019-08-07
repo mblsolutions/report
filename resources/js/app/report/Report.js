@@ -39,9 +39,9 @@ export class Report extends Form {
         return new Promise(resolve => {
             self.request('/api/report/' + id, 'get')
                 .then(response => {
-                    self.report = response.data;
+                    self.report = response.data.data;
 
-                    resolve(response.data);
+                    resolve(self.report);
                 }).catch(error => {
                 resolve(error);
             });

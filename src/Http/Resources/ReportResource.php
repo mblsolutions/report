@@ -36,7 +36,8 @@ class ReportResource extends JsonResource
             'active' =>  $this->active ?? true,
             'fields' => new ReportFieldCollection($this->getReportFields()),
             'selects' => new ReportSelectCollection($this->getReportSelects()),
-            'joins' => new ReportJoinCollection($this->getReportJoins())
+            'joins' => new ReportJoinCollection($this->getReportJoins()),
+            'deleted_at' => $this->deleted_at
         ];
     }
 
