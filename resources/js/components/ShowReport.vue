@@ -2,12 +2,17 @@
     <div id="show-report">
 
         <div v-if="loaded">
-            <ParameterSelection v-model="report" v-if="report.report.fields.length > 0">
+            <ParameterSelection
+                    @submit-report-parameters="submitReport" v-model="report"
+                    v-if="parameters_submitted === false && report.report.fields.length > 0"
+            >
                 <slot name="loading"></slot>
             </ParameterSelection>
 
             <div v-else>
-                <RenderReport v-model="report" @report-rendered="reportRendered">
+                <RenderReport
+                        @reset-report-parameters="resetReportParameters"  @report-rendered="reportRendered" v-model="report"
+                >
                     <slot name="loading"></slot>
                 </RenderReport>
             </div>
@@ -22,9 +27,9 @@
 </template>
 
 <script>
+    import {Report} from "../app/report/Report";
     import ParameterSelection from "./show/ParameterSelection";
     import RenderReport from "./show/RenderReport";
-    import {Report} from "../app/report/Report";
 
     export default {
         name: "ShowReport",
@@ -41,6 +46,7 @@
         data() {
             return {
                 report: null,
+                parameters_submitted: false,
                 loaded: false
             }
         },
@@ -60,6 +66,18 @@
              */
             reportRendered(results) {
                 this.$emit('render-show-report', results);
+            },
+            /**
+             * Submit Report Render
+             */
+            submitReport() {
+                this.parameters_submitted = true;
+            },
+            /**
+             * Reset Report Parameters
+             */
+            resetReportParameters() {
+                this.parameters_submitted = false;
             }
         },
         mounted() {

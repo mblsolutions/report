@@ -78,8 +78,8 @@
                         { value: 'decimal_sum', name: 'Decimal (SUM)' },
                         { value: 'currency', name: 'Currency' },
                         { value: 'currency_sum', name: 'Currency (SUM)' },
-                        { value: 'date', name: 'date' },
-                        { value: 'datetime', name: 'datetime' },
+                        { value: 'date', name: 'Date' },
+                        { value: 'datetime', name: 'DateTime' },
                     ];
                 }
             },

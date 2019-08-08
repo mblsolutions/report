@@ -119,7 +119,7 @@ export class ManageReport extends Form {
      */
     removeField(index) {
     if (this.data.fields[index].id) {
-        this.data.fields[index].deleted_at = new Date().toISOString();
+        this.data.fields[index].deleted_at = ManageReport.getTimestamp();
         } else {
         this.data.fields.splice(index, 1);
         }
@@ -163,7 +163,7 @@ export class ManageReport extends Form {
      */
     removeSelect(index) {
     if (this.data.selects[index].id) {
-            this.data.selects[index].deleted_at = new Date().toISOString();
+            this.data.selects[index].deleted_at = ManageReport.getTimestamp();
         } else {
             this.data.selects.splice(index, 1);
         }
@@ -242,7 +242,7 @@ export class ManageReport extends Form {
      */
     removeJoin(index) {
         if (this.data.joins[index].id) {
-            this.data.joins[index].deleted_at = new Date().toISOString();
+            this.data.joins[index].deleted_at = ManageReport.getTimestamp();
         } else {
             this.data.joins.splice(index, 1);
         }
@@ -314,6 +314,15 @@ export class ManageReport extends Form {
         }
 
         return 0;
+    }
+
+    /**
+     * Get Timestamp
+     *
+     * @return {string}
+     */
+    static getTimestamp() {
+        return new Date().toISOString().slice(0, 19).replace('T', ' ');
     }
 
 

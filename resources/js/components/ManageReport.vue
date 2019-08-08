@@ -33,11 +33,23 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="report_description">Report Description</label>
-                    <input id="report_description" type="text" name="description" class="form-control" placeholder="Description" :class="{ 'is-invalid': report.hasError('description') }" v-model="report.data.description">
+                <div class="row">
+                    <div class="col-xs-12 col-md-8">
+                        <div class="form-group">
+                            <label for="report_description">Report Description</label>
+                            <input id="report_description" type="text" name="description" class="form-control" placeholder="Description" :class="{ 'is-invalid': report.hasError('description') }" v-model="report.data.description">
 
-                    <div v-if="report.hasError('description')" class="invalid-feedback">{{ report.getError('description') }}</div>
+                            <div v-if="report.hasError('description')" class="invalid-feedback">{{ report.getError('description') }}</div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-4">
+                        <div class="form-group">
+                            <label for="report_display_limit">Display Limit</label>
+                            <input id="report_display_limit" type="text" name="display_limit" class="form-control" placeholder="25" :class="{ 'is-invalid': report.hasError('display_limit') }" v-model="report.data.display_limit">
+
+                            <div v-if="report.hasError('display_limit')" class="invalid-feedback">{{ report.getError('display_limit') }}</div>
+                        </div>
+                    </div>
                 </div>
 
                 <hr class="col-xs-12">
@@ -257,7 +269,7 @@
 
                 <div class="form-group">
                     <label for="report_orderby">Order By</label>
-                    <input id="report_orderby" type="text" name="orderby" class="form-control" placeholder="Order By (e.g. users.created_at DESC)" :class="{ 'is-invalid': report.hasError('orderby') }" v-model="report.data.groupby">
+                    <input id="report_orderby" type="text" name="orderby" class="form-control" placeholder="Order By (e.g. users.created_at DESC)" :class="{ 'is-invalid': report.hasError('orderby') }" v-model="report.data.orderby">
 
                     <div v-if="report.hasError('orderby')" class="invalid-feedback">{{ report.getError('orderby') }}</div>
                 </div>

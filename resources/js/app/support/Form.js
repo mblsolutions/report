@@ -8,8 +8,8 @@ export class Form {
      *
      * @param data
      */
-    constructor(data) {
-        this.data = data;
+    constructor(data = null) {
+        this.data = data ? data : {};
 
         this.response = null;
         this.error = new Error;

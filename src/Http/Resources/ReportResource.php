@@ -26,6 +26,7 @@ class ReportResource extends JsonResource
             'name' => $this->name,
             'connection' => $this->connection ?? config('database.default'),
             'description' => $this->description,
+            'display_limit' => $this->display_limit ?? 25,
             'show_data' => $this->show_data ?? true,
             'show_totals' =>  $this->show_totals ?? false,
             'table' => $this->table,

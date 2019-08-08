@@ -9,7 +9,7 @@ use MBLSolutions\Report\Http\Resources\ReportCollection;
 use MBLSolutions\Report\Http\Resources\ReportResource;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Repositories\ReportRepository;
-use MBLSolutions\Report\Services\RenderReport;
+use MBLSolutions\Report\Services\BuildReportService;
 
 class ReportController
 {
@@ -56,7 +56,7 @@ class ReportController
      */
     public function render(Report $report, Request $request): Collection
     {
-        $service = new RenderReport($report);
+        $service = new BuildReportService($report, $request->toArray());
 
         return $service->render();
     }

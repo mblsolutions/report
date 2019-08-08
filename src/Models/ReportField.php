@@ -12,7 +12,8 @@ class ReportField extends Model
 
     /** {@inheritDoc} */
     protected $guarded = [
-        'id'
+        'id',
+        'options'
     ];
 
     /**

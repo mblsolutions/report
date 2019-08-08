@@ -3,22 +3,22 @@
 namespace MBLSolutions\Report\Exceptions;
 
 use Exception;
-use MBLSolutions\Report\Services\RenderReport;
+use MBLSolutions\Report\Services\BuildReportService;
 use Throwable;
 
 class RenderReportException extends Exception
 {
-    /** @var RenderReport $service */
+    /** @var BuildReportService $service */
     protected $service;
 
     /**
      * Report Render Exception
-     * @param RenderReport $service
+     * @param BuildReportService $service
      * @param string $message
      * @param $code
      * @param Throwable|null $previous
      */
-    public function __construct(RenderReport $service, $message = '', $code = 0, Throwable $previous = null)
+    public function __construct(BuildReportService $service, $message = '', $code = 0, Throwable $previous = null)
     {
         $this->service = $service;
 
@@ -30,9 +30,9 @@ class RenderReportException extends Exception
     /**
      * Get the Report Service
      *
-     * @return RenderReport
+     * @return BuildReportService
      */
-    public function getService(): RenderReport
+    public function getService(): BuildReportService
     {
         return $this->service;
     }

@@ -9,7 +9,7 @@ use MBLSolutions\Report\Exceptions\RenderReportException;
 use MBLSolutions\Report\Http\Resources\ReportResource;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Repositories\ManageReportRepository;
-use MBLSolutions\Report\Services\TestReport;
+use MBLSolutions\Report\Services\TestReportService;
 
 class ManageReportController
 {
@@ -105,7 +105,7 @@ class ManageReportController
         try {
             $start = microtime(true);
 
-            $service = new TestReport($request);
+            $service = new TestReportService($request);
 
             return [
                 'success' => true,

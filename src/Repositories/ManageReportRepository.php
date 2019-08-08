@@ -42,7 +42,7 @@ class ManageReportRepository
             DB::beginTransaction();
 
             /** @var Report $report */
-            $report = Report::create($request->except('fields', 'selects', 'joins'));
+            $report = Report::create($request->toArray());
 
             $this->handleReportRelations($report, $request);
 
@@ -70,8 +70,10 @@ class ManageReportRepository
         try {
             DB::beginTransaction();
 
+            logger(json_encode($request->toArray()));
+
             /** @var Report $report */
-            $report->update($request->except('fields', 'selects', 'joins'));
+            $report->update($request->toArray());
 
             $this->handleReportRelations($report, $request);
 
@@ -182,6 +184,7 @@ class ManageReportRepository
             'name' => 'required|string|max:100',
             'description' => 'required|string|max:255',
             'connection' => 'required|string|max:100',
+            'display_limit' => 'required|numeric|between:25,500',
             'table' => 'required|string|max:128',
             'where' => 'nullable',
             'groupby' => 'nullable',
@@ -194,9 +197,9 @@ class ManageReportRepository
             'fields.*.label' => 'required|string',
             'fields.*.alias' => 'required|string',
             'fields.*.type' => 'required|string',
-            'fields.*.model' => 'required|string',
-            'fields.*.model_select_name' => 'required|string',
-            'fields.*.model_select_value' => 'required|string',
+            'fields.*.model' => 'nullable|string',
+            'fields.*.model_select_name' => 'nullable|string',
+            'fields.*.model_select_value' => 'nullable|string',
             // Selects Validation
             'selects.*.column' => 'required|string',
             'selects.*.alias' => 'required|string',

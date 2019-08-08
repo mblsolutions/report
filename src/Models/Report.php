@@ -12,10 +12,14 @@ class Report extends Model
 
     /** {@inheritDoc} */
     protected $guarded = [
-        'id'
+        'id',
+        'fields',
+        'selects',
+        'joins'
     ];
 
     protected $casts = [
+        'display_limit' => 'integer',
         'show_data' => 'boolean',
         'show_totals' => 'boolean',
         'active' => 'boolean'

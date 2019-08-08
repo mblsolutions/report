@@ -19,6 +19,7 @@ class CreateReportsTable extends Migration
             $table->string('name', 100);
             $table->string('description');
             $table->string('connection', 100);
+            $table->unsignedSmallInteger('display_limit')->default(25);
             $table->string('table', 128);
             $table->text('where')->nullable();
             $table->text('groupby')->nullable();

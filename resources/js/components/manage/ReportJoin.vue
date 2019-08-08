@@ -38,7 +38,7 @@
             <div class="col-xs-12 col-md-2">
                 <div class="form-group">
                     <label for="join_condition">Condition</label>
-                    <input id="join_condition" type="text" name="first" class="form-control" placeholder="Condition (e.g. =, !=)" v-model="data.first">
+                    <input id="join_condition" type="text" name="operator" class="form-control" placeholder="Condition (e.g. =, !=)" v-model="data.operator">
                 </div>
             </div>
             <div class="col-xs-12 col-md-5">

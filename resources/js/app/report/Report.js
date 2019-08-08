@@ -53,11 +53,13 @@ export class Report extends Form {
      *
      * @return {Promise}
      */
-    render(id) {
+    render(id, page = 1) {
         let self = this;
 
+        self.results = [];
+
         return new Promise(resolve => {
-            self.request('/api/report/' + id, 'post')
+            self.request('/api/report/' + id + '?page=' + page, 'post')
                 .then(response => {
                     self.results = response.data;
 

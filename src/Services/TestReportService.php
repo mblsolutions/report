@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use MBLSolutions\Report\Exceptions\RenderReportException;
 use MBLSolutions\Report\Models\Report;
 
-class TestReport extends RenderReport
+class TestReportService extends BuildReportService
 {
 
     /**
