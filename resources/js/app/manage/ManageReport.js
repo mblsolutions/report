@@ -9,7 +9,9 @@ export class ManageReport extends Form {
         super();
 
         this.connections = [];
+        this.middleware = [];
         this.models = [];
+        this.data_types = [];
     }
 
     /**
@@ -21,8 +23,7 @@ export class ManageReport extends Form {
         let self = this;
 
         return Promise.all([
-            self.loadConnections(),
-            self.loadModels(),
+            self.loadSettings(),
             self.loadReport(id)
         ]).then(function (results) {
             return results;
@@ -66,7 +67,34 @@ export class ManageReport extends Form {
     }
 
     /**
-     * Load the Report Select Models
+     * Load Report Settings
+     * e.g. Connections, Middleware, Models and Select Types
+     *
+     * @return {Promise}
+     */
+    loadSettings() {
+        let self = this;
+
+        return new Promise(resolve => {
+            self.request('/api/report/manage/settings', 'get')
+                .then(response => {
+                    self.connections = response.data.connections;
+                    self.middleware = response.data.middleware;
+                    self.models = response.data.models;
+                    self.data_types = response.data.data_types;
+
+                    resolve([
+                        self.connections,
+                        self.middleware,
+                        self.models,
+                        self.data_types
+                    ]);
+                });
+        });
+    }
+
+    /**
+     * Load the Report Selectable Models
      *
      * @return {Promise}
      */
@@ -79,6 +107,42 @@ export class ManageReport extends Form {
                     self.connections = response.data;
 
                     resolve(self.connections);
+                });
+        });
+    }
+
+    /**
+     * Load the Report Middleware
+     *
+     * @return {Promise}
+     */
+    loadMiddleware() {
+        let self = this;
+
+        return new Promise(resolve => {
+            self.request('/api/report/middleware', 'get')
+                .then(response => {
+                    self.models = response.data;
+
+                    resolve(self.models);
+                });
+        });
+    }
+
+    /**
+     * Load the Report Select Types
+     *
+     * @return {Promise}
+     */
+    loadSelectTypes() {
+        let self = this;
+
+        return new Promise(resolve => {
+            self.request('/api/report/data/type', 'get')
+                .then(response => {
+                    self.models = response.data;
+
+                    resolve(self.models);
                 });
         });
     }
@@ -101,6 +165,12 @@ export class ManageReport extends Form {
         });
     }
 
+    /**
+     * Load Report
+     *
+     * @param id
+     * @return {Promise}
+     */
     loadReport(id) {
         let self = this;
 
@@ -220,7 +290,7 @@ export class ManageReport extends Form {
                 id: null,
                 column: null,
                 alias: null,
-                type: 'string',
+                type: null,
                 column_order: null,
                 deleted_at: null
             });

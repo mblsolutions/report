@@ -28,6 +28,7 @@
                     <div class="form-group">
                         <label for="column_type">Column Type</label>
                         <select name="type" id="column_type" class="form-control" v-model="data.type">
+                            <option :value="null">Select Column Type</option>
                             <option :value="type.value" v-for="type in types">{{ type.name }}</option>
                         </select>
                     </div>
@@ -68,19 +69,7 @@
             types: {
                 type: Array,
                 default: function () {
-                    return [
-                        { value: 'string', name: 'String' },
-                        { value: 'string_count', name: 'String (COUNT)' },
-                        { value: 'integer', name: 'Integer' },
-                        { value: 'integer_sum', name: 'Integer (SUM)' },
-                        { value: 'integer_count', name: 'Integer (COUNT)' },
-                        { value: 'decimal', name: 'Decimal' },
-                        { value: 'decimal_sum', name: 'Decimal (SUM)' },
-                        { value: 'currency', name: 'Currency' },
-                        { value: 'currency_sum', name: 'Currency (SUM)' },
-                        { value: 'date', name: 'Date' },
-                        { value: 'datetime', name: 'DateTime' },
-                    ];
+                    return [];
                 }
             },
             'show_add_button': {

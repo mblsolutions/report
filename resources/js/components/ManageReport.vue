@@ -149,7 +149,7 @@
                         <transition name="fade">
                             <ReportSelect
                                     :key="select.id ? select.id : select" :index="index" :show_add_button="isLastSelect(index)"
-                                    v-model="report.data.selects[index]"
+                                    :types="report.data_types" v-model="report.data.selects[index]"
                                     @move-select-up="moveReportSelectUp" @move-select-down="moveReportSelectDown"
                                     @remove-select="removeReportSelect" @add-select="addNewReportSelect"
                             ></ReportSelect>

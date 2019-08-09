@@ -36,15 +36,17 @@ class Report
         $options = array_merge($defaultOptions, $options);
 
         Route::group($options, static function () {
+
+            Route::post('report/manage/test', 'ManageReportController@test')->name('manage.test');
+            Route::get('report/manage/settings', 'ManageSettingsController@index')->name('manage.settings');
+
             Route::resource('report/manage', 'ManageReportController', [
                 'only' => ['index', 'show', 'store', 'update', 'destroy'],
                 'parameters' => [
                     'manage' => 'report'
                 ]
             ]);
-            Route::post('report/manage/test', 'ManageReportController@test')->name('manage.test');
-            Route::get('report/connection', 'ConnectionController@index')->name('connection.list');
-            Route::get('report/model', 'ModelController@index')->name('model.list');
+
         });
     }
 
@@ -68,6 +70,10 @@ class Report
             Route::get('report', 'ReportController@index')->name('index');
             Route::get('report/{report}', 'ReportController@show')->name('show');
             Route::post('report/{report}', 'ReportController@render')->name('render');
+            Route::get('report/connection', 'ConnectionController@index')->name('connection.list');
+            Route::get('report/middleware', 'ReportMiddlewareController@index')->name('middleware.list');
+            Route::get('report/data/type', 'DataTypeController@index')->name('data.type.list');
+            Route::get('report/model', 'ModelController@index')->name('model.list');
         });
     }
 

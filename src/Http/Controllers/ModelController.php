@@ -3,7 +3,7 @@
 namespace MBLSolutions\Report\Http\Controllers;
 
 use Illuminate\Support\Collection;
-use MBLSolutions\Report\Models\SelectFieldModel;
+use MBLSolutions\Report\Models\ReportSelectField;
 
 class ModelController
 {
@@ -15,7 +15,7 @@ class ModelController
      */
     public function index(): Collection
     {
-        return (new SelectFieldModel)->all();
+        return (new ReportSelectField)->all();
     }
 
 }

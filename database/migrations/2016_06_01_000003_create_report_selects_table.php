@@ -19,7 +19,7 @@ class CreateReportSelectsTable extends Migration
             $table->unsignedInteger('report_id')->index();
             $table->text('column');
             $table->string('alias', 50);
-            $table->string('type', 12)->default('string');
+            $table->string('type');
             $table->unsignedTinyInteger('column_order')->default(0);
             $table->timestamps();
             $table->softDeletes();

@@ -3,20 +3,12 @@
 namespace MBLSolutions\Report\Models;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
+use MBLSolutions\Report\Support\ConfigModel;
 
-class SelectConnectionModel
+class ReportConnection extends ConfigModel
 {
-    /** @var Collection $connections */
-    protected $connections;
-
-    /**
-     * Select Field Models
-     */
-    public function __construct()
-    {
-        $this->connections = collect(config('database.connections'));
-    }
+    /** {@inheritDoc} */
+    protected $key = 'database.connections';
 
     /**
      * Get all Select Field Models
@@ -25,7 +17,7 @@ class SelectConnectionModel
      */
     public function all(): Collection
     {
-        $connections = $this->connections->map(function (array $connection, string $key) {
+        $connections = $this->models->map(function (array $connection, string $key) {
             return [
                 'value' => $key,
                 'name' => $this->formatName($key),

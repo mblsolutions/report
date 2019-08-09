@@ -5,9 +5,11 @@ namespace MBLSolutions\Report\Services;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use MBLSolutions\Report\Http\Resources\ReportResultCollection;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportSelect;
+use MBLSolutions\Report\Support\Maps\ReportResultMap;
 
 class BuildReportService
 {
@@ -212,7 +214,15 @@ class BuildReportService
     {
         if ($this->report->shouldShowData()) {
             if ($this->paginate) {
-                return $this->query->paginate($this->report->display_limit);
+                $results = $this->query->paginate($this->report->display_limit);
+
+                $results->getCollection()->transform(function ($attributes) {
+                    $map = new ReportResultMap($attributes);
+
+                    return $map->format($this->report->selects);
+                });
+
+                return $results;
             }
 
             return $this->query->get();

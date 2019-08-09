@@ -12,6 +12,6 @@ interface PopulatesReportOption
      *
      * @return Collection
      */
-    public function options(): Collection;
+    public static function options(): Collection;
 
 }

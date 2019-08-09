@@ -3,19 +3,19 @@
 namespace MBLSolutions\Report\Http\Controllers;
 
 use Illuminate\Support\Collection;
-use MBLSolutions\Report\Models\ReportConnection;
+use MBLSolutions\Report\Models\ReportDataType;
 
-class ConnectionController
+class DataTypeController
 {
 
     /**
-     * Get a list of available connections
+     * Get the Report Data Types
      *
      * @return Collection
      */
     public function index(): Collection
     {
-        return (new ReportConnection())->all();
+        return (new ReportDataType)->all();
     }
 
 }

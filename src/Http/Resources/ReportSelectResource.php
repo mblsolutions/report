@@ -4,7 +4,7 @@ namespace MBLSolutions\Report\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use MBLSolutions\Report\Models\ReportSelectType;
+use MBLSolutions\Report\DataType\CastString;
 
 class ReportSelectResource extends JsonResource
 {
@@ -21,7 +21,7 @@ class ReportSelectResource extends JsonResource
             'id' => $this->id,
             'column' => $this->column,
             'alias' => $this->alias,
-            'type' => $this->type ?? ReportSelectType::STRING,
+            'type' => $this->type ?? CastString::class,
             'column_order' => $this->column_order,
             'deleted_at' => $this->deleted_at
         ];

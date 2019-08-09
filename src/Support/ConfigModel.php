@@ -1,24 +1,27 @@
 <?php
 
-namespace MBLSolutions\Report\Models;
+namespace MBLSolutions\Report\Support;
 
 use Illuminate\Support\Collection;
 
-class SelectFieldModel
+abstract class ConfigModel
 {
+    /** @var string $key */
+    protected $key;
+
     /** @var Collection $models */
     protected $models;
 
     /**
-     * Select Field Models
+     * Config Model Instance
      */
     public function __construct()
     {
-        $this->models = collect(config('report.models'));
+        $this->models = collect(config($this->key));
     }
 
     /**
-     * Get all Select Field Models
+     * Get all Config Models
      *
      * @return Collection
      */
@@ -27,7 +30,7 @@ class SelectFieldModel
         $models = $this->models->map(function ($namespace) {
             return [
                 'value' => $namespace,
-                'name' => $this->formatClassName($namespace)
+                'name' => $this->formatName($namespace)
             ];
         });
 
@@ -40,7 +43,7 @@ class SelectFieldModel
      * @param string $namespace
      * @return mixed
      */
-    public function formatClassName(string $namespace)
+    public function formatName(string $namespace)
     {
         $parts = explode('\\', $namespace);
 
