@@ -56,6 +56,16 @@ class Report extends Model
     }
 
     /**
+     * Get the middleware that belong to the report
+     *
+     * @return HasMany
+     */
+    public function middleware(): HasMany
+    {
+        return $this->hasMany(ReportMiddleware::class);
+    }
+
+    /**
      * Should Data be shown on Report
      *
      * @return bool

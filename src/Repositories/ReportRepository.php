@@ -126,6 +126,10 @@ class ReportRepository
             $this->updateOrCreateJoins($report, collect($request->get('joins')));
         }
 
+        if ($request->get('middleware')) {
+            $this->updateOrCreateMiddleware($report, collect($request->get('middleware')));
+        }
+
         return $this;
     }
 
@@ -178,6 +182,22 @@ class ReportRepository
     }
 
     /**
+     * Update/Create Report Joins
+     *
+     * @param Report $report
+     * @param Collection $collection
+     * @return ManageReportRepository
+     */
+    protected function updateOrCreateMiddleware(Report $report, Collection $collection): ManageReportRepository
+    {
+        $collection->each(static function ($data) use ($report) {
+            $report->middleware()->updateOrCreate(['id' => $data['id'] ?? null], $data);
+        });
+
+        return $this;
+    }
+
+    /**
      * Validate Report Request
      *
      * @param Request $request
@@ -215,6 +235,8 @@ class ReportRepository
             'joins.*.first' => 'required|string',
             'joins.*.operator' => 'required|string',
             'joins.*.second' => 'required|string',
+            // Middleware Validation
+            'middleware.*.middleware' => 'required|string'
         ], []);
     }
 

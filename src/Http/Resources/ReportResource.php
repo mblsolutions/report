@@ -2,13 +2,9 @@
 
 namespace MBLSolutions\Report\Http\Resources;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
-use MBLSolutions\Report\Models\ReportField;
-use MBLSolutions\Report\Models\ReportJoin;
-use MBLSolutions\Report\Models\ReportSelect;
 
 class ReportResource extends JsonResource
 {
@@ -38,6 +34,7 @@ class ReportResource extends JsonResource
             'fields' => new ReportFieldCollection($this->getReportFields()),
             'selects' => new ReportSelectCollection($this->getReportSelects()),
             'joins' => new ReportJoinCollection($this->getReportJoins()),
+            'middleware' => new ReportMiddlewareCollection($this->getReportMiddleware()),
             'deleted_at' => $this->deleted_at
         ];
     }
@@ -71,6 +68,16 @@ class ReportResource extends JsonResource
     protected function getReportJoins()
     {
         return $this->joins;
+    }
+
+    /**
+     * Get the Report Middleware
+     *
+     * @return mixed
+     */
+    protected function getReportMiddleware()
+    {
+        return $this->middleware;
     }
 
 }

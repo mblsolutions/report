@@ -94,6 +94,26 @@
                         <div v-if="report.hasError('active')" class="invalid-feedback">{{ report.getError('active') }}</div>
                     </div>
                 </div>
+
+                <hr class="col-xs-12">
+
+                <h3>Report Middleware</h3>
+
+                <div class="form-group" v-for="(middleware, index) in report.middleware">
+
+                    <div class="form-check">
+                        <input :id="'report_middleware_' + middleware.name" type="checkbox" name="report_middleware_" class="form-check-input" v-model="report.data.middleware">
+                        <label class="form-check-label" :for="'report_middleware_' + middleware.name">
+                            {{ middleware.name }}
+                        </label>
+
+                        <!-- TODO add report middleware -->
+
+                        <!--<div v-if="report.hasError('show_data')" class="invalid-feedback">{{ report.getError('show_data') }}</div>-->
+                    </div>
+
+                </div>
+
             </div>
 
             <div class="my-3 p-3 bg-white rounded shadow-sm">

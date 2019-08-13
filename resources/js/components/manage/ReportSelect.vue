@@ -67,12 +67,12 @@
                 }
             },
             types: {
-                type: Array,
+                type: Object,
                 default: function () {
-                    return [];
+                    return {};
                 }
             },
-            'show_add_button': {
+            show_add_button: {
                 type: Boolean,
                 default: false
             }

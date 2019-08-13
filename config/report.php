@@ -52,7 +52,7 @@ return [
     */
 
     'middleware' => [
-        \MBLSolutions\Report\Middleware\HasAuthenticationGate::class
+        \MBLSolutions\Report\Middleware\Authenticated::class,
     ]
 
 ];

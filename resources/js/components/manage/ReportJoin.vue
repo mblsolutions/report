@@ -81,7 +81,7 @@
                     ];
                 }
             },
-            'show_add_button': {
+            show_add_button: {
                 type: Boolean,
                 default: false
             }

@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use MBLSolutions\Report\Http\Resources\ReportResultCollection;
+use MBLSolutions\Report\Interfaces\ReportMiddleware;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportSelect;
@@ -102,6 +103,10 @@ class BuildReportService
             $this->addWhere();
         }
 
+        if ($this->report->middleware) {
+            $this->handleMiddleware();
+        }
+
         if ($this->report->groupby) {
             $this->addGroupBy();
         }
@@ -153,6 +158,22 @@ class BuildReportService
         });
 
         $this->query->whereRaw($this->report->where);
+    }
+
+    /**
+     * Handle Report Middleware
+     *
+     * @return void
+     */
+    public function handleMiddleware(): void
+    {
+        // TODO $this->report->middleware
+        $this->report->middleware->each(function ($reportMiddleware) {
+            /** @var ReportMiddleware $middleware */
+            $middleware = new $reportMiddleware->middleware;
+
+            $this->query = $middleware->handle($this->query);
+        });
     }
 
     /**

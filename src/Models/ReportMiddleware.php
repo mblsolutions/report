@@ -2,10 +2,29 @@
 
 namespace MBLSolutions\Report\Models;
 
-use MBLSolutions\Report\Support\ConfigModel;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ReportMiddleware extends ConfigModel
+class ReportMiddleware extends Model
 {
+    use SoftDeletes;
+
     /** {@inheritDoc} */
-    protected $key = 'report.middleware';
+    protected $table = 'report_middleware';
+
+    /** {@inheritDoc} */
+    protected $guarded = [
+    ];
+
+    /**
+     * Get the Report the middleware belongs to
+     *
+     * @return BelongsTo
+     */
+    public function report(): BelongsTo
+    {
+        return $this->belongsTo(Report::class);
+    }
+
 }
