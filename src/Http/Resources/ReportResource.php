@@ -5,6 +5,8 @@ namespace MBLSolutions\Report\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
+use MBLSolutions\Report\Models\ReportField;
+use MBLSolutions\Report\Models\ReportMiddleware;
 
 class ReportResource extends JsonResource
 {
@@ -46,7 +48,16 @@ class ReportResource extends JsonResource
      */
     protected function getReportFields(): Collection
     {
-        return $this->fields;
+        return $this->fields->reject(function (ReportField $field) {
+
+            // TODO figure this out
+
+            /*$middleware = $this->middleware->filter(function (ReportMiddleware $reportMiddleware) use ($field) {
+                return (new $reportMiddleware->middleware)->field($field) === false;
+            });*/
+
+            //return $middleware->count() > 0;
+        });
     }
 
 
