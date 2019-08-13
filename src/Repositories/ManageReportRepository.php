@@ -70,8 +70,6 @@ class ManageReportRepository
         try {
             DB::beginTransaction();
 
-            logger(json_encode($request->toArray()));
-
             /** @var Report $report */
             $report->update($request->toArray());
 
@@ -121,6 +119,10 @@ class ManageReportRepository
             $this->updateOrCreateJoins($report, collect($request->get('joins')));
         }
 
+        if ($request->get('middleware')) {
+            $this->updateOrCreateMiddleware($report, collect($request->get('middleware')));
+        }
+
         return $this;
     }
 
@@ -167,6 +169,22 @@ class ManageReportRepository
     {
         $collection->each(static function ($data) use ($report) {
             $report->joins()->updateOrCreate(['id' => $data['id'] ?? null], $data);
+        });
+
+        return $this;
+    }
+
+    /**
+     * Update/Create Report Middleware
+     *
+     * @param Report $report
+     * @param Collection $collection
+     * @return ManageReportRepository
+     */
+    protected function updateOrCreateMiddleware(Report $report, Collection $collection): ManageReportRepository
+    {
+        $collection->each(static function ($data) use ($report) {
+            $report->middleware()->updateOrCreate(['id' => $data['id'] ?? null], $data);
         });
 
         return $this;

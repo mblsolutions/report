@@ -15,7 +15,8 @@ class Report extends Model
         'id',
         'fields',
         'selects',
-        'joins'
+        'joins',
+        'middleware'
     ];
 
     protected $casts = [

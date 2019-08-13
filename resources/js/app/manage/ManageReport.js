@@ -185,13 +185,52 @@ export class ManageReport extends Form {
     }
 
     /**
+     * Remove a Report Middleware
+     */
+    removeMiddleware(index) {
+        if (this.data.middleware[index].id) {
+            this.data.middleware[index].deleted_at = ManageReport.getTimestamp();
+        } else {
+            this.data.middleware.splice(index, 1);
+        }
+    }
+
+    /**
+     * Add a new Report Middleware
+     */
+    addNewMiddleware() {
+        return new Promise(resolve => {
+            let id = this.getNextFieldIndex();
+
+            this.data.middleware.push({
+                id: null,
+                middleware: null,
+                deleted_at: null
+            });
+
+            resolve(id);
+        }).then(id => {
+            setTimeout(function() {
+
+                setTimeout(function() {
+                    let element = document.getElementById('report-middleware-' + id);
+
+                    if (element) {
+                        element.scrollIntoView();
+                    }
+                }, 100);
+            }, 100);
+        })
+    }
+
+    /**
      * Remove a Report Field
      */
     removeField(index) {
-    if (this.data.fields[index].id) {
-        this.data.fields[index].deleted_at = ManageReport.getTimestamp();
+        if (this.data.fields[index].id) {
+            this.data.fields[index].deleted_at = ManageReport.getTimestamp();
         } else {
-        this.data.fields.splice(index, 1);
+            this.data.fields.splice(index, 1);
         }
     }
 
@@ -345,6 +384,19 @@ export class ManageReport extends Form {
                 }
             }, 100);
         })
+    }
+
+    /**
+     * Get the Index of Next Middleware
+     *
+     * @return {Number}
+     */
+    getNextMiddlewareIndex() {
+        if (this.data.middleware) {
+            return this.data.middleware.length;
+        }
+
+        return 0;
     }
 
     /**

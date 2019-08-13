@@ -94,25 +94,36 @@
                         <div v-if="report.hasError('active')" class="invalid-feedback">{{ report.getError('active') }}</div>
                     </div>
                 </div>
+            </div>
 
-                <hr class="col-xs-12">
+            <div class="my-3 p-3 bg-white rounded shadow-sm">
+                <h3>
+                    Report Middleware
+                    <button class="btn btn-sm btn-primary pull-right float-right" @click.prevent="addNewReportMiddleware">Add Middleware</button>
+                </h3>
 
-                <h3>Report Middleware</h3>
+                <p class="text-muted">
+                    Middleware provides a way to automatically inject query conditions into a report or intercept a request to render a report.
+                    For example check that a user is authenticated to view the report or check that results shown are owned by the current user.
+                </p>
 
-                <div class="form-group" v-for="(middleware, index) in report.middleware">
-
-                    <div class="form-check">
-                        <input :id="'report_middleware_' + middleware.name" type="checkbox" name="report_middleware_" class="form-check-input" v-model="report.data.middleware">
-                        <label class="form-check-label" :for="'report_middleware_' + middleware.name">
-                            {{ middleware.name }}
-                        </label>
-
-                        <!-- TODO add report middleware -->
-
-                        <!--<div v-if="report.hasError('show_data')" class="invalid-feedback">{{ report.getError('show_data') }}</div>-->
+                <div v-if="report.data.middleware.length > 0">
+                    <div v-for="(middleware, index) in report.data.middleware">
+                        <transition name="fade">
+                            <ReportMiddleware
+                                    :index="index" :show_add_button="isLasMiddleware(index)"
+                                    :middleware="report.middleware"
+                                    v-model="report.data.middleware[index]"
+                                    @remove-middleware="removeReportMiddleware" @add-middleware="addNewReportMiddleware"
+                            ></ReportMiddleware>
+                        </transition>
                     </div>
-
                 </div>
+                <div v-else>
+                    <div class="alert alert-primary" role="alert">
+                        There is no middleware assigned to this report. <a href="#" class="alert-link" @click.prevent="addNewReportMiddleware">Add a Middleware</a>.
+                </div>
+            </div>
 
             </div>
 
@@ -319,6 +330,7 @@
     import ReportField from "./manage/ReportField";
     import ReportSelect from "./manage/ReportSelect";
     import ReportJoin from "./manage/ReportJoin";
+    import ReportMiddleware from "./manage/ReportMiddleware";
 
     export default {
         name: "ManageReport",
@@ -344,7 +356,8 @@
         components: {
             ReportField,
             ReportSelect,
-            ReportJoin
+            ReportJoin,
+            ReportMiddleware
         },
         data() {
             return {
@@ -367,6 +380,22 @@
              */
             hasLoadingSlot() {
                 return !! this.$slots.loading;
+            },
+            /**
+             * Remove Report Middleware
+             */
+            removeReportMiddleware(index) {
+                this.report.removeMiddleware(index);
+
+                this.$emit('remove-report-middleware', index);
+            },
+            /**
+             * Add New Report Middleware
+             */
+            addNewReportMiddleware() {
+                let middleware = this.report.addNewMiddleware();
+
+                this.$emit('remove-report-middleware', middleware);
             },
             /**
              * Remove Report Field
@@ -431,6 +460,14 @@
                 let join = this.report.addNewJoin();
 
                 this.$emit('add-report-join', join);
+            },
+            /**
+             * Check if this is Last Field Row
+             *
+             * @return {Boolean}
+             */
+            isLasMiddleware(index) {
+                return  Number(index + 1) === this.report.getNextMiddlewareIndex()
             },
             /**
              * Check if this is Last Field Row
