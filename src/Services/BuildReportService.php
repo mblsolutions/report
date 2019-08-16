@@ -186,9 +186,14 @@ class BuildReportService
      */
     protected function addWhere(): void
     {
-        $this->parameters->each(function ($value, $field) {
-            $this->report->where = preg_replace("/(\{{$field}\}|\{\{{$field}\}\})/i", "{$value}", $this->report->where);
-        });
+        if ($this->parameters->count() > 0) {
+            $this->parameters->each(function ($value, $field) {
+                // TODO bug where value is an array, need to resolve in testing...
+                if (!is_array($value)) {
+                    $this->report->where = preg_replace("/(\{{$field}\}|\{\{{$field}\}\})/i", $value, $this->report->where);
+                }
+            });
+        }
 
         $this->query->whereRaw($this->report->where);
     }
