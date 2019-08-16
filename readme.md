@@ -52,6 +52,14 @@ To configure custom middleware/guards around report view only routes.
 Report::viewRoutes();
 ```
 
+#### Export Routes
+
+To configure custom middleware/guards around report export result only routes.
+
+```php
+Report::exportRoutes();
+```
+
 ### Applying Custom Middleware/Gates
 
 To apply middleware to the routes, wrap the routes in middleware groups.
@@ -63,6 +71,10 @@ Route::middleware(['admin'])->group(function () {
 
 Route::middleware(['user'])->group(function () {
     Report::viewRoutes();
+});
+
+Route::middleware(['web'])->group(function () {
+    Report::exportRoutes();
 });
 ```
 
@@ -134,10 +146,17 @@ The following endpoints are available to you once the routes have been added:
 | GET       | /api/report                   | report.index              |
 | GET       | /api/report/{report}          | report.show               |
 | POST      | /api/report/{report}          | report.render             |
+| POST      | /report/{report}/export       | report.export             |
 | GET       | /api/report/connection        | report.connection.list    |
 | GET       | /api/report/middleware        | report.middleware.list    |
 | GET       | /api/report/data/type         | report.data.type.list     |
 | GET       | /api/report/model             | report.model.list         |
+
+#### Export Routes
+
+| Method    | URI                           | Name                      |
+| ---       | ---                           | ---                       |
+| GET       | /report/{report}/export       | report.export             |
 
 #### Manage Routes
 

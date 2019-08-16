@@ -2,14 +2,18 @@
 
 namespace MBLSolutions\Report\Http\Controllers;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use MBLSolutions\Report\Http\Resources\ReportCollection;
 use MBLSolutions\Report\Http\Resources\ReportResource;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Repositories\ReportRepository;
 use MBLSolutions\Report\Services\BuildReportService;
+use MBLSolutions\Report\Services\ExportReportService;
 
 class ReportController
 {
@@ -61,6 +65,39 @@ class ReportController
         return $service->render();
     }
 
+    /**
+     * Generate a signed Export URI
+     *
+     * @param Report $report
+     * @param Request $request
+     * @return array
+     */
+    public function generateExport(Report $report, Request $request): array
+    {
+        $params = array_merge(['report' => $report->id, 'uid' => auth()->user()->id], $request->except('signature'));
 
+        return [
+            'uri' => URL::temporarySignedRoute('report.export', Carbon::now()->addHour(), $params)
+        ];
+    }
+
+    /**
+     * Download Report Results
+     *
+     * @param Report $report
+     * @param Request $request
+     * @return mixed
+     */
+    public function export(Report $report, Request $request)
+    {
+        // Check that request has a valid url signature
+        if (!$request->hasValidSignature()) {
+            abort(401);
+        }
+
+        Auth::loginUsingId($request->get('uid'));
+
+        return (new ExportReportService($report, $request))->handle();
+    }
 
 }

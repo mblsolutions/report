@@ -97,15 +97,16 @@ class ManageReportController
     /**
      * Test Report Config
      *
+     * @param Report $report
      * @param Request $request
      * @return mixed
      */
-    public function test(Request $request)
+    public function test(Report $report, Request $request)
     {
         try {
             $start = microtime(true);
 
-            $service = new TestReportService($request);
+            $service = new TestReportService($report, $request->all());
 
             return [
                 'success' => true,

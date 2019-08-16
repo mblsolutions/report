@@ -49,14 +49,11 @@ class ReportResource extends JsonResource
     protected function getReportFields(): Collection
     {
         return $this->fields->reject(function (ReportField $field) {
+            $disabled = $this->middleware->filter(static function (ReportMiddleware $reportMiddleware) use ($field) {
+                return ! (new $reportMiddleware->middleware)->field($field);
+            });
 
-            // TODO figure this out
-
-            /*$middleware = $this->middleware->filter(function (ReportMiddleware $reportMiddleware) use ($field) {
-                return (new $reportMiddleware->middleware)->field($field) === false;
-            });*/
-
-            //return $middleware->count() > 0;
+            return $disabled->count() > 0;
         });
     }
 

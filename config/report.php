@@ -53,6 +53,25 @@ return [
 
     'middleware' => [
         \MBLSolutions\Report\Middleware\Authenticated::class,
-    ]
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Export Drivers
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the export drivers available for export report
+    | results out of the application.
+    |
+    | Drivers: "csv", "print", "json"
+    |
+    | @interface \MBLSolutions\Report\Interfaces\ExportDriver
+    */
+
+    'export_drivers' => [
+        \MBLSolutions\Report\Driver\Export\CsvExport::class,
+        \MBLSolutions\Report\Driver\Export\PrintExport::class,
+        \MBLSolutions\Report\Driver\Export\JsonExport::class,
+    ],
 
 ];

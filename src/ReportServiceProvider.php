@@ -14,6 +14,8 @@ class ReportServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'mbl-report');
+
         // Publish MBL Solutions report config
         $this->publishes([
             __DIR__ . '/../config/report.php' => config_path('report.php'),

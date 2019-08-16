@@ -40,11 +40,11 @@ export class ManageReport extends Form {
 
         return new Promise((resolve, reject) => {
             self.request(action, method)
-                .then(response => {
-                    resolve(response.data);
-                }).catch(error => {
-                    reject(error);
-                });
+            .then(response => {
+                resolve(response.data);
+            }).catch(error => {
+                reject(error);
+            });
         });
     }
 
@@ -53,16 +53,16 @@ export class ManageReport extends Form {
      *
      * @return {Promise}
      */
-    test() {
+    test(id) {
         let self = this;
 
-        return new Promise(resolve => {
-            self.request('/api/report/manage/test', 'post')
-                .then(response => {
-                    resolve(response.data);
-                }).catch(error => {
-                    resolve(error);
-                });
+        return new Promise((resolve, reject) => {
+            self.request('/api/report/manage/' + id + '/test', 'post')
+            .then(response => {
+                resolve(response.data);
+            }).catch(error => {
+                reject(error);
+            });
         });
     }
 
@@ -75,21 +75,23 @@ export class ManageReport extends Form {
     loadSettings() {
         let self = this;
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             self.request('/api/report/manage/settings', 'get')
-                .then(response => {
-                    self.connections = response.data.connections;
-                    self.middleware = response.data.middleware;
-                    self.models = response.data.models;
-                    self.data_types = response.data.data_types;
+            .then(response => {
+                self.connections = response.data.connections;
+                self.middleware = response.data.middleware;
+                self.models = response.data.models;
+                self.data_types = response.data.data_types;
 
-                    resolve([
-                        self.connections,
-                        self.middleware,
-                        self.models,
-                        self.data_types
-                    ]);
-                });
+                resolve([
+                    self.connections,
+                    self.middleware,
+                    self.models,
+                    self.data_types
+                ]);
+            }).catch(error => {
+                reject(error);
+            });
         });
     }
 
@@ -101,13 +103,15 @@ export class ManageReport extends Form {
     loadConnections() {
         let self = this;
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             self.request('/api/report/connection', 'get')
-                .then(response => {
-                    self.connections = response.data;
+            .then(response => {
+                self.connections = response.data;
 
-                    resolve(self.connections);
-                });
+                resolve(self.connections);
+            }).catch(error => {
+                reject(error);
+            });
         });
     }
 
@@ -119,13 +123,15 @@ export class ManageReport extends Form {
     loadMiddleware() {
         let self = this;
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             self.request('/api/report/middleware', 'get')
-                .then(response => {
-                    self.models = response.data;
+            .then(response => {
+                self.models = response.data;
 
-                    resolve(self.models);
-                });
+                resolve(self.models);
+            }).catch(error => {
+                reject(error);
+            });
         });
     }
 
@@ -137,13 +143,15 @@ export class ManageReport extends Form {
     loadSelectTypes() {
         let self = this;
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             self.request('/api/report/data/type', 'get')
-                .then(response => {
-                    self.models = response.data;
+            .then(response => {
+                self.models = response.data;
 
-                    resolve(self.models);
-                });
+                resolve(self.models);
+            }).catch(error => {
+                reject(error);
+            });
         });
     }
 
@@ -155,13 +163,15 @@ export class ManageReport extends Form {
     loadModels() {
         let self = this;
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             self.request('/api/report/model', 'get')
-                .then(response => {
-                    self.models = response.data;
+            .then(response => {
+                self.models = response.data;
 
-                    resolve(self.models);
-                });
+                resolve(self.models);
+            }).catch(error => {
+                reject(error);
+            });
         });
     }
 
@@ -174,13 +184,15 @@ export class ManageReport extends Form {
     loadReport(id) {
         let self = this;
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             self.request('/api/report/manage/' + id, 'get')
-                .then(response => {
-                    self.data = response.data.data;
+            .then(response => {
+                self.data = response.data.data;
 
-                    resolve(self.data);
-                });
+                resolve(self.data);
+            }).catch(error => {
+                reject(error);
+            });
         });
     }
 
@@ -199,7 +211,7 @@ export class ManageReport extends Form {
      * Add a new Report Middleware
      */
     addNewMiddleware() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             let id = this.getNextFieldIndex();
 
             this.data.middleware.push({
@@ -220,7 +232,7 @@ export class ManageReport extends Form {
                     }
                 }, 100);
             }, 100);
-        })
+        });
     }
 
     /**
@@ -238,7 +250,7 @@ export class ManageReport extends Form {
      * Add a new Report Field
      */
     addNewField() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             let id = this.getNextFieldIndex();
 
             this.data.fields.push({
@@ -322,7 +334,7 @@ export class ManageReport extends Form {
      * Add a new Report Select
      */
     addNewSelect() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             let id = this.getNextSelectIndex();
 
             this.data.selects.push({
@@ -361,7 +373,7 @@ export class ManageReport extends Form {
      * Add a new Report Join
      */
     addNewJoin() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             let id = this.getNextJoinIndex();
 
             this.data.joins.push({

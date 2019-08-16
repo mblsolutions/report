@@ -50,4 +50,26 @@ abstract class ConfigModel
         return end($parts);
     }
 
+    /**
+     * Format Class Name
+     *
+     * @param string $namespace
+     * @return string
+     */
+    public function formatClassName(string $namespace): string
+    {
+        if (class_exists($namespace)) {
+            $type = new $namespace;
+
+            if (property_exists($type, 'name')) {
+                return $type->name;
+            }
+        }
+
+        $name = $this->formatName($namespace);
+
+        return implode(' ', preg_split('/(?=[A-Z])/', $name));
+
+    }
+
 }

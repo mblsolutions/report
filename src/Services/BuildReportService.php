@@ -5,9 +5,9 @@ namespace MBLSolutions\Report\Services;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use MBLSolutions\Report\Http\Resources\ReportResultCollection;
 use MBLSolutions\Report\Interfaces\ReportMiddleware;
 use MBLSolutions\Report\Models\Report;
+use MBLSolutions\Report\Models\ReportExportDrivers;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportSelect;
 use MBLSolutions\Report\Support\Maps\ReportResultMap;
@@ -54,6 +54,7 @@ class BuildReportService
             'headings' => $this->headings(),
             'data' => $this->data(),
             'totals' => $this->totals(),
+            'drivers' => $this->exportDrivers(),
             'raw' => $this->getRawQuery()
         ]);
     }
@@ -69,6 +70,18 @@ class BuildReportService
     }
 
     /**
+     * Get available Export Drivers
+     *
+     * @return Collection
+     */
+    protected function exportDrivers(): Collection
+    {
+        $drivers = new ReportExportDrivers();
+
+        return $drivers->all();
+    }
+
+    /**
      * Get Report Headings
      *
      * @return Collection
@@ -80,6 +93,26 @@ class BuildReportService
         }
 
         return $this->headings;
+    }
+
+    /**
+     * Get Report Selects
+     *
+     * @return Collection
+     */
+    public function selects(): Collection
+    {
+        return $this->report->selects;
+    }
+
+    /**
+     * Get Report Query
+     *
+     * @return Builder
+     */
+    public function query(): Builder
+    {
+        return $this->query;
     }
 
     /**
@@ -165,9 +198,8 @@ class BuildReportService
      *
      * @return void
      */
-    public function handleMiddleware(): void
+    protected function handleMiddleware(): void
     {
-        // TODO $this->report->middleware
         $this->report->middleware->each(function ($reportMiddleware) {
             /** @var ReportMiddleware $middleware */
             $middleware = new $reportMiddleware->middleware;
@@ -181,7 +213,7 @@ class BuildReportService
      *
      * @return void
      */
-    public function addGroupBy(): void
+    protected function addGroupBy(): void
     {
         $this->query->groupBy(DB::raw($this->report->groupby));
     }
@@ -191,7 +223,7 @@ class BuildReportService
      *
      * @return void
      */
-    public function addHaving(): void
+    protected function addHaving(): void
     {
         $this->query->havingRaw($this->report->having);
     }

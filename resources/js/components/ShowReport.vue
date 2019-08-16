@@ -65,7 +65,10 @@
              * @param results
              */
             reportRendered(results) {
-                this.$emit('render-show-report', results);
+                this.$emit('render-show-report', {
+                    results: results,
+                    params: this.report.data
+                });
             },
             /**
              * Submit Report Render

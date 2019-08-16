@@ -20,25 +20,11 @@ class ReportMiddlewareOptions extends ConfigModel
         $models = $this->models->map(function ($namespace) {
             return [
                 'value' => $namespace,
-                'name' => $this->formatName($namespace)
+                'name' => $this->formatClassName($namespace)
             ];
         });
 
         return $models->sortBy('name');
-    }
-
-    /**
-     * Format Name
-     *
-     * @param string $namespace
-     * @return string
-     */
-    public function formatName(string $namespace): string
-    {
-        $name = parent::formatName($namespace);
-
-        return implode(' ', preg_split('/(?=[A-Z])/', $name));
-
     }
 
 }

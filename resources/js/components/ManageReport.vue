@@ -309,10 +309,10 @@
 
                 <div class="form-group">
                     <button class="btn btn-primary" @click.prevent="submitReport">
-                        Submit Report
+                        Save Report
                     </button>
                     <button class="btn btn-success" @click.prevent="testReport">
-                        Test Report
+                        Save and Test Report
                     </button>
                 </div>
             </div>
@@ -496,15 +496,21 @@
             /**
              * Submit Report
              */
-            submitReport() {
+            submitReport(redirect = true) {
                 let vm = this;
 
-                vm.report.submit(vm.action, vm.method).then(result => {
-                    vm.$emit('report-submitted', result);
+                return new Promise((resolve, reject) => {
+                    vm.report.submit(vm.action, vm.method).then(result => {
+                        vm.$emit('report-submitted', result);
 
-                    window.location.href = this.redirect_location;
-                }).catch(error => {
-                    console.error(error)
+                        if (redirect) {
+                            window.location.href = this.redirect_location;
+                        }
+
+                        resolve(result.data);
+                    }).catch(error => {
+                        vm.$emit('submit-report-error', error);
+                    });
                 });
             },
             /**
@@ -513,8 +519,13 @@
             testReport() {
                 let vm = this;
 
-                vm.report.test().then(result => {
-                    vm.$emit('report-test-results', result);
+                this.submitReport(false).then(report => {
+
+                    vm.report.test(report.id).then(result => {
+                        vm.$emit('report-test-results', result);
+                    }).catch(error => {
+                        vm.$emit('test-report-error', error);
+                    });
                 });
             },
             /**
@@ -555,14 +566,17 @@
             let vm = this;
 
             new Promise((resolve) => {
-
                 vm.report = new ManageReport();
 
-                vm.report.load(vm.id).then(response => {
+                vm.report.load(vm.id).then(() => {
                     resolve(true);
+                }).catch(error => {
+                    vm.$emit('load-report-error', error);
                 });
             }).then(report => {
                 vm.loaded = true;
+            }).catch(error => {
+                vm.$emit('manage-report-error', error);
             });
         }
     }

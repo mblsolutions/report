@@ -3,25 +3,11 @@
 namespace MBLSolutions\Report\Services;
 
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use MBLSolutions\Report\Exceptions\RenderReportException;
-use MBLSolutions\Report\Models\Report;
 
 class TestReportService extends BuildReportService
 {
-
-    /**
-     * Create a new Test Report Service Instance
-     *
-     * @param Request $request
-     */
-    public function __construct(Request $request)
-    {
-        $report = new Report($request->except('selects', 'joins', 'fields'));
-
-        parent::__construct($report);
-    }
 
     /**
      * Run the Report
