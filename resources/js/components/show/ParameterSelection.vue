@@ -13,7 +13,7 @@
                     </select>
                 </div>
                 <div v-else>
-                    <input :id="'field_' + field.alias" :type="field.type" :name="field.alias" class="form-control" :placeholder="field.label">
+                    <input :id="'field_' + field.alias" :type="field.type" :name="field.alias" class="form-control" :placeholder="field.label" v-model="data.data[field.alias]">
                 </div>
             </div>
 

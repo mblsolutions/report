@@ -144,7 +144,7 @@
                             <ReportField
                                     :index="index" :show_add_button="isLastField(index)"
                                     :models="report.models"
-                                    v-model="report.data.fields[index]"
+                                    v-model="report"
                                     @remove-field="removeReportField" @add-field="addNewReportField"
                             ></ReportField>
                         </transition>

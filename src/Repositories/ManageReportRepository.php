@@ -215,9 +215,9 @@ class ManageReportRepository
             'fields.*.label' => 'required|string',
             'fields.*.alias' => 'required|string',
             'fields.*.type' => 'required|string',
-            'fields.*.model' => 'nullable|string',
-            'fields.*.model_select_name' => 'nullable|string',
-            'fields.*.model_select_value' => 'nullable|string',
+            'fields.*.model' => 'required_if:fields.*.type,select',
+            'fields.*.model_select_name' => 'required_if:fields.*.type,select',
+            'fields.*.model_select_value' => 'required_if:fields.*.type,select',
             // Selects Validation
             'selects.*.column' => 'required|string',
             'selects.*.alias' => 'required|string',

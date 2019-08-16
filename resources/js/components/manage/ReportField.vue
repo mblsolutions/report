@@ -4,7 +4,7 @@
         <hr class="col-xs-12">
 
         <h4>
-            {{ fieldLabel }} <span class="badge badge-primary"><small>#</small>{{ (index + 1) }}</span>
+            {{ fieldLabel }} <span class="badge badge-primary"><small>#</small></span>
             <div class="pull-right float-right">
                 <button class="btn btn-sm btn-danger mr-2" @click.prevent="removeField(index)">Remove Field</button>
                 <button v-if="show_add_button" class="btn btn-sm btn-success" @click.prevent="addField">Add Field</button>
@@ -12,29 +12,35 @@
         </h4>
 
         <div class="form-group">
-            <label for="field_label">Field Label</label>
-            <input id="field_label" type="text" name="label" class="form-control" placeholder="Label" v-model="data.label">
+            <label for="field_label">Field Label {{ index }}</label>
+            <input id="field_label" type="text" name="label" class="form-control" :class="{ 'is-invalid': report.hasError('label', index, 'fields') }" placeholder="Label" v-model="data.label">
+
+            <div v-if="report.hasError('label', index, 'fields')" class="invalid-feedback">{{ report.getError('label', index, 'fields') }}</div>
         </div>
 
         <div class="row">
             <div class="col-xs-12 col-md-6">
                 <div class="form-group">
                     <label for="criteria_alias">Criteria Alias</label>
-                    <input id="criteria_alias" type="text" name="alias" class="form-control" placeholder="Criteria Alias" v-model="data.alias">
+                    <input id="criteria_alias" type="text" name="alias" :class="{ 'is-invalid': report.hasError('alias', index, 'fields') }" class="form-control" placeholder="Criteria Alias" v-model="data.alias">
 
                     <small class="text-muted">
                         The Criteria Alias <i>start_date</i> could be used in the query builder
                         to filter users created after the specified date e.g. <code>users.created_at >= <b>&#123;start_date&#125;</b></code>
                     </small>
+
+                    <div v-if="report.hasError('alias', index, 'fields')" class="invalid-feedback">{{ report.getError('alias', index, 'fields') }}</div>
                 </div>
             </div>
 
             <div class="col-xs-12 col-md-6">
                 <div class="form-group">
                     <label for="criteria_type">Criteria Type</label>
-                    <select name="type" id="criteria_type" class="form-control" v-model="data.type">
+                    <select name="type" id="criteria_type" class="form-control" :class="{ 'is-invalid': report.hasError('type', index, 'fields') }" v-model="data.type">
                         <option :value="type.value" v-for="type in types">{{ type.name }}</option>
                     </select>
+
+                    <div v-if="report.hasError('type', index, 'fields')" class="invalid-feedback">{{ report.getError('type', index, 'fields') }}</div>
                 </div>
             </div>
         </div>
@@ -49,33 +55,39 @@
                 </small>
 
                 <div class="form-group">
-                    <label for="model">Model</label>
-                    <select name="type" id="model" class="form-control" v-model="data.model">
+                    <label for="report_model">Model</label>
+                    <select name="model" id="report_model" class="form-control" :class="{ 'is-invalid': report.hasError('model', index, 'fields') }" v-model="data.model">
                         <option :value="null">Select Model</option>
                         <option :value="model.value" v-for="model in models">{{ model.name }}</option>
                     </select>
+
+                    <div v-if="report.hasError('model', index, 'fields')" class="invalid-feedback">{{ report.getError('model', index, 'fields') }}</div>
                 </div>
 
                 <div class="row">
                     <div class="col-xs-12 col-md-6">
                         <div class="form-group">
                             <label for="model_select_value">Value </label>
-                            <input id="model_select_value" type="text" name="model_select_value" class="form-control" placeholder="Select Value" v-model="data.model_select_value">
+                            <input id="model_select_value" type="text" name="model_select_value" class="form-control" :class="{ 'is-invalid': report.hasError('model_select_value', index, 'fields') }" placeholder="Select Value" v-model="data.model_select_value">
 
                             <small class="text-muted">
                                 The attribute on the model use for the selects value e.g. <code><b>`id`</b> on the <b>Users</b> model</code>
                             </small>
+
+                            <div v-if="report.hasError('model_select_value', index, 'fields')" class="invalid-feedback">{{ report.getError('model_select_value', index, 'fields') }}</div>
                         </div>
                     </div>
 
                     <div class="col-xs-12 col-md-6">
                         <div class="form-group">
                             <label for="model_select_name">Select Name</label>
-                            <input id="model_select_name" type="text" name="model_select_name" class="form-control" placeholder="Select Name" v-model="data.model_select_name">
+                            <input id="model_select_name" type="text" name="model_select_name" class="form-control" :class="{ 'is-invalid': report.hasError('model_select_name', index, 'fields') }" placeholder="Select Name" v-model="data.model_select_name">
 
                             <small class="text-muted">
                                 The attribute on the model use for the selects value e.g. <code><b>`name`</b> on the <b>Users</b> model</code>
                             </small>
+
+                            <div v-if="report.hasError('model_select_name', index, 'fields')" class="invalid-feedback">{{ report.getError('model_select_name', index, 'fields') }}</div>
                         </div>
                     </div>
                 </div>
@@ -127,6 +139,7 @@
         data() {
             return {
                 data: null,
+                report: null,
                 loaded: false
             }
         },
@@ -159,11 +172,14 @@
             }
         },
         mounted() {
+            let self = this;
+
             new Promise(resolve => {
-                this.data = this.value;
+                self.report = self.value;
+                self.data = self.value.data.fields[self.index];
                 resolve(true);
             }).then(response => {
-                this.loaded = response;
+                self.loaded = response;
             });
         }
     }

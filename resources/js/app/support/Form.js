@@ -69,9 +69,16 @@ export class Form {
      * Check if Form has Error
      *
      * @param key
+     * @param index
+     * @param pre_key
      * @return {boolean}
      */
-    hasError(key) {
+    hasError(key, index = null, pre_key = null) {
+
+        if (index !== null && pre_key !== null) {
+            key = pre_key + '.' + index + '.' + key;
+        }
+
         return this.error.exists(key);
     }
 
@@ -79,9 +86,16 @@ export class Form {
      * Get Error
      *
      * @param key
+     * @param index
+     * @param pre_key
      * @return {boolean|string}
      */
-    getError(key) {
+    getError(key, index = null, pre_key = null) {
+
+        if (index !== null && pre_key !== null) {
+            key = pre_key + '.' + index + '.' + key;
+        }
+
         return this.error.get(key);
     }
 
