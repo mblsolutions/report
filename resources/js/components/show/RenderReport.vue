@@ -89,19 +89,22 @@
              * @return {string}
              */
             getParameterName(index, value) {
+                try {
+                    let field = this.data.report.fields[index];
+                    let alias_key = field.model_select_value;
 
-                let field = this.data.report.fields[index];
-                let alias_key = field.model_select_value;
+                    let name = Object.keys(field.options).find(function (key) {
+                        return field.options[key][alias_key] == value;
+                    });
 
-                let name = Object.keys(field.options).find(function (key) {
-                    return field.options[key][alias_key] == value;
-                });
+                    if (name) {
+                        return field.options[name][field.model_select_name];
+                    }
 
-                if (name) {
-                    return field.options[name][field.model_select_name];
+                    return '-';
+                } catch (error) {
+                    return value;
                 }
-
-                return '-';
             },
             /**
              * Reset Report Parameters
