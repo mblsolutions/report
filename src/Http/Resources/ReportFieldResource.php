@@ -27,7 +27,9 @@ class ReportFieldResource extends JsonResource
             'model_select_value' => $this->model_select_value,
             'model_select_name' => $this->model_select_name,
             'deleted_at' => $this->deleted_at,
-            'options' => $this->getOptions(new $this->model)
+            'options' => $this->when($this->model, function () {
+                return $this->getOptions(new $this->model);
+            })
         ];
     }
 
