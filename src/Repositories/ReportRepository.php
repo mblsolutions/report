@@ -88,5 +88,4 @@ class ReportRepository extends ManageReportRepository
         return $report->fresh();
     }
 
-
 }

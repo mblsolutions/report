@@ -113,7 +113,7 @@
                             <ReportMiddleware
                                     :index="index" :show_add_button="isLasMiddleware(index)"
                                     :middleware="report.middleware"
-                                    v-model="report.data.middleware[index]"
+                                    v-model="report"
                                     @remove-middleware="removeReportMiddleware" @add-middleware="addNewReportMiddleware"
                             ></ReportMiddleware>
                         </transition>
@@ -180,7 +180,7 @@
                         <transition name="fade">
                             <ReportSelect
                                     :key="select.id ? select.id : select" :index="index" :show_add_button="isLastSelect(index)"
-                                    :types="report.data_types" v-model="report.data.selects[index]"
+                                    :types="report.data_types" v-model="report"
                                     @move-select-up="moveReportSelectUp" @move-select-down="moveReportSelectDown"
                                     @remove-select="removeReportSelect" @add-select="addNewReportSelect"
                             ></ReportSelect>
@@ -226,7 +226,7 @@
                         <transition name="fade">
                             <ReportJoin
                                     :index="index" :show_add_button="isLastJoin(index)"
-                                    v-model="report.data.joins[index]"
+                                    v-model="report"
                                     @remove-join="removeReportJoin" @add-join="addNewReportJoin"
                             ></ReportJoin>
                         </transition>

@@ -15,10 +15,12 @@
         <div class="form-group">
             <div class="form-group">
                 <label for="column_type">Middleware</label>
-                <select name="type" id="column_type" class="form-control" v-model="data.middleware">
+                <select name="type" id="column_type" class="form-control" :class="{ 'is-invalid': report.hasError('middleware', index, 'middleware') }" v-model="data.middleware">
                     <option :value="null">Select Middleware</option>
                     <option :value="object.value" v-for="object in middleware">{{ object.name }}</option>
                 </select>
+
+                <div v-if="report.hasError('middleware', index, 'middleware')" class="invalid-feedback">{{ report.getError('middleware', index, 'middleware') }}</div>
             </div>
         </div>
 
@@ -53,6 +55,7 @@
         data() {
             return {
                 data: null,
+                report: null,
                 loaded: false
             }
         },
@@ -91,11 +94,15 @@
             }
         },
         mounted() {
+            let vm = this;
+
             new Promise(resolve => {
-                this.data = this.value;
+                vm.report = vm.value;
+                vm.data = vm.value.data.middleware[vm.index];
+
                 resolve(true);
             }).then(response => {
-                this.loaded = response;
+                vm.loaded = response;
             });
         }
     }

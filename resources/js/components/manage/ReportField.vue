@@ -172,14 +172,14 @@
             }
         },
         mounted() {
-            let self = this;
+            let vm = this;
 
             new Promise(resolve => {
-                self.report = self.value;
-                self.data = self.value.data.fields[self.index];
+                vm.report = vm.value;
+                vm.data = vm.value.data.fields[vm.index];
                 resolve(true);
             }).then(response => {
-                self.loaded = response;
+                vm.loaded = response;
             });
         }
     }

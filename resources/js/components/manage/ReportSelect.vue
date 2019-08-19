@@ -13,24 +13,30 @@
 
         <div class="form-group">
             <label for="select_column">Select Column</label>
-            <input id="select_column" type="text" name="column" class="form-control" placeholder="Select Column (e.g. users.name)" v-model="data.column">
+            <input id="select_column" type="text" name="column" class="form-control" :class="{ 'is-invalid': report.hasError('column', index, 'selects') }" placeholder="Select Column (e.g. users.name)" v-model="data.column">
+
+            <div v-if="report.hasError('column', index, 'selects')" class="invalid-feedback">{{ report.getError('column', index, 'selects') }}</div>
         </div>
 
         <div class="row">
             <div class="col-xs-12 col-md-5">
                 <div class="form-group">
                     <label for="column_alias">Column Alias</label>
-                    <input id="column_alias" type="text" name="alias" class="form-control" placeholder="Column Alias (e.g. Name)" v-model="data.alias">
+                    <input id="column_alias" type="text" name="alias" class="form-control" :class="{ 'is-invalid': report.hasError('alias', index, 'selects') }" placeholder="Column Alias (e.g. Name)" v-model="data.alias">
+
+                    <div v-if="report.hasError('alias', index, 'selects')" class="invalid-feedback">{{ report.getError('alias', index, 'selects') }}</div>
                 </div>
             </div>
             <div class="col-8 col-xs-8 col-md-4">
                 <div class="form-group">
                     <div class="form-group">
                         <label for="column_type">Column Type</label>
-                        <select name="type" id="column_type" class="form-control" v-model="data.type">
+                        <select name="type" id="column_type" class="form-control" :class="{ 'is-invalid': report.hasError('type', index, 'selects') }" v-model="data.type">
                             <option :value="null">Select Column Type</option>
                             <option :value="type.value" v-for="type in types">{{ type.name }}</option>
                         </select>
+
+                        <div v-if="report.hasError('type', index, 'selects')" class="invalid-feedback">{{ report.getError('type', index, 'selects') }}</div>
                     </div>
                 </div>
             </div>
@@ -80,6 +86,7 @@
         data() {
             return {
                 data: null,
+                report: null,
                 loaded: false
             }
         },
@@ -124,14 +131,17 @@
             }
         },
         mounted() {
-            new Promise(resolve => {
-                this.data = this.value;
+            let vm = this;
 
-                this.data.column_order = this.index;
+            new Promise(resolve => {
+                vm.report = vm.value;
+                vm.data = vm.value.data.selects[vm.index];
+
+                vm.data.column_order = vm.index;
 
                 resolve(true);
             }).then(response => {
-                this.loaded = response;
+                vm.loaded = response;
             });
         }
     }
