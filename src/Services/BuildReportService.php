@@ -190,12 +190,31 @@ class BuildReportService
             $this->parameters->each(function ($value, $field) {
                 // TODO bug where value is an array, need to resolve in testing...
                 if (!is_array($value)) {
-                    $this->report->where = preg_replace("/(\{{$field}\}|\{\{{$field}\}\})/i", $value, $this->report->where);
+                    $this->report->where = $this->replaceParameter($field, $value, $this->report->where);
                 }
             });
         }
 
-        $this->query->whereRaw($this->report->where);
+        if ($this->report->where) {
+            $this->query->whereRaw($this->report->where);
+        }
+    }
+
+    /**
+     * Replace Field Parameters
+     *
+     * @param string $field
+     * @param $value
+     * @param $subject
+     * @return string|string[]|null
+     */
+    public function replaceParameter(string $field, $value, $subject)
+    {
+        if ($value === null) {
+            return preg_replace("/(([a-z.]+)\s(=)\s(\'?)(\{{$field}\})(\'?))/i", null, $subject);
+        }
+
+        return preg_replace("/(\{{$field}\}|\{\{{$field}\}\})/i", $value, $subject);
     }
 
     /**

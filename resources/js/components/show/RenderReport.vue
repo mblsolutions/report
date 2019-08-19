@@ -1,7 +1,18 @@
 <template>
     <div id="render-report">
 
-        <div v-if="loaded">
+        <div id="report-result-error" class="col-12 col-xs-12" v-if="error">
+            <div class="text-center">
+                <h1>Report Error</h1>
+                <p class="text-muted">
+                    An error occurred while rendering report, please contact support.
+                </p>
+                <p class="code-block" v-if="error.response">
+                    <code>{{ error.response.message }}</code>
+                </p>
+            </div>
+        </div>
+        <div v-else-if="loaded">
 
             <div id="report-parameters" class="col-12 col-xs-12 offset-md-6 col-md-6" v-if="data.report.fields.length > 0">
                 <table class="table table-sm table-striped">
@@ -79,6 +90,7 @@
             return {
                 data: null,
                 page: 1,
+                error: false,
                 loaded: false
             }
         },
@@ -134,6 +146,9 @@
 
                         vm.loaded = true;
                     });
+                }).catch(error => {
+                    vm.error = error;
+                    vm.$emit('report-render-error', error);
                 })
             },
             /**
@@ -157,21 +172,29 @@
 
                         vm.loaded = true;
                    });
+                }).catch(error => {
+                    vm.error = error;
+                    vm.$emit('report-render-error', error);
                 })
             }
         },
         mounted() {
             let vm = this;
 
-            new Promise(resolve => {
+            new Promise((resolve, reject) => {
                 vm.data = vm.value;
 
                 vm.data.render(vm.data.report.id, vm.page).then(results => {
                     vm.$emit('report-rendered', results);
                     resolve(true);
+                }).catch(error => {
+                    reject(error);
                 });
             }).then(response => {
                 vm.loaded = response;
+            }).catch(error => {
+                vm.error = error;
+                vm.$emit('report-render-error', error);
             });
         }
     }

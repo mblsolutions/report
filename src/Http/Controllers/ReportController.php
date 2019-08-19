@@ -2,8 +2,10 @@
 
 namespace MBLSolutions\Report\Http\Controllers;
 
+use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -56,9 +58,9 @@ class ReportController
      *
      * @param Report $report
      * @param Request $request
-     * @return Collection
+     * @return mixed
      */
-    public function render(Report $report, Request $request): Collection
+    public function render(Report $report, Request $request)
     {
         $service = new BuildReportService($report, $request->toArray());
 

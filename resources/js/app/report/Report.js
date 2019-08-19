@@ -17,12 +17,12 @@ export class Report extends Form {
     index() {
         let self = this;
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             self.request('/api/report', 'get')
                 .then(response => {
                     resolve(response.data);
                 }).catch(error => {
-                    resolve(error);
+                    reject(error);
                 });
         });
 
@@ -36,15 +36,15 @@ export class Report extends Form {
     getReport(id) {
         let self = this;
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             self.request('/api/report/' + id, 'get')
                 .then(response => {
                     self.report = response.data.data;
 
                     resolve(self.report);
                 }).catch(error => {
-                resolve(error);
-            });
+                    reject(error);
+                });
         })
     }
 
@@ -58,15 +58,15 @@ export class Report extends Form {
 
         self.results = [];
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             self.request('/api/report/' + id + '?page=' + page, 'post')
                 .then(response => {
                     self.results = response.data;
 
                     resolve(self.results);
                 }).catch(error => {
-                resolve(error);
-            });
+                    reject(error);
+                });
         });
     }
 
