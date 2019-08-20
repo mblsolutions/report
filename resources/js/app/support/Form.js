@@ -20,7 +20,7 @@ export class Form {
      *
      * @return Promise
      */
-    request(action, method) {
+    request(action, method, params = null) {
         let self = this;
 
         return new Promise((resolve, reject) => {
@@ -30,7 +30,7 @@ export class Form {
             axios({
                 url: action,
                 method: method,
-                data: self.data,
+                data: params ? params : self.data,
                 headers: {
                     'Accept': 'application/json'
                 }

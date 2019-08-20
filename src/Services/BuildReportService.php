@@ -195,9 +195,30 @@ class BuildReportService
             });
         }
 
-        if ($this->report->where) {
-            $this->query->whereRaw($this->report->where);
+        if ($this->checkWhereIsNotEmpty()) {
+            $this->query->whereRaw($this->cleanWhereSyntax());
         }
+    }
+
+    /**
+     * Check if where statement is not empty
+     *
+     * @return bool
+     */
+    public function checkWhereIsNotEmpty(): bool
+    {
+        return !empty(preg_replace('/\s+/', '', $this->report->where));
+    }
+
+    /**
+     * Clean Where syntax, removing keywords post replacement
+     * .e.g WHERE AND users.id = 1
+     *
+     * @return string
+     */
+    public function cleanWhereSyntax(): string
+    {
+        return preg_replace('/\A(\s*)(AND)|(OR)/i', '', $this->report->where, 1);
     }
 
     /**
@@ -210,8 +231,8 @@ class BuildReportService
      */
     public function replaceParameter(string $field, $value, $subject)
     {
-        if ($value === null) {
-            return preg_replace("/(([a-z.]+)\s(=)\s(\'?)(\{{$field}\})(\'?))/i", null, $subject);
+        if ($value == null) {
+            return preg_replace("/((AND\s*)?([a-z._]+)\s(>=|<=|=|<|>|!=|<>)\s(\\'?)(\{{$field}\})(\\'?)?)/", null, $subject);
         }
 
         return preg_replace("/(\{{$field}\}|\{\{{$field}\}\})/i", $value, $subject);
@@ -271,10 +292,10 @@ class BuildReportService
     private function buildJoin(ReportJoin $join): void
     {
         switch ($join->type) {
-            case 'left':
+            case 'left_join':
                 $this->query->leftJoin($join->table, $join->first, $join->operator, $join->second);
                 break;
-            case 'right':
+            case 'right_join':
                 $this->query->rightJoin($join->table, $join->first, $join->operator, $join->second);
                 break;
             default:

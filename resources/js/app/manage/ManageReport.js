@@ -56,6 +56,8 @@ export class ManageReport extends Form {
     test(id) {
         let self = this;
 
+        console.log(this.data.selects);
+
         return new Promise((resolve, reject) => {
             self.request('/api/report/manage/' + id + '/test', 'post')
             .then(response => {
