@@ -55,11 +55,16 @@ export class ManageReport extends Form {
      */
     test(id) {
         let self = this;
+        let params = {};
 
-        console.log(this.data.selects);
+        for (let i = 0; i < this.data.fields.length; i++) {
+            if (this.data.fields[i].alias) {
+                params[this.data.fields[i].alias] = null;
+            }
+        }
 
         return new Promise((resolve, reject) => {
-            self.request('/api/report/manage/' + id + '/test', 'post')
+            self.request('/api/report/manage/' + id + '/test', 'post', params)
             .then(response => {
                 resolve(response.data);
             }).catch(error => {
