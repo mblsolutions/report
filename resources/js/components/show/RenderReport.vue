@@ -35,9 +35,9 @@
                 </table>
             </div>
 
-            <div id="report-results" class="col-12 col-xs-12">
+            <div id="report-results" class="col-12 col-xs-12" v-if="data.results && data.results.length > 0">
                 <div class="table-responsive report-results-table">
-                    <table class="table table-sm table-striped table-hover" :key="page">
+                    <table class="table table-sm table-striped table-hover" :key="page" >
                         <thead>
                         <tr>
                             <th scope="col" v-for="column in data.results.headings">
@@ -54,6 +54,14 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <div class="index-no-results p-5 align-self-center text-center">
+                <h4 class="text-primary">No Results</h4>
+                <p class="text-muted">
+                    This report generated no results.
+                    <span v-if="data.report.fields.length > 0">Try adjusting your <a href="#" @click.prevent="resetParameters">report parameters</a>.</span>
+                </p>
             </div>
 
             <hr class="col-xs col-xs-12">
