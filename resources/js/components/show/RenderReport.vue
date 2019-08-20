@@ -35,7 +35,7 @@
                 </table>
             </div>
 
-            <div id="report-results" class="col-12 col-xs-12" v-if="data.results && data.results.length > 0">
+            <div id="report-results" class="col-12 col-xs-12" v-if="data.results && data.results.data.total > 0">
                 <div class="table-responsive report-results-table">
                     <table class="table table-sm table-striped table-hover" :key="page" >
                         <thead>
@@ -56,7 +56,7 @@
                 </div>
             </div>
 
-            <div class="index-no-results p-5 align-self-center text-center">
+            <div class="index-no-results p-5 align-self-center text-center" v-else>
                 <h4 class="text-primary">No Results</h4>
                 <p class="text-muted">
                     This report generated no results.

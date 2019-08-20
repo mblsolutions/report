@@ -112,7 +112,7 @@ const app = new Vue({
     components: {
         // MBL Solutions Report Package components
         'mbl-manage-report': require('./report/components/ManageReport').default,
-        'mbl-view-report': require('./report/components/ViewReport').default
+        'mbl-show-report': require('./report/components/ShowReport').default
     }
 });
 ```
