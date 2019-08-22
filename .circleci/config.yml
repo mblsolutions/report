@@ -1,0 +1,81 @@
+defaults: &defaults
+  parallelism: 1
+  working_directory: ~/report
+  docker:
+    - image: circleci/php:7.2-node-browsers
+
+version: 2
+jobs:
+  BuildEnvironment:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: mkdir -p workspace
+      # Install Linux and PHP Packages
+      - run:
+          name: Install Linux Packages
+          command: sudo apt install -y libsqlite3-dev zlib1g-dev libpng-dev
+      - run:
+          name: Install PHP Extensions
+          command: sudo docker-php-ext-install bcmath gd zip
+      # Install Composer Dependencies
+      - run:
+          name: Update Composer
+          command: sudo composer self-update > composer-update
+      - restore_cache:
+          keys:
+            - composer-v1-{{ checksum "composer.lock" }}
+            - composer-v1-
+      - run:
+          name: Install Composer Dependencies
+          command: composer install -n --prefer-dist --ignore-platform-reqs > composer-vendor
+      - save_cache:
+          key: composer-v1-{{ checksum "composer.lock" }}
+          paths:
+            - vendor
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
+          # taken to be the root directory of the workspace.
+          root: ~/report
+          # Must be relative path from root
+          paths:
+            - composer-update
+            - composer-vendor
+  UnitTests:
+    <<: *defaults
+    steps:
+      - checkout
+      # Install Linux and PHP Packages
+      - run:
+          name: Install Linux Packages
+          command: sudo apt install -y libsqlite3-dev zlib1g-dev libpng-dev
+      - run:
+          name: Install PHP Extensions
+          command: sudo docker-php-ext-install bcmath gd zip
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: ~/report
+      # Restore
+      - restore_cache:
+          keys:
+            - composer-v1-{{ checksum "composer.lock" }}
+            - composer-v1-
+      # Configure application
+      - run:
+          name: Setup SQLite Database
+          command: touch storage/testing.sqlite
+      - run:
+          name: Setup PHPUnit coverage folder
+          command: mkdir -p ~/phpunit
+      - run:
+          name: Run PHPUnit Feature Tests
+          command: php ./vendor/bin/phpunit --log-junit ~/phpunit/junit.xml
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - BuildEnvironment
+      - UnitTests:
+          requires:
+            - BuildEnvironment
