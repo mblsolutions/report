@@ -61,9 +61,9 @@ jobs:
             - composer-v1-{{ checksum "composer.lock" }}
             - composer-v1-
       # Configure application
-      - run:
-          name: Setup SQLite Database
-          command: touch storage/testing.sqlite
+      #- run:
+          #name: Setup SQLite Database
+          #command: touch storage/testing.sqlite
       - run:
           name: Setup PHPUnit coverage folder
           command: mkdir -p ~/phpunit
