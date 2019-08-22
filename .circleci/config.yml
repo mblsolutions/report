@@ -22,10 +22,6 @@ jobs:
       - run:
           name: Update Composer
           command: sudo composer self-update > composer-update
-      - restore_cache:
-          keys:
-            - composer-v1-{{ checksum "composer.lock" }}
-            - composer-v1-
       - run:
           name: Install Composer Dependencies
           command: composer install -n --prefer-dist --ignore-platform-reqs > composer-vendor
