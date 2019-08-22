@@ -1,8 +1,8 @@
 # MBL Solutions Report
 
-|Branch|master|
+|Branch|Build Status|
 |---|---|
-|Live|[![CircleCI](https://circleci.com/gh/mblsolutions/report/tree/master.svg?style=svg)](https://circleci.com/gh/mblsolutions/report/tree/master)|
+|master|[![CircleCI](https://circleci.com/gh/mblsolutions/report.svg?style=svg&circle-token=bd1594c46eeb017633ca0a4bc4d86f4ac637987b)](https://circleci.com/gh/mblsolutions/report)|
 
 Import MBL Solutions Reporting into any Laravel 5+ application using this package.
 
