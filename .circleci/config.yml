@@ -35,16 +35,11 @@ jobs:
       - run:
           name: Install PHP Extensions
           command: sudo docker-php-ext-install bcmath gd zip
-
-      # Configure application
-      #- run:
-          #name: Setup SQLite Database
-          #command: touch storage/testing.sqlite
       - run:
           name: Setup PHPUnit coverage folder
           command: mkdir -p ~/phpunit
       - run:
-          name: Run PHPUnit Feature Tests
+          name: Run PHPUnit Tests
           command: php ./vendor/bin/phpunit --log-junit ~/phpunit/junit.xml
 workflows:
   version: 2
