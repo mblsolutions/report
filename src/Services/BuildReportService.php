@@ -5,6 +5,7 @@ namespace MBLSolutions\Report\Services;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use MBLSolutions\Report\Events\ReportRendered;
 use MBLSolutions\Report\Interfaces\ReportMiddleware;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportExportDrivers;
@@ -40,7 +41,7 @@ class BuildReportService
         $this->report = $report;
         $this->parameters = collect($parameters);
 
-        $this->buildReportQuery();
+        $this->query = DB::connection($this->report->connection)->table($this->report->table);
     }
 
     /**
@@ -50,13 +51,19 @@ class BuildReportService
      */
     public function render(): Collection
     {
-        return collect([
+        $this->buildReportQuery();
+
+        $result = collect([
             'headings' => $this->headings(),
             'data' => $this->data(),
-            'totals' => $this->totals(),
+            'totals' => false,
             'drivers' => $this->exportDrivers(),
             'raw' => $this->getRawQuery()
         ]);
+
+        event(new ReportRendered($this->report));
+
+        return $result;
     }
 
     /**
@@ -120,10 +127,8 @@ class BuildReportService
      *
      * @return Builder
      */
-    protected function buildReportQuery(): Builder
+    public function buildReportQuery(): Builder
     {
-        $this->query = DB::connection($this->report->connection)->table($this->report->table);
-
         if ($this->report->joins->count()) {
             $this->addJoins();
         }
@@ -132,7 +137,7 @@ class BuildReportService
             $this->addSelects();
         }
 
-        if ($this->report->where) {
+        if (!empty($this->report->where)) {
             $this->addWhere();
         }
 
@@ -140,15 +145,15 @@ class BuildReportService
             $this->handleMiddleware();
         }
 
-        if ($this->report->groupby) {
+        if (!empty($this->report->groupby)) {
             $this->addGroupBy();
         }
 
-        if ($this->report->having) {
+        if (!empty($this->report->having)) {
             $this->addHaving();
         }
 
-        if ($this->report->orderby) {
+        if (!empty($this->report->orderby)) {
             $this->addOrderBy();
         }
 
@@ -188,7 +193,6 @@ class BuildReportService
     {
         if ($this->parameters->count() > 0) {
             $this->parameters->each(function ($value, $field) {
-                // TODO bug where value is an array, need to resolve in testing...
                 if (!is_array($value)) {
                     $this->report->where = $this->replaceParameter($field, $value, $this->report->where);
                 }
@@ -205,7 +209,7 @@ class BuildReportService
      *
      * @return bool
      */
-    public function checkWhereIsNotEmpty(): bool
+    protected function checkWhereIsNotEmpty(): bool
     {
         return !empty(preg_replace('/\s+/', '', $this->report->where));
     }
@@ -216,9 +220,9 @@ class BuildReportService
      *
      * @return string
      */
-    public function cleanWhereSyntax(): string
+    protected function cleanWhereSyntax(): string
     {
-        return preg_replace('/\A(\s*)(AND)|(OR)/i', '', $this->report->where, 1);
+        return preg_replace('/\A(\s*)(AND)|(\s*)(OR)/i', '', $this->report->where, 1);
     }
 
     /**
@@ -329,18 +333,4 @@ class BuildReportService
         return false;
     }
 
-    /**
-     * Get Report Totals
-     *
-     * @return mixed
-     */
-    private function totals()
-    {
-        if ($this->report->shouldShowTotals()) {
-            return [];
-        }
-
-        return false;
-    }
-    
 }

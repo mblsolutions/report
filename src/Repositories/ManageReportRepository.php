@@ -3,12 +3,16 @@
 namespace MBLSolutions\Report\Repositories;
 
 use Exception;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use MBLSolutions\Report\Events\ReportCreated;
+use MBLSolutions\Report\Events\ReportDestroyed;
+use MBLSolutions\Report\Events\ReportUpdated;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportDataType;
 use MBLSolutions\Report\Models\ReportFieldType;
@@ -18,6 +22,16 @@ use MBLSolutions\Report\Models\ReportSelectField;
 class ManageReportRepository
 {
 
+    /**
+     * All Reports
+     *
+     * @param int $limit
+     * @return LengthAwarePaginator
+     */
+    public function paginate($limit = 25): LengthAwarePaginator
+    {
+        return Report::paginate($limit);
+    }
 
     /**
      * Get a Report or make a New One
@@ -53,12 +67,14 @@ class ManageReportRepository
 
             DB::commit();
 
+            event(new ReportCreated($report));
+
         } catch (Exception $exception) {
             DB::rollBack();
             throw $exception;
         }
 
-        return $report->fresh();
+        return $report;
     }
 
 
@@ -81,12 +97,15 @@ class ManageReportRepository
             $this->handleReportRelations($report, $request);
 
             DB::commit();
+
+            event(new ReportUpdated($report));
+
         } catch (Exception $exception) {
             DB::rollBack();
             throw $exception;
         }
 
-        return $report->fresh();
+        return $report->refresh();
     }
 
     /**
@@ -100,7 +119,9 @@ class ManageReportRepository
     {
         $report->delete();
 
-        return $report->fresh();
+        event(new ReportDestroyed($report));
+
+        return $report->refresh();
     }
 
     /**

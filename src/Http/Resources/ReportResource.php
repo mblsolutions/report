@@ -45,6 +45,7 @@ class ReportResource extends JsonResource
      * Get the Report Fields
      *
      * @return mixed
+     * @codeCoverageIgnore
      */
     protected function getReportFields(): Collection
     {

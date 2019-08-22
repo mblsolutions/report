@@ -53,7 +53,7 @@ class ReportResultMap
      * @param string $namespace
      * @return ReportDataType
      */
-    private function getAttributeFormatter(string $namespace): ReportDataType
+    protected function getAttributeFormatter(string $namespace): ReportDataType
     {
         if (class_exists($namespace)) {
             $typeFormatter = new $namespace;

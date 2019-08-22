@@ -2,14 +2,9 @@
 
 namespace MBLSolutions\Report\Http\Controllers;
 
-use Exception;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\URL;
+use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
 use MBLSolutions\Report\Http\Resources\ReportCollection;
 use MBLSolutions\Report\Http\Resources\ReportResource;
 use MBLSolutions\Report\Models\Report;
@@ -25,10 +20,11 @@ class ReportController
     /**
      * Report Controller
      *
+     * @param ReportRepository $repository
      */
-    public function __construct()
+    public function __construct(ReportRepository $repository)
     {
-        $this->repository = new ReportRepository;
+        $this->repository = $repository;
     }
 
     /**
@@ -81,10 +77,8 @@ class ReportController
      */
     public function generateExport(Report $report, Request $request): array
     {
-        $params = array_merge(['report' => $report->id, 'uid' => auth()->user()->id], $request->except('signature'));
-
         return [
-            'uri' => URL::temporarySignedRoute('report.export', Carbon::now()->addHour(), $params)
+            'uri' => $report->getExportLink($request)
         ];
     }
 
@@ -94,15 +88,18 @@ class ReportController
      * @param Report $report
      * @param Request $request
      * @return mixed
+     * @throws UnknownExportDriverException
      */
     public function export(Report $report, Request $request)
     {
+        if (auth()->guest()) {
+            Auth::loginUsingId($request->get('uid'));
+        }
+
         // Check that request has a valid url signature
         if (!$request->hasValidSignature()) {
             abort(401);
         }
-
-        Auth::loginUsingId($request->get('uid'));
 
         return (new ExportReportService($report, $request))->handle();
     }

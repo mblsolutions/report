@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use MBLSolutions\Report\Exceptions\RenderReportException;
+use MBLSolutions\Report\Http\Resources\ReportCollection;
 use MBLSolutions\Report\Http\Resources\ReportResource;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Repositories\ManageReportRepository;
@@ -18,10 +19,23 @@ class ManageReportController
 
     /**
      * Manage Report Controller
+     *
+     * @param ManageReportRepository $repository
      */
-    public function __construct()
+    public function __construct(ManageReportRepository $repository)
     {
-        $this->repository = new ManageReportRepository;
+        $this->repository = $repository;
+    }
+
+    /**
+     * Get All Reports
+     *
+     * @param Request $request
+     * @return ReportCollection
+     */
+    public function index(Request $request): ReportCollection
+    {
+        return new ReportCollection($this->repository->paginate($request->get('limit')));
     }
 
     /**

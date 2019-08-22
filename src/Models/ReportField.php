@@ -20,6 +20,7 @@ class ReportField extends Model
      * Get the Report the fields belong to
      *
      * @return BelongsTo
+     * @codeCoverageIgnore
      */
     public function report(): BelongsTo
     {

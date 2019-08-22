@@ -3,6 +3,8 @@
 namespace MBLSolutions\Report\Services;
 
 use Illuminate\Http\Request;
+use MBLSolutions\Report\Events\ReportExported;
+use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
 use MBLSolutions\Report\Interfaces\ExportDriver;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportExportDrivers;
@@ -31,16 +33,22 @@ class ExportReportService
      * Handle the Report Export
      *
      * @return mixed;
+     * @throws UnknownExportDriverException
      */
     public function handle()
     {
-        return $this->getDriver()->export($this->report, $this->request->toArray());
+        $result = $this->getDriver()->export($this->report, $this->request->toArray());
+
+        event(new ReportExported($this->report));
+
+        return $result;
     }
 
     /**
      * Get the Driver based on the hash
      *
      * @return ExportDriver
+     * @throws UnknownExportDriverException
      */
     public function getDriver(): ExportDriver
     {

@@ -14,6 +14,7 @@ class ReportSelectResource extends JsonResource
      *
      * @param  Request  $request
      * @return array
+     * @codeCoverageIgnore
      */
     public function toArray($request): array
     {

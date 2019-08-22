@@ -2,8 +2,8 @@
 
 namespace MBLSolutions\Report\DataType;
 
-use DateTime;
 use Exception;
+use Illuminate\Support\Carbon;
 use MBLSolutions\Report\Interfaces\ReportDataType;
 
 class CastDateTime implements ReportDataType
@@ -19,7 +19,11 @@ class CastDateTime implements ReportDataType
      */
     public function cast($value): string
     {
-        return (string) (new DateTime($value))->format('Y-m-d H:i:s');
+        try {
+            return (string) (new Carbon($value))->format('Y-m-d H:i:s');
+        } catch (Exception $exception) {
+            return $value;
+        }
     }
 
 }

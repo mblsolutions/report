@@ -7,6 +7,18 @@ use MBLSolutions\Report\Models\ReportDataType;
 
 class DataTypeController
 {
+    /** @var ReportDataType $dataType */
+    protected $dataType;
+
+    /**
+     * Data Type Controller
+     *
+     * @param ReportDataType $dataType
+     */
+    public function __construct(ReportDataType $dataType)
+    {
+        $this->dataType = $dataType;
+    }
 
     /**
      * Get the Report Data Types
@@ -15,7 +27,7 @@ class DataTypeController
      */
     public function index(): Collection
     {
-        return (new ReportDataType)->all();
+        return $this->dataType->all();
     }
 
 }

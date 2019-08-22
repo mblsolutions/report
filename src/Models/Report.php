@@ -5,6 +5,8 @@ namespace MBLSolutions\Report\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\Request;
+use MBLSolutions\Report\GenerateReportExportUri;
 
 class Report extends Model
 {
@@ -84,6 +86,24 @@ class Report extends Model
     public function shouldShowTotals(): bool
     {
         return $this->show_totals;
+    }
+
+    /**
+     * Generate an Export URI
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function getExportLink(Request $request): string
+    {
+        $params = array_merge([
+                'report' => $this->id,
+                'uid' => auth()->user()->id
+            ],
+            $request->except('signature')
+        );
+
+        return app(GenerateReportExportUri::class)->__invoke($params);
     }
 
 }

@@ -21,6 +21,7 @@ class ReportMiddleware extends Model
      * Get the Report the middleware belongs to
      *
      * @return BelongsTo
+     * @codeCoverageIgnore
      */
     public function report(): BelongsTo
     {

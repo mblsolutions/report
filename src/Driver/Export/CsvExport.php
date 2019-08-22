@@ -34,6 +34,7 @@ class CsvExport extends ReportExport implements ExportDriver
      * @param BuildReportService $service
      * @param bool $format
      * @return self
+     * @codeCoverageIgnore
      */
     protected function buildCsvExport(BuildReportService $service, bool $format): self
     {
@@ -49,6 +50,7 @@ class CsvExport extends ReportExport implements ExportDriver
      *
      * @param $service
      * @return self
+     * @codeCoverageIgnore
      */
     protected function getHeadings(BuildReportService $service): self
     {
@@ -63,6 +65,7 @@ class CsvExport extends ReportExport implements ExportDriver
      * @param BuildReportService $service
      * @param bool $format
      * @return self
+     * @codeCoverageIgnore
      */
     protected function getRows(BuildReportService $service, bool $format = false): self
     {

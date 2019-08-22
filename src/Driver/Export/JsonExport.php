@@ -37,6 +37,7 @@ class JsonExport extends ReportExport implements ExportDriver
      * @param array $params
      * @param bool $format
      * @return self
+     * @codeCoverageIgnore
      */
     protected function buildJsonExport(BuildReportService $service, Report $report, array $params = [], bool $format = false): self
     {
@@ -58,6 +59,7 @@ class JsonExport extends ReportExport implements ExportDriver
      * @param Report $report
      * @param array $params
      * @return self
+     * @codeCoverageIgnore
      */
     public function getMeta(BuildReportService $service, Report $report, array $params = []): self
     {
@@ -80,6 +82,7 @@ class JsonExport extends ReportExport implements ExportDriver
      * @param $service
      * @param bool $format
      * @return self
+     * @codeCoverageIgnore
      */
     public function getData(BuildReportService $service, bool $format): self
     {

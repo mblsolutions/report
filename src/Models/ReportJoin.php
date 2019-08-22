@@ -19,6 +19,7 @@ class ReportJoin extends Model
      * Get the Report the joins belong to
      *
      * @return BelongsTo
+     * @codeCoverageIgnore
      */
     public function report(): BelongsTo
     {

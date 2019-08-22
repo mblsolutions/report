@@ -68,7 +68,7 @@ abstract class ConfigModel
 
         $name = $this->formatName($namespace);
 
-        return implode(' ', preg_split('/(?=[A-Z])/', $name));
+        return trim(implode(' ', preg_split('/(?=[A-Z])/', $name)));
 
     }
 

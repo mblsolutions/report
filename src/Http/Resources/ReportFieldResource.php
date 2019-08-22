@@ -15,6 +15,7 @@ class ReportFieldResource extends JsonResource
      *
      * @param  Request  $request
      * @return array
+     * @codeCoverageIgnore
      */
     public function toArray($request): array
     {
@@ -38,6 +39,7 @@ class ReportFieldResource extends JsonResource
      *
      * @param PopulatesReportOption $model
      * @return array
+     * @codeCoverageIgnore
      */
     public function getOptions(PopulatesReportOption $model): array
     {

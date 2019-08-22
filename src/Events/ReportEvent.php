@@ -2,12 +2,12 @@
 
 namespace MBLSolutions\Report\Events;
 
-use MBLSolutions\Report\Report;
+use MBLSolutions\Report\Models\Report;
 
 abstract class ReportEvent
 {
     /** @var Report $report */
-    protected $report;
+    public $report;
 
     /**
      * Create a new Report Event instance

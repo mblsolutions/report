@@ -20,7 +20,11 @@ abstract class ReportExport
      */
     protected function getReportBuilder($report, $params): BuildReportService
     {
-        return new BuildReportService($report, $params);
+        $service = new BuildReportService($report, $params);
+
+        $service->buildReportQuery();
+
+        return $service;
     }
 
     /**
@@ -29,6 +33,7 @@ abstract class ReportExport
      * @param BuildReportService $service
      * @param Collection $collection
      * @return Collection
+     * @codeCoverageIgnore
      */
     protected function formatResults(BuildReportService $service, Collection $collection): Collection
     {

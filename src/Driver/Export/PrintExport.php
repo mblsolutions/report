@@ -25,13 +25,15 @@ class PrintExport extends ReportExport implements ExportDriver
     {
         $service = $this->getReportBuilder($report, $params);
 
+        $format = $params['format'] ?? false;
+
         return view('mbl-report::print', [
             'report' => $report,
             'params' => $this->getParameters($params),
             'user' => auth()->user(),
             'date' => Carbon::now()->toIso8601String(),
             'headings' => $service->headings(),
-            'data' => $this->getReportData($service,  (bool) $params['format'])
+            'data' => $this->getReportData($service, (bool) $format)
         ]);
     }
 
@@ -41,6 +43,7 @@ class PrintExport extends ReportExport implements ExportDriver
      * @param BuildReportService $service
      * @param bool $format
      * @return Collection
+     * @codeCoverageIgnore
      */
     public function getReportData(BuildReportService $service, bool $format = false): Collection
     {
@@ -58,6 +61,7 @@ class PrintExport extends ReportExport implements ExportDriver
      *
      * @param array $params
      * @return array
+     * @codeCoverageIgnore
      */
     protected function getParameters(array $params = []): array
     {
@@ -76,6 +80,7 @@ class PrintExport extends ReportExport implements ExportDriver
      *
      * @param string $key
      * @return string
+     * @codeCoverageIgnore
      */
     private function formatParameterKey(string $key): string
     {
@@ -89,6 +94,7 @@ class PrintExport extends ReportExport implements ExportDriver
      *
      * @param string $param
      * @return string
+     * @codeCoverageIgnore
      */
     private function formatParameterValue(string $param): string
     {

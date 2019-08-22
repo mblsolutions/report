@@ -7,6 +7,18 @@ use MBLSolutions\Report\Models\ReportSelectField;
 
 class ModelController
 {
+    /** @var ReportSelectField $model */
+    protected $model;
+
+    /**
+     * ModelController constructor.
+     *
+     * @param ReportSelectField $field
+     */
+    public function __construct(ReportSelectField $field)
+    {
+        $this->model = $field;
+    }
 
     /**
      * Get a list of selectable models
@@ -15,7 +27,7 @@ class ModelController
      */
     public function index(): Collection
     {
-        return (new ReportSelectField)->all();
+        return $this->model->all();
     }
 
 }

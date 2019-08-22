@@ -7,6 +7,18 @@ use MBLSolutions\Report\Models\ReportConnection;
 
 class ConnectionController
 {
+    /** @var ReportConnection $connection */
+    protected $connection;
+
+    /**
+     * Connection Controller
+     *
+     * @param ReportConnection $connection
+     */
+    public function __construct(ReportConnection $connection)
+    {
+        $this->connection = $connection;
+    }
 
     /**
      * Get a list of available connections
@@ -15,7 +27,7 @@ class ConnectionController
      */
     public function index(): Collection
     {
-        return (new ReportConnection())->all();
+        return $this->connection->all();
     }
 
 }

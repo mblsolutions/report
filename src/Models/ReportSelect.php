@@ -19,6 +19,7 @@ class ReportSelect extends Model
      * Get the Report the selects belong to
      *
      * @return BelongsTo
+     * @codeCoverageIgnore
      */
     public function report(): BelongsTo
     {

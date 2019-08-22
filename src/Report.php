@@ -68,16 +68,16 @@ class Report
         $options = array_merge($defaultOptions, $options);
 
         Route::group($options, static function () {
+            Route::get('report/connection', 'ConnectionController@index')->name('connection.list');
+            Route::get('report/middleware', 'ReportMiddlewareController@index')->name('middleware.list');
+            Route::get('report/data/type', 'DataTypeController@index')->name('data.type.list');
+            Route::get('report/model', 'ModelController@index')->name('model.list');
+
             Route::get('report', 'ReportController@index')->name('index');
             Route::get('report/{report}', 'ReportController@show')->name('show');
             Route::post('report/{report}', 'ReportController@render')->name('render');
 
             Route::post('report/{report}/export', 'ReportController@generateExport')->name('export');
-
-            Route::get('report/connection', 'ConnectionController@index')->name('connection.list');
-            Route::get('report/middleware', 'ReportMiddlewareController@index')->name('middleware.list');
-            Route::get('report/data/type', 'DataTypeController@index')->name('data.type.list');
-            Route::get('report/model', 'ModelController@index')->name('model.list');
         });
     }
 
