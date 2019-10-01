@@ -1,27 +1,27 @@
 <template>
     <div :id="'report-middleware-' + index" class="report-middleware" v-if="loaded && data.deleted_at === null">
 
-        <hr class="col-xs-12">
+        <hr class="my-5">
 
-        <h4>
-            {{ middlewareLabel }} <span class="badge badge-primary"><small>#</small>{{ (index + 1) }}</span>
+        <h4 class="text-xl text-brand-blue-500 px-2">
+            {{ middlewareLabel }}
+            <span class="bg-brand-blue-400 text-white px-1 font-bold rounded-sm">
+                <span class="text-sm font-normal">#</span>{{ (index + 1) }}
+            </span>
             <div class="pull-right float-right">
-                <button class="btn btn-sm btn-danger mr-2" @click.prevent="removeMiddleware(index)">Remove Middleware</button>
-                <button v-if="show_add_button" class="btn btn-sm btn-success" @click.prevent="addMiddleware">Add Middleware</button>
+                <button class="brand-btn-alt mr-2" @click.prevent="removeMiddleware(index)">Remove Middleware</button>
+                <button v-if="show_add_button" class="brand-btn" @click.prevent="addMiddleware">Add Middleware</button>
             </div>
         </h4>
 
-
         <div class="form-group">
-            <div class="form-group">
-                <label for="column_type">Middleware</label>
-                <select name="type" id="column_type" class="form-control" :class="{ 'is-invalid': report.hasError('middleware', index, 'middleware') }" v-model="data.middleware">
-                    <option :value="null">Select Middleware</option>
-                    <option :value="object.value" v-for="object in middleware">{{ object.name }}</option>
-                </select>
+            <label class="form-label" for="column_type">Middleware</label>
+            <select name="type" id="column_type" class="form-control" :class="{ 'is-invalid': report.hasError('middleware', index, 'middleware') }" v-model="data.middleware">
+                <option :value="null">Select Middleware</option>
+                <option :value="object.value" v-for="object in middleware">{{ object.name }}</option>
+            </select>
 
-                <div v-if="report.hasError('middleware', index, 'middleware')" class="invalid-feedback">{{ report.getError('middleware', index, 'middleware') }}</div>
-            </div>
+            <div v-if="report.hasError('middleware', index, 'middleware')" class="invalid-feedback">{{ report.getError('middleware', index, 'middleware') }}</div>
         </div>
 
     </div>

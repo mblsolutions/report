@@ -1,68 +1,55 @@
 <template>
     <div :id="'report-join-' + index" class="join" v-if="loaded && data.deleted_at === null">
 
-        <hr class="col-xs-12">
+        <hr class="my-5">
 
-        <h4>
-            Join <span class="badge badge-primary"><small>#</small>{{ (index + 1) }}</span>
+        <h4 class="text-xl text-brand-blue-500 px-2">
+            Join <span class="bg-brand-blue-500 text-white p-1 text-base"><small>#</small>{{ (index + 1) }}</span>
             <div class="pull-right float-right">
-                <button class="btn btn-sm btn-danger mr-2" @click.prevent="removeJoin(index)">Remove Join</button>
-                <button v-if="show_add_button" class="btn btn-sm btn-success" @click.prevent="addJoin">Add Join</button>
+                <button class="brand-btn-alt mr-2" @click.prevent="removeJoin(index)">Remove Join</button>
+                <button v-if="show_add_button" class="brand-btn" @click.prevent="addJoin">Add Join</button>
             </div>
         </h4>
 
-        <div class="row">
-            <div class="col-xs-12 col-md-6">
-                <div class="form-group">
-                    <label for="join_type">Join Type</label>
-                    <select name="type" id="join_type" class="form-control" :class="{ 'is-invalid': report.hasError('type', index, 'joins') }" v-model="data.type">
-                        <option :value="type.value" v-for="type in types">{{ type.name }}</option>
-                    </select>
+        <div class="md:flex">
+            <div class="form-group md:w-1/2">
+                <label class="form-label" for="join_type">Join Type</label>
+                <select name="type" id="join_type" class="form-control" :class="{ 'is-invalid': report.hasError('type', index, 'joins') }" v-model="data.type">
+                    <option :value="type.value" v-for="type in types">{{ type.name }}</option>
+                </select>
 
-                    <div v-if="report.hasError('type', index, 'joins')" class="invalid-feedback">{{ report.getError('type', index, 'joins') }}</div>
-                </div>
+                <div v-if="report.hasError('type', index, 'joins')" class="invalid-feedback">{{ report.getError('type', index, 'joins') }}</div>
             </div>
-            <div class="col-xs-12 col-md-6">
-                <div class="form-group">
-                    <label for="join_table">Join Table</label>
-                    <input id="join_table" type="text" name="table" class="form-control" :class="{ 'is-invalid': report.hasError('table', index, 'joins') }" placeholder="Table" v-model="data.table">
+            <div class="form-group md:w-1/2">
+                <label class="form-label" for="join_table">Join Table</label>
+                <input id="join_table" type="text" name="table" class="form-control" :class="{ 'is-invalid': report.hasError('table', index, 'joins') }" placeholder="Table" v-model="data.table">
 
-                    <div v-if="report.hasError('table', index, 'joins')" class="invalid-feedback">{{ report.getError('table', index, 'joins') }}</div>
-                </div>
+                <div v-if="report.hasError('table', index, 'joins')" class="invalid-feedback">{{ report.getError('table', index, 'joins') }}</div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-xs-12 col-md-5">
-                <div class="form-group">
-                    <label for="join_first">Column 1</label>
-                    <input id="join_first" type="text" name="first" class="form-control" :class="{ 'is-invalid': report.hasError('first', index, 'joins') }" placeholder="First Column (e.g. users.team_id)" v-model="data.first">
+        <div class="md:flex">
+            <div class="form-group md:w-5/12">
+                <label class="form-label" for="join_first">Column 1</label>
+                <input id="join_first" type="text" name="first" class="form-control" :class="{ 'is-invalid': report.hasError('first', index, 'joins') }" placeholder="First Column (e.g. users.team_id)" v-model="data.first">
 
-                    <div v-if="report.hasError('first', index, 'joins')" class="invalid-feedback">{{ report.getError('first', index, 'joins') }}</div>
-                </div>
+                <div v-if="report.hasError('first', index, 'joins')" class="invalid-feedback">{{ report.getError('first', index, 'joins') }}</div>
             </div>
-            <div class="col-xs-12 col-md-2">
-                <div class="form-group">
-                    <label for="join_condition">Condition</label>
-                    <input id="join_condition" type="text" name="operator" class="form-control" :class="{ 'is-invalid': report.hasError('operator', index, 'joins') }" placeholder="Condition (e.g. =, !=)" v-model="data.operator">
+            <div class="form-group md:w-2/12">
+                <label class="form-label" for="join_condition">Condition</label>
+                <input id="join_condition" type="text" name="operator" class="form-control" :class="{ 'is-invalid': report.hasError('operator', index, 'joins') }" placeholder="Condition (e.g. =, !=)" v-model="data.operator">
 
-                    <div v-if="report.hasError('operator', index, 'joins')" class="invalid-feedback">{{ report.getError('operator', index, 'joins') }}</div>
-                </div>
+                <div v-if="report.hasError('operator', index, 'joins')" class="invalid-feedback">{{ report.getError('operator', index, 'joins') }}</div>
             </div>
-            <div class="col-xs-12 col-md-5">
-                <div class="form-group">
-                    <label for="join_second">Column 2</label>
-                    <input id="join_second" type="text" name="second" class="form-control" :class="{ 'is-invalid': report.hasError('second', index, 'joins') }" placeholder="Second Column (e.g. teams.id)" v-model="data.second">
+            <div class="form-group md:w-5/12">
+                <label class="form-label" for="join_second">Column 2</label>
+                <input id="join_second" type="text" name="second" class="form-control" :class="{ 'is-invalid': report.hasError('second', index, 'joins') }" placeholder="Second Column (e.g. teams.id)" v-model="data.second">
 
-                    <div v-if="report.hasError('second', index, 'joins')" class="invalid-feedback">{{ report.getError('second', index, 'joins') }}</div>
-                </div>
+                <div v-if="report.hasError('second', index, 'joins')" class="invalid-feedback">{{ report.getError('second', index, 'joins') }}</div>
             </div>
         </div>
-
-
-
     </div>
-    
+
 </template>
 
 <script>

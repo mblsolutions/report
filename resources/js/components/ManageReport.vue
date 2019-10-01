@@ -1,29 +1,36 @@
 <template>
     <div id="manage-report">
-
         <form :action="action" :method="method" enctype="multipart/form-data" v-if="loaded">
 
-            <div class="my-3 p-3 bg-white rounded shadow-sm">
-                <h3>Report Information</h3>
+            <div class="section-panel p-3">
 
-                <p class="text-muted">
+                <div class="error-alert" v-if="report.hasErrors()">
+                    <p class="align-middle font-bold text-base">
+                        <i class="material-icons text-sm">error</i> {{ report.getErrorMessage() }}
+                    </p>
+                    <ul class="text-sm mt-2" v-if="report.error.errors">
+                        <li v-for="error in report.error.errors">{{ error[0] }}</li>
+                    </ul>
+                </div>
+
+                <h3 class="text-2xl text-brand-blue-500 px-2">Report Information</h3>
+
+                <p class="text-muted p-2">
                     Settings pertaining to how a report is rendered and the report information. When a report is rendered two primary sources of information are available,
                     the report data (individual rows of information based on the report query) and the report totals (the counts/sums of
                     columns on the report). Columns are configured by the report selects and can be configured to count and sum relevant columns
                     (please note these columns are limited to numeric data types only).
                 </p>
 
-                <div class="row">
-                    <div class="col-xs-12 col-md-6">
-                        <div class="form-group">
-                            <label for="report_name">Report Name</label>
-                            <input id="report_name" type="text" name="name" class="form-control" placeholder="Report Name" :class="{ 'is-invalid': report.hasError('name') }" v-model="report.data.name">
+                <div class="md:flex">
+                    <div class="form-group md:w-1/2">
+                        <label class="form-label" for="report_name">Report Name</label>
+                        <input id="report_name" type="text" name="name" class="form-control" placeholder="Report Name" :class="{ 'is-invalid': report.hasError('name') }" v-model="report.data.name">
 
-                            <div v-if="report.hasError('name')" class="invalid-feedback">{{ report.getError('name') }}</div>
-                        </div>
+                        <div v-if="report.hasError('name')" class="invalid-feedback">{{ report.getError('name') }}</div>
                     </div>
-                    <div class="col-xs-12 col-md-6">
-                        <label for="connection">Connection</label>
+                    <div class="form-group md:w-1/2">
+                        <label class="form-label" for="connection">Connection</label>
                         <select name="type" id="connection" class="form-control" :class="{ 'is-invalid': report.hasError('connection') }" v-model="report.data.connection">
                             <option :value="null">Select Connection</option>
                             <option :value="connection.value" v-for="connection in report.connections">{{ connection.name }}</option>
@@ -36,7 +43,7 @@
                 <div class="row">
                     <div class="col-xs-12 col-md-8">
                         <div class="form-group">
-                            <label for="report_description">Report Description</label>
+                            <label class="form-label" for="report_description">Report Description</label>
                             <input id="report_description" type="text" name="description" class="form-control" placeholder="Description" :class="{ 'is-invalid': report.hasError('description') }" v-model="report.data.description">
 
                             <div v-if="report.hasError('description')" class="invalid-feedback">{{ report.getError('description') }}</div>
@@ -44,7 +51,7 @@
                     </div>
                     <div class="col-xs-12 col-md-4">
                         <div class="form-group">
-                            <label for="report_display_limit">Display Limit</label>
+                            <label class="form-label" for="report_display_limit">Display Limit</label>
                             <input id="report_display_limit" type="text" name="display_limit" class="form-control" placeholder="25" :class="{ 'is-invalid': report.hasError('display_limit') }" v-model="report.data.display_limit">
 
                             <div v-if="report.hasError('display_limit')" class="invalid-feedback">{{ report.getError('display_limit') }}</div>
@@ -52,16 +59,15 @@
                     </div>
                 </div>
 
-                <hr class="col-xs-12">
+                <hr class="my-5">
 
                 <div class="form-group">
                     <div class="form-check">
-                        <input id="show_data" type="checkbox" name="show_data" class="form-check-input" v-model="report.data.show_data">
-                        <label class="form-check-label" for="show_data">
-                            Display Report Data
+                        <label class="checkbox-container">
+                            <span class="tracking-wide text-sm font-bold text-gray-600 ml-2">Display Report Data</span>
+                            <input id="show_data" type="checkbox" name="show_data" class="form-check-input" v-model="report.data.show_data">
+                            <span class="checkmark"></span>
                         </label>
-
-                        <div v-if="report.hasError('show_data')" class="invalid-feedback">{{ report.getError('show_data') }}</div>
                     </div>
 
                     <small class="text-muted">
@@ -70,14 +76,11 @@
                 </div>
 
                 <div class="form-group">
-                    <div class="form-check">
+                    <label class="checkbox-container">
+                        <span class="tracking-wide text-sm font-bold text-gray-600 ml-2">Display Report Totals</span>
                         <input id="show_totals" type="checkbox" name="show_totals" class="form-check-input" v-model="report.data.show_totals">
-                        <label class="form-check-label" for="show_totals">
-                            Display Report Totals
-                        </label>
-
-                        <div v-if="report.hasError('show_totals')" class="invalid-feedback">{{ report.getError('show_totals') }}</div>
-                    </div>
+                        <span class="checkmark"></span>
+                    </label>
 
                     <small class="text-muted">
                         Should this report display the result totals when viewing the report.
@@ -86,23 +89,22 @@
 
                 <div class="form-group">
                     <div class="form-check">
-                        <input id="active" type="checkbox" name="active" class="form-check-input" v-model="report.data.active">
-                        <label class="form-check-label" for="active">
-                            Active
+                        <label class="checkbox-container">
+                            <span class="tracking-wide text-sm font-bold text-gray-600 ml-2">Active</span>
+                            <input id="active" type="checkbox" name="active" class="form-check-input" v-model="report.data.active">
+                            <span class="checkmark"></span>
                         </label>
-
-                        <div v-if="report.hasError('active')" class="invalid-feedback">{{ report.getError('active') }}</div>
                     </div>
                 </div>
             </div>
 
             <div class="my-3 p-3 bg-white rounded shadow-sm">
-                <h3>
+                <h3 class="text-2xl text-brand-blue-500 px-2">
                     Report Middleware
-                    <button class="btn btn-sm btn-primary pull-right float-right" @click.prevent="addNewReportMiddleware">Add Middleware</button>
+                    <button class="brand-btn pull-right float-right" @click.prevent="addNewReportMiddleware">Add Middleware</button>
                 </h3>
 
-                <p class="text-muted">
+                <p class="text-muted  p-2">
                     Middleware provides a way to automatically inject query conditions into a report or intercept a request to render a report.
                     For example check that a user is authenticated to view the report or check that results shown are owned by the current user.
                 </p>
@@ -120,20 +122,20 @@
                     </div>
                 </div>
                 <div v-else>
-                    <div class="alert alert-primary" role="alert">
-                        There is no middleware assigned to this report. <a href="#" class="alert-link" @click.prevent="addNewReportMiddleware">Add a Middleware</a>.
+                    <div class="info-alert align-middle font-bold text-base" role="alert">
+                        There is no middleware assigned to this report. <a href="#" class="font-bold" @click.prevent="addNewReportMiddleware">Add a Middleware</a>.
+                    </div>
                 </div>
-            </div>
 
             </div>
 
             <div class="my-3 p-3 bg-white rounded shadow-sm">
-                <h3>
+                <h3 class="text-2xl text-brand-blue-500 px-2">
                     Report Fields
-                    <button class="btn btn-sm btn-primary pull-right float-right" @click.prevent="addNewReportField">Add Field</button>
+                    <button class="brand-btn pull-right float-right" @click.prevent="addNewReportField">Add Field</button>
                 </h3>
 
-                <p class="text-muted">
+                <p class="text-muted p-2">
                     Report fields are the parameters passed to the report, these parameters are used to further refine rendered report data e.g.
                     passing a start_date and end_date to limit results between two dates.
                 </p>
@@ -151,26 +153,26 @@
                     </div>
                 </div>
                 <div v-else>
-                    <div class="alert alert-primary" role="alert">
-                        There are no fields added to this report. <a href="#" class="alert-link" @click.prevent="addNewReportField">Add a field</a> to allow users to
+                    <div class="info-alert align-middle font-bold text-base" role="alert">
+                        There are no fields added to this report. <a href="#" class="font-bold" @click.prevent="addNewReportField">Add a field</a> to allow users to
                         further refine report results.
                     </div>
                 </div>
             </div>
 
             <div class="my-3 p-3 bg-white rounded shadow-sm">
-                <h3>Report Query</h3>
+                <h3 class="text-2xl text-brand-blue-500 px-2">Report Query</h3>
 
-                <p class="text-muted">
+                <p class="text-muted p-2">
                     Build up the report using the report query builder.
                 </p>
 
-                <h3>
+                <h3 class="text-lg text-brand-blue-500 px-2">
                     Selects
-                    <button class="btn btn-sm btn-primary pull-right float-right" @click.prevent="addNewReportSelect">Add Column</button>
+                    <button class="brand-btn pull-right float-right" @click.prevent="addNewReportSelect">Add Column</button>
                 </h3>
 
-                <p class="text-muted">
+                <p class="text-muted p-2">
                     Each <b>select</b> in the report will be turned into a column on the report, the <b>alias</b> will be the column title when rendering reports.
                     The select <b>type</b> will determine how the rendered data is formatted, and if the data should display a total.
                 </p>
@@ -188,36 +190,36 @@
                     </div>
                 </div>
                 <div v-else>
-                    <div class="alert alert-primary" role="alert">
-                        <a href="#" class="alert-link" @click.prevent="addNewReportSelect">Add selected columns</a> to show data results on the report.
+                    <div class="info-alert align-middle font-bold text-base" role="alert">
+                        <a href="#" class="font-bold" @click.prevent="addNewReportSelect">Add selected columns</a> to show data results on the report.
                     </div>
                 </div>
 
-                <hr class="col-xs-12">
+                <hr class="my-5">
 
-                <h3>
+                <h3 class="text-lg text-brand-blue-500 px-2">
                     From
                 </h3>
 
-                <p class="text-muted">
+                <p class="text-muted p-2">
                     The primary table the report will be run from.
                 </p>
 
                 <div class="form-group">
-                    <label for="report_table">Table</label>
+                    <label class="form-label" for="report_table">Table</label>
                     <input id="report_table" type="text" name="table" class="form-control" placeholder="Table" :class="{ 'is-invalid': report.hasError('table') }" v-model="report.data.table">
 
                     <div v-if="report.hasError('table')" class="invalid-feedback">{{ report.getError('table') }}</div>
                 </div>
 
-                <hr class="col-xs-12">
+                <hr class="my-5">
 
-                <h3>
+                <h3 class="text-lg text-brand-blue-500 px-2">
                     Joins
-                    <button class="btn btn-sm btn-primary pull-right float-right" @click.prevent="addNewReportJoin">Add Join</button>
+                    <button class="brand-btn pull-right float-right" @click.prevent="addNewReportJoin">Add Join</button>
                 </h3>
 
-                <p class="text-muted">
+                <p class="text-muted p-2">
                     Join additional tables into the query to access data relational data.
                 </p>
 
@@ -233,26 +235,26 @@
                     </div>
                 </div>
                 <div v-else>
-                    <div class="alert alert-primary" role="alert">
-                        <a href="#" class="alert-link" @click.prevent="addNewReportField">Add joins</a> to access relational data associated
+                    <div class="info-alert align-middle font-bold text-base" role="alert">
+                        <a href="#" class="font-bold" @click.prevent="addNewReportJoin">Add joins</a> to access relational data associated
                         with the primary table.
                     </div>
                 </div>
 
-                <hr class="col-xs-12">
+                <hr class="my-5">
 
-                <h3>
+                <h3 class="text-lg text-brand-blue-500 px-2">
                     Where
                 </h3>
 
-                <p class="text-muted">
+                <p class="text-muted p-2">
                     Columns on the primary table or any joined tables can be used in this section e.g. <code><b>users.active</b> = 1</code>.
                     Field parameters can be used by adding the criteria alias in curly braces e.g. <code>users.created_at >= <b>&#123;start_date&#125;</b></code>.
                     We recommend always appending the columns table to avoid ambiguous column names e.g. <code><b>users</b>.id = 1 AND <b>logs</b>.id > 100</code>
                 </p>
 
                 <div class="form-group">
-                    <label for="report_where">Where</label>
+                    <label class="form-label" for="report_where">Where</label>
                     <div class="autocomplete">
                         <transition name="fade">
                             <div class="autocomplete-list" v-if="show_suggestions && report.data.fields.length > 0">
@@ -266,7 +268,7 @@
                                 </div>
                             </div>
                         </transition>
-                        <textarea id="report_where" name="where" rows="8" class="form-control"
+                        <textarea id="report_where" name="where" rows="8" class="block w-full relative flex-shrink flex-grow flex-auto px-3 flex-1 border-b-4 border-brand-blue-400 rounded-l-none bg-brand-blue-100 outline-none text-brand-blue-900 leading-normal h-32"
                                   :class="{ 'is-invalid': report.hasError('where') }" v-model="report.data.where" @keyup="checkForSuggestions"
                         ></textarea>
                     </div>
@@ -274,53 +276,51 @@
                     <div v-if="report.hasError('where')" class="invalid-feedback">{{ report.getError('where') }}</div>
                 </div>
 
-                <hr class="col-xs-12">
+                <hr class="my-5">
 
-                <h3>
+                <h3 class="text-lg text-brand-blue-500 px-2">
                     Result Sorting
                 </h3>
 
-                <p class="text-muted">
+                <p class="text-muted p-2">
                     Sort you results.
                 </p>
 
                 <div class="form-group">
-                    <label for="report_groupby">Group By</label>
+                    <label class="form-label" for="report_groupby">Group By</label>
                     <input id="report_groupby" type="text" name="groupby" class="form-control" placeholder="Group By (e.g. users.role)" :class="{ 'is-invalid': report.hasError('groupby') }" v-model="report.data.groupby">
 
                     <div v-if="report.hasError('groupby')" class="invalid-feedback">{{ report.getError('groupby') }}</div>
                 </div>
 
                 <div class="form-group">
-                    <label for="report_having">Having</label>
+                    <label class="form-label" for="report_having">Having</label>
                     <input id="report_having" type="text" name="having" class="form-control" placeholder="Having (e.g. users.id > 100)" :class="{ 'is-invalid': report.hasError('having') }" v-model="report.data.having">
 
                     <div v-if="report.hasError('having')" class="invalid-feedback">{{ report.getError('having') }}</div>
                 </div>
 
                 <div class="form-group">
-                    <label for="report_orderby">Order By</label>
+                    <label class="form-label" for="report_orderby">Order By</label>
                     <input id="report_orderby" type="text" name="orderby" class="form-control" placeholder="Order By (e.g. users.created_at DESC)" :class="{ 'is-invalid': report.hasError('orderby') }" v-model="report.data.orderby">
 
                     <div v-if="report.hasError('orderby')" class="invalid-feedback">{{ report.getError('orderby') }}</div>
                 </div>
 
-                <hr class="col-xs-12">
+                <hr class="my-5">
 
                 <div class="form-group">
-                    <button class="btn btn-primary" @click.prevent="submitReport">
+                    <button class="brand-btn mr-2" @click.prevent="submitReport">
                         Save Report
                     </button>
-                    <button class="btn btn-success" @click.prevent="testReport">
+                    <button class="brand-btn" @click.prevent="testReport">
                         Save and Test Report
                     </button>
                 </div>
             </div>
         </form>
         <div v-else>
-            <div class="my-3 p-3 bg-white rounded shadow-sm" v-if="hasLoadingSlot">
-                <slot name="loading"></slot>
-            </div>
+            <slot name="loading" v-if="hasLoadingSlot"></slot>
         </div>
     </div>
 </template>

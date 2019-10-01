@@ -1,7 +1,7 @@
 <template>
     <div id="render-report">
 
-        <div id="report-result-error" class="col-12 col-xs-12" v-if="error">
+        <div id="report-result-error" class="section-panel p-3" v-if="error">
             <div class="text-center">
                 <h1>Report Error</h1>
                 <p class="text-muted">
@@ -12,45 +12,48 @@
                 </p>
             </div>
         </div>
-        <div v-else-if="loaded">
+        <div class="section-panel p-3" v-else-if="loaded">
 
-            <div id="report-parameters" class="col-12 col-xs-12 offset-md-6 col-md-6" v-if="data.report.fields.length > 0">
-                <table class="table table-sm table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col" colspan="2">
+            <div class="flex mb-8">
+                <div class="md:w-1/2">&nbsp;</div>
+                <div class="w-full md:w-1/2" v-if="data.report.fields.length > 0">
+                    <table class="table table-auto table-sm table-striped">
+                        <thead class="table-row-head">
+                        <tr class="table-row-head">
+                            <th colspan="2">
                                 Parameters
                                 <div class="pull-right float-right">
-                                    <button class="btn btn-sm btn-primary" @click.prevent="resetParameters">Reset Parameters</button>
+                                    <button class="brand-btn" @click.prevent="resetParameters">Reset Parameters</button>
                                 </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(field, index) in data.report.fields">
-                            <td class="parameter-title">{{ field.label }}</td>
-                            <td class="parameter-value">{{ getParameterName(index, data.data[field.alias]) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="report-results" class="col-12 col-xs-12" v-if="data.results && data.results.data.total > 0">
-                <div class="table-responsive report-results-table">
-                    <table class="table table-sm table-striped table-hover" :key="page" >
-                        <thead>
-                        <tr>
-                            <th scope="col" v-for="column in data.results.headings">
-                                {{ column }}
                             </th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="result in data.results.data.data">
-                            <td scope="row" v-for="column in data.results.headings">
-                                {{ result[column] }}
-                            </td>
+                        <tr class="table-row" v-for="(field, index) in data.report.fields">
+                            <td class="table-cell">{{ field.label }}</td>
+                            <td class="table-cell">{{ getParameterName(index, data.data[field.alias]) }}</td>
                         </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="report-results" class="col-12 col-xs-12" v-if="data.results && data.results.data.total > 0">
+                <div class="table-responsive report-results-table">
+                    <table class="table table-auto table-sm table-striped table-hover" :key="page" >
+                        <thead class="table-row-head">
+                            <tr class="table-row-head">
+                                <th v-for="column in data.results.headings">
+                                    {{ column }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-row" v-for="result in data.results.data.data">
+                                <td class="table-cell" v-for="column in data.results.headings">
+                                    {{ result[column] }}
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -66,18 +69,18 @@
 
             <hr class="col-xs col-xs-12">
 
-            <div class="row">
-                <div class="col-xs col-xs-12 col-md-4 text-left">
-                    <button class="btn btn-block btn-primary" :disabled="page <= 1" @click.prevent="previousPage">Previous Page</button>
+            <div class="flex mt-5 py-5 border-t-2 border-brand-blue-100">
+                <div class="w-2/6 text-left">
+                    <button class="brand-btn w-full" :class="{ 'brand-btn-disabled': page <= 1 }" :disabled="page <= 1" @click.prevent="previousPage">Previous Page</button>
                 </div>
-                <div class="col-xs col-xs-12 col-md-4 text-center">
-                    <p class="report-meta">
+                <div class="w-2/6 text-center">
+                    <p class="text-gray-600 text-xs">
                         {{ data.results.data.total }} results found ({{ data.results.data.per_page }} per page)<br>
-                        <small>Displaying {{ data.results.data.from }} to {{ data.results.data.to }}</small>
+                        <span class="text-gray-500">Displaying {{ data.results.data.from }} to {{ data.results.data.to }}</span>
                     </p>
                 </div>
-                <div class="col-xs col-xs-12 col-md-4 text-right">
-                    <button class="btn btn-block btn-primary" :disabled="page >= data.results.data.last_page" @click.prevent="nextPage">Next Page</button>
+                <div class="w-2/6 text-right">
+                    <button class="brand-btn w-full" :class="{ 'brand-btn-disabled': page >= data.results.data.last_page }" :disabled="page >= data.results.data.last_page" @click.prevent="nextPage">Next Page</button>
                 </div>
             </div>
         </div>

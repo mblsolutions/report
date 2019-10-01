@@ -2,9 +2,6 @@ import {Form} from "../support/Form";
 
 export class Report extends Form {
 
-    /**
-     * Render Report
-     */
     constructor() {
         super();
 
