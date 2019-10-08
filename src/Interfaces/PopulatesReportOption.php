@@ -14,6 +14,6 @@ interface PopulatesReportOption
      * @param string $name
      * @return Collection
      */
-    public static function options(string $value, string $name): Collection;
+    public static function options(string $value = 'id', string $name = 'name'): Collection;
 
 }
