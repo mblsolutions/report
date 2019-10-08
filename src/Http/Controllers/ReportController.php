@@ -58,11 +58,6 @@ class ReportController
      */
     public function render(Report $report, Request $request)
     {
-        // TODO handle rendering a report, throw/handle individual exceptions ??
-            // TODO 1. error with query/report builder
-            // TODO 3. no results returned
-            // TODO 2. unknown/generic error
-
         $service = new BuildReportService($report, $request->toArray());
 
         return $service->render();
