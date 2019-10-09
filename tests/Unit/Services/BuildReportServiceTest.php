@@ -376,6 +376,42 @@ class BuildReportServiceTest extends LaravelTestCase
     }
 
     /** @test **/
+    public function can_replace_parameter_if_supplied_null_with_extended_time_stamp(): void
+    {
+        $report = factory(Report::class)->create([
+            'table' => 'users',
+            'where' => "users.id = '{date_field} 00:00:00'",
+            'groupby' => null,
+            'having' => null,
+            'orderby' => null,
+        ]);
+
+        factory(ReportSelect::class)->create([
+            'report_id' => $report->id,
+            'column' => 'users.id',
+            'alias' => 'user_id',
+            'type' => CastTitleCaseString::class,
+            'column_order' => 0,
+        ]);
+
+        factory(ReportField::class)->create([
+            'report_id' => $report->id,
+            'label' => 'Date Field',
+            'type' => 'date',
+            'model' => null,
+            'alias' => 'date_field',
+            'model_select_value' => null,
+            'model_select_name' => null
+        ]);
+
+        $service = new BuildReportService($report, []);
+
+        $service->render();
+
+        $this->assertEquals("select users.id AS 'user_id' from \"users\"", $service->getRawQuery());
+    }
+
+    /** @test **/
     public function replace_parameters_that_are_supplied(): void
     {
         $report = factory(Report::class)->create([
