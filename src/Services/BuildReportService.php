@@ -9,6 +9,7 @@ use MBLSolutions\Report\Events\ReportRendered;
 use MBLSolutions\Report\Interfaces\ReportMiddleware;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportExportDrivers;
+use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportSelect;
 use MBLSolutions\Report\Support\Maps\ReportResultMap;
@@ -191,13 +192,9 @@ class BuildReportService
      */
     protected function addWhere(): void
     {
-        if ($this->parameters->count() > 0) {
-            $this->parameters->each(function ($value, $field) {
-                if (!is_array($value)) {
-                    $this->report->where = $this->replaceParameter($field, $value, $this->report->where);
-                }
-            });
-        }
+        $this->report->fields->each(function (ReportField $field) {
+            $this->report->where = $this->replaceParameter($field->alias, $this->parameters->get($field->alias), $this->report->where);
+        });
 
         if ($this->checkWhereIsNotEmpty()) {
             $this->query->whereRaw($this->cleanWhereSyntax());
@@ -235,6 +232,11 @@ class BuildReportService
      */
     public function replaceParameter(string $field, $value, $subject)
     {
+        //dump('performing replacement!');
+        //dump($field);
+        //dump($value);
+        //dump($subject);
+
         if ($value == null) {
             return preg_replace("/((AND\s*)?([a-z._]+)\s(>=|<=|=|<|>|!=|<>)\s(\\'?)(\{{$field}\})(\\'?)?)/", null, $subject);
         }

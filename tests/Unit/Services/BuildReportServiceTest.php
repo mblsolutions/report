@@ -376,6 +376,78 @@ class BuildReportServiceTest extends LaravelTestCase
     }
 
     /** @test **/
+    public function replace_parameters_that_are_supplied(): void
+    {
+        $report = factory(Report::class)->create([
+            'table' => 'users',
+            'where' => "users.id = '{first_field}'",
+            'groupby' => null,
+            'having' => null,
+            'orderby' => null,
+        ]);
+
+        factory(ReportSelect::class)->create([
+            'report_id' => $report->id,
+            'column' => 'users.id',
+            'alias' => 'user_id',
+            'type' => CastTitleCaseString::class,
+            'column_order' => 0,
+        ]);
+
+        factory(ReportField::class)->create([
+            'report_id' => $report->id,
+            'label' => 'First Field',
+            'type' => 'string',
+            'model' => null,
+            'alias' => 'first_field',
+            'model_select_value' => null,
+            'model_select_name' => null
+        ]);
+
+        $service = new BuildReportService($report, ['first_field' => 'replaced_value']);
+
+        $service->render();
+
+        $this->assertEquals("select users.id AS 'user_id' from \"users\" where users.id = 'replaced_value'", $service->getRawQuery());
+    }
+
+    /** @test **/
+    public function replace_parameters_that_are_not_supplied(): void
+    {
+        $report = factory(Report::class)->create([
+            'table' => 'users',
+            'where' => "users.id = '{first_field}'",
+            'groupby' => null,
+            'having' => null,
+            'orderby' => null,
+        ]);
+
+        factory(ReportSelect::class)->create([
+            'report_id' => $report->id,
+            'column' => 'users.id',
+            'alias' => 'user_id',
+            'type' => CastTitleCaseString::class,
+            'column_order' => 0,
+        ]);
+
+        factory(ReportField::class)->create([
+            'report_id' => $report->id,
+            'label' => 'First Field',
+            'type' => 'string',
+            'model' => null,
+            'alias' => 'first_field',
+            'model_select_value' => null,
+            'model_select_name' => null
+        ]);
+
+        $service = new BuildReportService($report, []);
+
+        $service->render();
+
+        $this->assertEquals("select users.id AS 'user_id' from \"users\"", $service->getRawQuery());
+    }
+
+    /** @test **/
     public function can_handle_middleware(): void
     {
         factory(ReportMiddleware::class)->create([
