@@ -2,6 +2,7 @@
 
 - bump support for laravel 7 and 8
 - add GitHub actions workflow
+- remove circle ci
 
 ## v1.0.6
 
