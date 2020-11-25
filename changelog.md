@@ -1,6 +1,7 @@
 ## v1.0.7
 
 - bump support for laravel 7 and 8
+- add GitHub actions workflow
 
 ## v1.0.6
 
