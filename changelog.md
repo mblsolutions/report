@@ -1,3 +1,7 @@
+## v1.0.8
+
+- add action status badge to readme
+
 ## v1.0.7
 
 - bump support for laravel 7 and 8
