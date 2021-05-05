@@ -1,3 +1,7 @@
+## v1.1.0
+
+- Update workflow and composer dependencies
+
 ## v1.0.8
 
 - add action status badge to readme
