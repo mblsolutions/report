@@ -1,14 +1,14 @@
-# MBL Solutions Report
+# Laravel Report
 
 |Branch|Build Status|
 |---|---|
-|master|![example workflow name](https://github.com/mblsolutions/report/workflows/Laravel%20Package/badge.svg)|
+|master|![example workflow name](https://github.com/mblsolutions/report/workflows/Laravel%20Report%20Package/badge.svg)|
 
-Import MBL Solutions Reporting into any Laravel 5+ application using this package.
+Import Laravel Reporting into any Laravel 5+ application using this package.
 
 ## Installation
 
-Install MBL Solutions Report with composer.
+Install Laravel Report with composer.
 
 ```bash
 php composer require mblsolutions/report
@@ -20,7 +20,7 @@ Copy the package config to your local config.
 php artisan vendor:publish --tag=report-config
 ```
 
-MBL Solutions comes with its own database migrations. Once the package has been installed run the
+Laravel Report comes with its own database migrations, once the package has been installed run the
 migrations.
 
 ```bash
@@ -114,7 +114,7 @@ published, you should register them in your ```reousrces/js/app.js``` file.
 const app = new Vue({
     el: '#app',
     components: {
-        // MBL Solutions Report Package components
+        // Laravel Report Package components
         'mbl-manage-report': require('./report/components/ManageReport').default,
         'mbl-show-report': require('./report/components/ShowReport').default
     }
