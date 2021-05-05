@@ -2,10 +2,13 @@ name: Laravel Package
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+      - v*
   pull_request:
-    branches: [ master ]
-
+    branches:
+      - master
+      - v*
 jobs:
   laravel-tests:
 
