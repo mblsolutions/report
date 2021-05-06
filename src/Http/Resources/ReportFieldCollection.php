@@ -17,7 +17,7 @@ class ReportFieldCollection extends ResourceCollection
      */
     public function toArray($request): array
     {
-        return $this->collection->transform(static function (ReportField $model) {
+        return $this->collection->transform(static function ($model) {
             return new ReportFieldResource($model);
         })->toArray();
     }

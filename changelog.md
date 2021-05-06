@@ -1,3 +1,8 @@
+## v1.1.1
+
+- Remove type hinting from resource collections (higher versions of laravel break resource 
+  collection compatibility)
+
 ## v1.1.0
 
 - Update workflow and composer dependencies

@@ -17,7 +17,7 @@ class ReportJoinCollection extends ResourceCollection
      */
     public function toArray($request): array
     {
-        return $this->collection->transform(static function (ReportJoin $model) {
+        return $this->collection->transform(static function ($model) {
             return new ReportJoinResource($model);
         })->toArray();
     }

@@ -17,7 +17,7 @@ class ReportMiddlewareCollection extends ResourceCollection
      */
     public function toArray($request): array
     {
-        return $this->collection->transform(static function (ReportMiddleware $model) {
+        return $this->collection->transform(static function ($model) {
             return new ReportMiddlewareResource($model);
         })->toArray();
     }
