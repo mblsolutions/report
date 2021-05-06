@@ -17,7 +17,7 @@ class ReportSelectCollection extends ResourceCollection
      */
     public function toArray($request): array
     {
-        return $this->collection->transform(static function (ReportSelect $model) {
+        return $this->collection->transform(static function ($model) {
             return new ReportSelectResource($model);
         })->toArray();
     }
