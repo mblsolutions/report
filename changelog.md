@@ -1,4 +1,4 @@
-## v1.1.0
+## v1.1.1
 
 - Remove type hinting from resource collections (higher versions of laravel break resource 
   collection compatibility)
