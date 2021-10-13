@@ -1,4 +1,4 @@
-## v1.1.2
+## v1.3.0
 
 - Regex OR modified 
 
