@@ -1,3 +1,7 @@
+## v1.3.0
+
+- Regex OR modified 
+
 ## v1.1.1
 
 - Remove type hinting from resource collections (higher versions of laravel break resource 
