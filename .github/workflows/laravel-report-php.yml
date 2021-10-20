@@ -3,22 +3,21 @@ on:
   push:
     branches:
       - master
-      - v*
+      - v1.*
+      - v2.*
   pull_request:
     branches:
       - master
-      - v*
+      - v1.*
+      - v2.*
 jobs:
   php-tests:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@b7d1d9c9a92d8d8463ce36d7f60da34d461724f8
         with:
-          php-version: 7.1
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
-          coverage: none
+          php-version: '8.0'
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Execute tests (Unit and Feature tests) via PHPUnit
