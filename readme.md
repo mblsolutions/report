@@ -1,8 +1,9 @@
 # Laravel Report
 
-|Branch|Build Status|
-|---|---|
-|master|![example workflow name](https://github.com/mblsolutions/report/workflows/Laravel%20Report%20Package/badge.svg)|
+|Branch|PHP Version|Build Status|
+|---|---|---|
+|master| PHP 7.4 |[![Laravel Report PHP 7.4](https://github.com/mblsolutions/report/actions/workflows/laravel-report-php-7-4.yml/badge.svg)](https://github.com/mblsolutions/report/actions/workflows/laravel-report-php-7-4.yml)|
+|master| PHP 8.0 |[![Laravel Report PHP 8.0](https://github.com/mblsolutions/report/actions/workflows/laravel-report-php.yml/badge.svg)](https://github.com/mblsolutions/report/actions/workflows/laravel-report-php.yml)|
 
 Import Laravel Reporting into any Laravel 5+ application using this package.
 
