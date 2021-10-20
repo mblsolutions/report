@@ -1,4 +1,4 @@
-name: PHP Composer
+name: Laravel Report PHP
 on:
   push:
     branches:
