@@ -1,4 +1,4 @@
-name: Run Composer and Unit Tests on PHP 7.4
+name: Laravel Report PHP 7.4
 on:
   push:
     branches:
