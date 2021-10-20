@@ -1,6 +1,6 @@
 ## v2.0.0
 
-+ Update exports to be run on jobs
++ bump support for php from ^7.1 to 7.4 or ^8.0
 
 ## v1.3.0
 
