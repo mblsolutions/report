@@ -18,7 +18,7 @@ class ReportControllerTest extends LaravelTestCase
     {
         factory(Report::class)->create(['name' => 'Test Report']);
 
-        $response = $this->getJson('/report');
+        $response = $this->getJson(route('report.index'));
 
         $response->assertStatus(200)
                  ->assertJson([
@@ -33,9 +33,9 @@ class ReportControllerTest extends LaravelTestCase
     /** @test **/
     public function can_show_report(): void
     {
-        factory(Report::class)->create(['name' => 'Test Report']);
+        $report = factory(Report::class)->create(['name' => 'Test Report']);
 
-        $response = $this->getJson('/report/1');
+        $response = $this->getJson(route('report.show', ['report' => $report->getKey()]));
 
         $response->assertStatus(200)
                  ->assertJson([
@@ -48,9 +48,9 @@ class ReportControllerTest extends LaravelTestCase
     /** @test **/
     public function can_render_a_report(): void
     {
-        factory(Report::class)->create();
+        $report = factory(Report::class)->create();
 
-        $response = $this->postJson('/report/1');
+        $response = $this->postJson(route('report.render', ['report' => $report->getKey()]));
 
         $response->assertStatus(200);
     }
@@ -58,9 +58,9 @@ class ReportControllerTest extends LaravelTestCase
     /** @test **/
     public function can_generate_report_export_uri(): void
     {
-        factory(Report::class)->create();
+        $report = factory(Report::class)->create();
 
-        $response = $this->actingAs(new User)->postJson('/report/1/export');
+        $response = $this->actingAs(new User)->postJson(route('report.export', ['report' => $report->getKey()]));
 
         $response->assertStatus(200);
     }
