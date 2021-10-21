@@ -1,3 +1,7 @@
+## v2.0.1
+
++ Remove support for Laravel version 5
+
 ## v2.0.0
 
 + bump support for php from ^7.1 to 7.4 or ^8.0
