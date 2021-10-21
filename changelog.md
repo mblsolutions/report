@@ -1,6 +1,7 @@
 ## v2.0.1
 
 + Remove support for Laravel version 5
++ Require illuminate/queue
 
 ## v2.0.0
 
