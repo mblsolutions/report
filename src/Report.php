@@ -73,6 +73,14 @@ class Report
             Route::get('report/data/type', 'DataTypeController@index')->name('data.type.list');
             Route::get('report/model', 'ModelController@index')->name('model.list');
 
+            // Asynchronous
+            Route::get('report/queue', 'QueuedReportController@index')->name('queue.index');
+            Route::post('report/queue/{report}', 'QueuedReportController@render')->name('queue.render');
+            Route::get('report/queue/job/{job}', 'QueuedReportController@job')->name('queue.job');
+            Route::get('report/queue/result/{job}', 'QueuedReportController@result')->name('queue.result');
+            Route::post('report/queue/export/{job}', 'QueuedReportController@export')->name('queue.export');
+
+            // Synchronous
             Route::get('report', 'ReportController@index')->name('index');
             Route::get('report/{report}', 'ReportController@show')->name('show');
             Route::post('report/{report}', 'ReportController@render')->name('render');

@@ -144,7 +144,7 @@ Please Note: We recommend that large record sets are not used as select types, d
 
 The following endpoints are available to you once the routes have been added:
 
-#### View Routes
+#### View Routes (synchronous)
 
 | Method    | URI                           | Name                      |
 | ---       | ---                           | ---                       |
@@ -156,6 +156,17 @@ The following endpoints are available to you once the routes have been added:
 | GET       | /api/report/middleware        | report.middleware.list    |
 | GET       | /api/report/data/type         | report.data.type.list     |
 | GET       | /api/report/model             | report.model.list         |
+
+
+### Queued View Routes (asynchronous)
+
+| Method    | URI                               | Name                      |
+| ---       | ---                               | ---                       |
+| GET       | /api/report/queue                 | report.queue.index        |
+| POST      | /api/report/queue/{report}        | report.queue.render       |
+| GET       | /api/report/queue/job/{job}       | report.queue.job          |
+| GET       | /api/report/queue/result/{job}    | report.queue.result       |
+| GET       | /api/report/queue/export/{job}    | report.queue.export       |
 
 #### Export Routes
 
@@ -175,3 +186,15 @@ The following endpoints are available to you once the routes have been added:
 | DELETE    | /api/report/manage/{report}   | report.manage.destroy     |
 | DELETE    | /api/report/manage/settings   | report.manage.settings    |
 
+### Report Events
+
+Events are fired at critical points during report creation/completion
+
+| Event               | Description                                | Data                           | Namespace                                          |
+| ---                 | ---                                        | ---                            | ---                                                |
+| ReportCreated       | A new report was created.                  | Report $report                 |  MBLSolutions\Report\Events\ReportCreated          |
+| ReportUpdated       | A report was updated.                      | Report $report                 |  MBLSolutions\Report\Events\ReportUpdated          |
+| ReportDestroyed     | A report was deleted.                      | Report $report                 |  MBLSolutions\Report\Events\ReportDestroyed        |
+| ReportRendered      | A report was rendered.                     | Report $report                 |  MBLSolutions\Report\Events\ReportRendered         |
+| ReportExported      | A report was exported.                     | Report $report                 |  MBLSolutions\Report\Events\ReportExported         |
+| ReportRenderStarted | A queued report job to render was started. | Report $report, ReportJob $job |  MBLSolutions\Report\Events\ReportRenderStarted    |

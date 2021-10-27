@@ -4,12 +4,15 @@
 
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Support\Str;
 use MBLSolutions\Report\DataType\CastTitleCaseString;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportField;
+use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportMiddleware;
 use MBLSolutions\Report\Models\ReportSelect;
+use MBLSolutions\Report\Support\Enums\JobStatus;
 use MBLSolutions\Report\Tests\Fakes\Middleware\FakeMiddleware;
 
 $factory->define(Report::class, static function (Faker $faker) {
@@ -66,5 +69,16 @@ $factory->define(ReportField::class, static function (Faker $faker) {
         'alias' => 'users_created_date',
         'model_select_value' => null,
         'model_select_name' => null
+    ];
+});
+
+$factory->define(ReportJob::class, static function (Faker $faker) {
+    return [
+        'uuid' => Str::uuid(),
+        'report_id' => function () {
+            return factory(Report::class)->create();
+        },
+        'status' => JobStatus::SCHEDULED,
+        'authenticatable_id' => null,
     ];
 });
