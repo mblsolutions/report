@@ -1,3 +1,12 @@
+## v2.0.2
+
++ Add support for queued report rendering
+  + GET /api/report/queue              report.queue.index
+  + POST /api/report/queue/{report}    report.queue.render
+  + GET /api/report/queue/job/{job}    report.queue.job
+  + GET /api/report/queue/result/{job} report.queue.result
+  + GET /api/report/queue/export/{job} report.queue.export
+
 ## v2.0.1
 
 + Remove support for Laravel version 5

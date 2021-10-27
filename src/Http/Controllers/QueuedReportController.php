@@ -28,12 +28,12 @@ class QueuedReportController
 
     /**
      * View Report Job Index
-     * 
+     *
      * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        return new JsonResponse(ReportJob::all(), 200);
+        return new JsonResponse(ReportJob::orderByDesc('updated_at')->paginate(), 200);
     }
 
     /**
