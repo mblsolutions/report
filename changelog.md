@@ -6,6 +6,8 @@
   + GET /api/report/queue/job/{job}    report.queue.job
   + GET /api/report/queue/result/{job} report.queue.result
   + GET /api/report/queue/export/{job} report.queue.export
++ Persist report data in to filesystem as a CSV
++ Export report from filesystem
 
 ## v2.0.1
 

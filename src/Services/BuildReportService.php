@@ -17,7 +17,7 @@ use MBLSolutions\Report\Support\Maps\ReportResultMap;
 class BuildReportService
 {
     /** @var bool $paginate */
-    public $paginate = true;
+    public $paginate;
 
     /** @var Report $report */
     protected $report;
@@ -36,9 +36,11 @@ class BuildReportService
      *
      * @param Report $report
      * @param array $parameters
+     * @param bool $paginate
      */
-    public function __construct(Report $report, array $parameters = [])
+    public function __construct(Report $report, array $parameters = [], bool $paginate = true)
     {
+        $this->paginate = $paginate;
         $this->report = $report;
         $this->parameters = collect($parameters);
 

@@ -77,8 +77,8 @@ class Report
             Route::get('report/queue', 'QueuedReportController@index')->name('queue.index');
             Route::post('report/queue/{report}', 'QueuedReportController@render')->name('queue.render');
             Route::get('report/queue/job/{job}', 'QueuedReportController@job')->name('queue.job');
-            Route::get('report/queue/result/{job}', 'QueuedReportController@result')->name('queue.result');
-            Route::post('report/queue/export/{job}', 'QueuedReportController@export')->name('queue.export');
+            // TODO Route::get('report/queue/result/{job}', 'QueuedReportController@result')->name('queue.result');
+            Route::get('report/queue/export/{job}', 'QueuedReportController@export')->name('queue.export');
 
             // Synchronous
             Route::get('report', 'ReportController@index')->name('index');

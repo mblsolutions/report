@@ -3,6 +3,8 @@
 namespace MBLSolutions\Report\Tests\Feature;
 
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
@@ -17,6 +19,7 @@ class QueuedReportControllerTest extends LaravelTestCase
     {
         parent::setUp();
 
+        Excel::fake();
         Bus::fake();
     }
 
@@ -67,6 +70,20 @@ class QueuedReportControllerTest extends LaravelTestCase
         $this->getJson(route('report.queue.job', [
             'job' => '931c1666-a70f-422b-aefe-925ab8b59aeb'
         ]))->assertStatus(200);
+    }
+
+    /** @test **/
+    public function can_generate_export_link(): void
+    {
+        $this->withoutExceptionHandling();
+
+        Storage::fake();
+
+        factory(ReportJob::class)->create([
+            'uuid' => '931c1666-a70f-422b-aefe-925ab8b59aeb'
+        ]);
+
+        $this->getJson(route('report.queue.export', ['job' => '931c1666-a70f-422b-aefe-925ab8b59aeb']))->assertStatus(200);
     }
 
 }

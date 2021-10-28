@@ -4,6 +4,7 @@ namespace MBLSolutions\Report\Tests;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Maatwebsite\Excel\ExcelServiceProvider;
 use MBLSolutions\Report\Report;
 use MBLSolutions\Report\ReportServiceProvider;
 use MBLSolutions\Report\Tests\Fakes\ExportDriver\FakeExportDriver;
@@ -48,6 +49,9 @@ class LaravelTestCase extends OTBTestCase
         $app['config']->set(
             'report.export_drivers', array_merge($config['export_drivers'], [FakeExportDriver::class])
         );
+        $app['config']->set('report.filesystem', $config['filesystem']);
+        $app['config']->set('report.filesystem_path', $config['filesystem_path']);
+
     }
 
     /**
@@ -56,7 +60,10 @@ class LaravelTestCase extends OTBTestCase
      */
     protected function getPackageProviders($app): array
     {
-        return [ReportServiceProvider::class];
+        return [
+            ReportServiceProvider::class,
+            ExcelServiceProvider::class
+        ];
     }
 
     /**

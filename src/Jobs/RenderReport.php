@@ -6,10 +6,12 @@ use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Http\Request;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
 use MBLSolutions\Report\Events\ReportRenderStarted;
+use MBLSolutions\Report\Export\Report\ReportExport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Services\BuildReportService;
@@ -23,10 +25,13 @@ class RenderReport implements ShouldQueue
 
     public ReportJob $reportJob;
 
-    public function __construct(string $uuid, Report $report)
+    public array $request;
+
+    public function __construct(string $uuid, Report $report, array $request = [])
     {
         $this->report = $report;
         $this->reportJob = $this->initiateRenderReportJob($uuid);
+        $this->request = $request;
     }
 
     public function handle(): void
@@ -34,17 +39,20 @@ class RenderReport implements ShouldQueue
         try {
             $this->reportJob->update(['status' => JobStatus::RUNNING]);
 
-            $service = new BuildReportService($this->report, []); // TODO $request->toArray())
+            $service = new BuildReportService($this->report, $this->request, false);
 
-            // TODO maybe store in file? Then read results from file?
-            Cache::remember($this->reportJob->getKey(), 86400, function () use ($service) {
-                return $service->render();
-            });
+            Excel::store(
+                new ReportExport($service),
+                config('report.filesystem_path', 'reports/') . $this->reportJob->getKey() . '.csv',
+                config('report.filesystem')
+            );
 
             $this->reportJob->update(['status' => JobStatus::COMPLETE]);
 
         } catch (Exception $exception) {
             $this->reportJob->update(['status' => JobStatus::FAILED]);
+
+            throw $exception;
         }
     }
 
