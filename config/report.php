@@ -45,7 +45,7 @@ return [
     |
     | Reports can be hidden and/or protected using custom middleware to
     | prevent users viewing reports. Middleware can also be used to add
-    | protection queries to reports to prevent users viewing data they
+    | protection queries to report's preventing users viewing data they
     | should not e.g. table.user_id = {current_user_id}
     |
     | @interface \MBLSolutions\Report\Interfaces\ReportMiddleware
@@ -73,5 +73,29 @@ return [
         \MBLSolutions\Report\Driver\Export\PrintExport::class,
         \MBLSolutions\Report\Driver\Export\JsonExport::class,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Report Filesystem Disk
+    |--------------------------------------------------------------------------
+    |
+    | Specify the filesystem driver you would like to use for reports to be
+    | stored.
+    |
+    */
+
+    'filesystem' => env('REPORT_FILESYSTEM_DRIVER', 'local'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Report Filesystem Path
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the path on the filesystem disk where reports should
+    | be stored.
+    |
+    */
+
+    'filesystem_path' => env('REPORT_FILESYSTEM_PATH', 'reports/'),
 
 ];

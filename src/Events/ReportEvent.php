@@ -7,7 +7,7 @@ use MBLSolutions\Report\Models\Report;
 abstract class ReportEvent
 {
     /** @var Report $report */
-    public $report;
+    public Report $report;
 
     /**
      * Create a new Report Event instance

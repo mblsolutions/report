@@ -10,7 +10,7 @@ class ReportMiddlewareControllerTest extends LaravelTestCase
     /** @test **/
     public function can_get_available_middleware(): void
     {
-        $response = $this->getJson('report/middleware');
+        $response = $this->getJson(route('report.middleware.list'));
 
         $response->assertStatus(200);
     }
