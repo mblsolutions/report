@@ -1,3 +1,19 @@
+## v2.0.2
+
++ Add support for queued report rendering
+  + GET /api/report/queue              report.queue.index
+  + POST /api/report/queue/{report}    report.queue.render
+  + GET /api/report/queue/job/{job}    report.queue.job
+  + GET /api/report/queue/result/{job} report.queue.result
+  + GET /api/report/queue/export/{job} report.queue.export
++ Persist report data in to filesystem as a CSV
++ Export report from filesystem
+
+## v2.0.1
+
++ Remove support for Laravel version 5
++ Require illuminate/queue
+
 ## v2.0.0
 
 + bump support for php from ^7.1 to 7.4 or ^8.0

@@ -10,7 +10,7 @@ class ModelControllerTest extends LaravelTestCase
     /** @test **/
     public function can_get_available_models(): void
     {
-        $response = $this->getJson('report/model');
+        $response = $this->getJson(route('report.model.list'));
 
         $response->assertStatus(200);
     }
