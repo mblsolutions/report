@@ -17,6 +17,7 @@ use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportMiddleware;
 use MBLSolutions\Report\Models\ReportSelect;
 use MBLSolutions\Report\Services\BuildReportService;
+use MBLSolutions\Report\Tests\Fakes\User;
 use MBLSolutions\Report\Tests\LaravelTestCase;
 
 class BuildReportServiceTest extends LaravelTestCase
@@ -665,6 +666,22 @@ class BuildReportServiceTest extends LaravelTestCase
 
         $this->assertNotInstanceOf(LengthAwarePaginator::class, $method->invoke($service));
         $this->assertInstanceOf(Collection::class, $method->invoke($service));
+    }
+
+    /** @test */
+    public function can_get_the_total_number_of_records_for_a_report(): void
+    {
+        $this->createFakeUser(5);
+
+        $service = new BuildReportService($this->report, []);
+
+        $this->assertEquals(5, $service->getTotalResults());
+    }
+
+    /** @test **/
+    public function can_chunk_report_records(): void
+    {
+        $this->createFakeUser(10);
     }
 
 }

@@ -18,4 +18,10 @@ class ReportJob extends Model
     /** {@inheritDoc} */
     protected $guarded = [];
 
+
+    protected $casts = [
+        'processed' => 'integer',
+        'total' => 'integer',
+    ];
+
 }

@@ -3,59 +3,49 @@
 namespace MBLSolutions\Report\Jobs;
 
 use Exception;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Http\Request;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Maatwebsite\Excel\Facades\Excel;
 use MBLSolutions\Report\Events\ReportRenderStarted;
-use MBLSolutions\Report\Export\Report\ReportExport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
-use MBLSolutions\Report\Services\BuildReportService;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 
-class RenderReport implements ShouldQueue
+class RenderReport extends RenderReportJob
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    public Report $report;
-
-    public ReportJob $reportJob;
-
-    public array $request;
 
     public function __construct(string $uuid, Report $report, array $request = [])
     {
         $this->report = $report;
-        $this->reportJob = $this->initiateRenderReportJob($uuid);
         $this->request = $request;
+
+        $this->reportJob = $this->initiateRenderReportJob($uuid);
     }
 
+    /**
+     * Execute the Job
+     *
+     * @throws Exception
+     */
     public function handle(): void
     {
         try {
-            $this->reportJob->update(['status' => JobStatus::RUNNING]);
+            $this->reportJob->update([
+                'status' => JobStatus::RUNNING,
+                'processed' => 0,
+                'total' => $this->getBuildReportService()->getTotalResults()
+            ]);
 
-            $service = new BuildReportService($this->report, $this->request, false);
-
-            Excel::store(
-                new ReportExport($service),
-                config('report.filesystem_path', 'reports/') . $this->reportJob->getKey() . '.csv',
-                config('report.filesystem')
-            );
-
-            $this->reportJob->update(['status' => JobStatus::COMPLETE]);
+            ProcessReportExportChunk::dispatch($this->report, $this->reportJob, $this->request, 1);
 
         } catch (Exception $exception) {
-            $this->reportJob->update(['status' => JobStatus::FAILED]);
-
-            throw $exception;
+            $this->handleJobException($exception);
         }
     }
 
+    /**
+     * Create a ReportJob record
+     *
+     * @param string $uuid
+     * @return ReportJob
+     */
     protected function initiateRenderReportJob(string $uuid): ReportJob
     {
         $model = new ReportJob([
@@ -70,5 +60,7 @@ class RenderReport implements ShouldQueue
 
         return $job;
     }
+
+
 
 }
