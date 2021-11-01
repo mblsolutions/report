@@ -2,13 +2,17 @@
 
 namespace MBLSolutions\Report\Tests;
 
+use Faker\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\ExcelServiceProvider;
 use MBLSolutions\Report\Report;
 use MBLSolutions\Report\ReportServiceProvider;
 use MBLSolutions\Report\Tests\Fakes\ExportDriver\FakeExportDriver;
 use MBLSolutions\Report\Tests\Fakes\Middleware\FakeMiddleware;
+use MBLSolutions\Report\Tests\Fakes\User;
 use Orchestra\Testbench\TestCase as OTBTestCase;
 
 class LaravelTestCase extends OTBTestCase
@@ -108,5 +112,40 @@ class LaravelTestCase extends OTBTestCase
         $this->app['config']->set('app.key', 'base64:KMRokGdMt+pgOmbRD+oiKwmfZiKAVxR6KkZ4KuiIo90=');
     }
 
+
+    /**
+     * Create Fake Users for testing
+     *
+     * @param int $count
+     * @return Collection|User
+     */
+    protected function createFakeUser(int $count = 1)
+    {
+        if ($count > 1) {
+            $users = collect([]);
+
+            for ($i = 0; $i < $count; $i++) {
+                $users->push($this->createUser());
+            }
+
+            return $users;
+        }
+
+        return $this->createUser();
+    }
+
+    /**
+     * Create a Fake User
+     *
+     * @return User
+     */
+    private function createUser(): User
+    {
+        $user = new User(['name' => Str::uuid()]);
+
+        $user->save();
+
+        return $user->refresh();
+    }
 
 }

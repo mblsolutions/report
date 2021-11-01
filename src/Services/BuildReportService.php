@@ -69,6 +69,11 @@ class BuildReportService
         return $result;
     }
 
+    public function getRenderedChunk(int $offset, int $limit): Collection
+    {
+        return $this->query->offset($offset)->limit($limit)->get();
+    }
+
     /**
      * Get the Raw Query
      *
@@ -77,6 +82,11 @@ class BuildReportService
     public function getRawQuery(): string
     {
         return $this->query->toSql();
+    }
+
+    public function getTotalResults(): int
+    {
+        return $this->buildReportQuery()->count();
     }
 
     /**
@@ -235,7 +245,6 @@ class BuildReportService
     public function replaceParameter(string $field, $value, $subject)
     {
         if ($value == null) {
-            //return preg_replace("/((AND\s*)?([a-z._]+)\s(>=|<=|=|<|>|!=|<>)\s(\\'?)(\{{$field}\})(\\'?)?)/", null, $subject);
             return preg_replace("/((AND\s*)?([a-z._]+)(\s?)(>=|<=|=|<|>|!=|<>)(\s?)(\\'?)(\{{$field}\})(\s?)([0-9:]*)(\\'?)?)/", null, $subject);
         }
 
