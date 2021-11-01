@@ -15,6 +15,7 @@ class RenderReport extends RenderReportJob
     {
         $this->report = $report;
         $this->request = $request;
+        $this->chunkLimit = config('report.chunk_limit', 50000);
 
         $this->reportJob = $this->initiateRenderReportJob($uuid);
     }

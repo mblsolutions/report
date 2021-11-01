@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ReportJob extends Model
@@ -23,5 +24,10 @@ class ReportJob extends Model
         'processed' => 'integer',
         'total' => 'integer',
     ];
+
+    public function report(): BelongsTo
+    {
+        return $this->belongsTo(Report::class);
+    }
 
 }

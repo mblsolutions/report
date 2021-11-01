@@ -678,10 +678,4 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals(5, $service->getTotalResults());
     }
 
-    /** @test **/
-    public function can_chunk_report_records(): void
-    {
-        $this->createFakeUser(10);
-    }
-
 }

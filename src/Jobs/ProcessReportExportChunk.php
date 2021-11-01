@@ -20,6 +20,7 @@ class ProcessReportExportChunk extends RenderReportJob
         $this->reportJob = $reportJob;
         $this->request = $request;
 
+        $this->chunkLimit = config('report.chunk_limit', 50000);
         $this->chunk = $chunk;
     }
 
@@ -28,24 +29,38 @@ class ProcessReportExportChunk extends RenderReportJob
      *
      * @throws Exception
      */
-    public function handle()
+    public function handle(): void
     {
         try {
-            $this->exportResultsToFile();
-
-            $this->updateReportJobStatus();
-
-            if ($this->isLastChunk()) {
-                $this->completeReportExport();
+            if ($this->checkReportHasResults()) {
+                $this->startExportProcess();
             } else {
-                $this->processNextChunk();
+                $this->completeReportExport();
             }
         } catch (Exception $exception) {
             $this->handleJobException($exception);
         }
     }
 
-    public function exportResultsToFile(): bool
+    /**
+     * Start the Export Process
+     *
+     * @return void
+     */
+    protected function startExportProcess(): void
+    {
+        $this->exportResultsToFile();
+
+        $this->updateReportJobStatus();
+
+        if ($this->isLastChunk()) {
+            $this->completeReportExport();
+        } else {
+            $this->processNextChunk();
+        }
+    }
+
+    protected function exportResultsToFile(): bool
     {
         $service = $this->getBuildReportService();
 
@@ -130,6 +145,16 @@ class ProcessReportExportChunk extends RenderReportJob
     protected function getTotalChunks(): int
     {
         return ceil($this->reportJob->getAttribute('total') / $this->chunkLimit);
+    }
+
+    /**
+     * Check Report has results
+     *
+     * @return bool
+     */
+    protected function checkReportHasResults(): bool
+    {
+        return $this->reportJob->getAttribute('total') > 0;
     }
 
 }
