@@ -98,4 +98,16 @@ return [
 
     'filesystem_path' => env('REPORT_FILESYSTEM_PATH', 'reports/'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Report Chunk Limit
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the report export chunk limit, each file of results
+    | will be limited to this number
+    |
+    */
+
+    'chunk_limit' => env('REPORT_CHUNK_LIMIT', 50000),
+
 ];

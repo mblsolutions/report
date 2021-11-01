@@ -1,3 +1,8 @@
+## v2.1.0
+
++ Chunked export on Queued jobs
++ Update queued export report to handle multiple urls
+
 ## v2.0.2
 
 + Add support for queued report rendering
