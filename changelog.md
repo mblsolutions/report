@@ -1,4 +1,4 @@
-## v2.0.1
+## v2.1.0
 
 + Chunked export on Queued jobs
 + Update queued export report to handle multiple urls
