@@ -69,9 +69,15 @@ class BuildReportService
         return $result;
     }
 
-    public function getRenderedChunk(int $offset, int $limit): Collection
+    public function getRenderedChunk(int $offset, int $limit, bool $toSql = false)
     {
-        return $this->query->offset($offset)->limit($limit)->get();
+        $builder = $this->buildReportQuery()->offset($offset)->limit($limit);
+
+        if ($toSql) {
+            return $builder->toSql();
+        }
+
+        return $builder->get();
     }
 
     /**
