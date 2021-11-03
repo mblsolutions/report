@@ -38,7 +38,10 @@ class ProcessReportExportChunk extends RenderReportJob
                 $this->completeReportExport();
             }
         } catch (Exception $exception) {
-            $this->handleJobException($exception);
+            $this->handleJobException(
+                $exception,
+                $this->getBuildReportService()->getRenderedChunk($this->getOffset(), $this->chunkLimit, true)
+            );
         }
     }
 
@@ -73,10 +76,8 @@ class ProcessReportExportChunk extends RenderReportJob
             'csv'
          );
 
-        $offset = ($this->chunk - 1) * 10000;
-
         return Excel::store(
-            new ReportExport($service, $offset, $this->chunkLimit),
+            new ReportExport($service, $this->getOffset(), $this->chunkLimit),
             $filePath,
             config('report.filesystem')
         );
@@ -89,9 +90,16 @@ class ProcessReportExportChunk extends RenderReportJob
         $total = $job->getAttribute('total');
         $processed = $job->getAttribute('processed') + $this->chunkLimit;
 
-        $this->reportJob->update([
-            'processed' => $processed > $total ? $total : $processed
-        ]);
+
+        $data = [
+            'processed' => $processed > $total ? $total : $processed,
+        ];
+
+        if ($this->chunk === 1) {
+            $data['query'] = $this->getBuildReportService()->getRenderedChunk($this->getOffset(), $this->chunkLimit, true);
+        }
+
+        $this->reportJob->update($data);
     }
 
     /**
@@ -155,6 +163,16 @@ class ProcessReportExportChunk extends RenderReportJob
     protected function checkReportHasResults(): bool
     {
         return $this->reportJob->getAttribute('total') > 0;
+    }
+
+    /**
+     * Get the Offset
+     *
+     * @return float|int
+     */
+    protected function getOffset()
+    {
+        return ($this->chunk - 1) * $this->chunkLimit;
     }
 
 }

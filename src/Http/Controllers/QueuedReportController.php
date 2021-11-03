@@ -8,21 +8,22 @@ use Illuminate\Support\Facades\Bus;
 use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
+use MBLSolutions\Report\Repositories\ReportJobRepository;
 use MBLSolutions\Report\Repositories\ReportRepository;
 use MBLSolutions\Report\Services\QueuedReportExportService;
 use MBLSolutions\Report\Support\Report\RenderJobUuidGenerator;
 
 class QueuedReportController
 {
-    /** @var ReportRepository $repository */
-    protected ReportRepository $repository;
+    /** @var ReportJobRepository $repository */
+    protected ReportJobRepository $repository;
 
     /**
      * Report Controller
      *
-     * @param ReportRepository $repository
+     * @param ReportJobRepository $repository
      */
-    public function __construct(ReportRepository $repository)
+    public function __construct(ReportJobRepository $repository)
     {
         $this->repository = $repository;
     }
@@ -30,11 +31,15 @@ class QueuedReportController
     /**
      * View Report Job Index
      *
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return new JsonResponse(ReportJob::orderByDesc('updated_at')->paginate(), 200);
+        return new JsonResponse(
+            $this->repository->paginate($request->get('limit', config('app.pagination_limit'))),
+            200
+        );
     }
 
     /**
