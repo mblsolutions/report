@@ -35,7 +35,11 @@ class ManageReportController
      */
     public function index(Request $request): ReportCollection
     {
-        return new ReportCollection($this->repository->paginate($request->get('limit')));
+        return new ReportCollection(
+            $this->repository->paginate(
+                $request->get('limit', config('app.pagination_limit'))
+            )
+        );
     }
 
     /**

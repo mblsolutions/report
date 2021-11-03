@@ -1,3 +1,8 @@
+## v2.2.0
+
++ Fix report export render to build report
++ Add headings to report export
+
 ## v2.1.0
 
 + Chunked export on Queued jobs

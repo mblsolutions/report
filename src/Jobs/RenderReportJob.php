@@ -41,12 +41,18 @@ abstract class RenderReportJob implements ShouldQueue
      * @param Exception $exception
      * @throws Exception
      */
-    protected function handleJobException(Exception $exception): void
+    protected function handleJobException(Exception $exception, string $query = null): void
     {
-        $this->reportJob->update([
+        $data = [
             'status' => JobStatus::FAILED,
-            'exception' => $exception->getMessage()
-        ]);
+            'exception' => $exception->getMessage(),
+        ];
+
+        if ($query) {
+            $data['query'] = $query;
+        }
+
+        $this->reportJob->update($data);
 
         throw $exception;
     }

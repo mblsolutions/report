@@ -22,8 +22,8 @@ class CreateReportJobsTable extends Migration
             $table->string('authenticatable_id')->nullable()->index();
             $table->unsignedInteger('processed')->nullable();
             $table->unsignedInteger('total')->nullable();
-            $table->json('parameters')->nullable();
-            $table->json('exception')->nullable();
+            $table->text('parameters')->nullable();
+            $table->text('exception')->nullable();
             $table->text('query')->nullable();
             $table->timestamps();
             $table->softDeletes();

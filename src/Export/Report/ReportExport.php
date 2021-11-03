@@ -4,9 +4,10 @@ namespace MBLSolutions\Report\Export\Report;
 
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use MBLSolutions\Report\Services\BuildReportService;
 
-class ReportExport implements FromCollection
+class ReportExport implements FromCollection, WithHeadings
 {
     protected BuildReportService $service;
 
@@ -20,6 +21,11 @@ class ReportExport implements FromCollection
         $this->service = $service;
         $this->offset = $offset;
         $this->limit = $limit;
+    }
+
+    public function headings(): array
+    {
+        return $this->service->headings()->toArray();
     }
 
     public function collection(): Collection
