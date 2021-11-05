@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use MBLSolutions\Report\GenerateReportExportUri;
 
 class Report extends Model
@@ -104,6 +105,13 @@ class Report extends Model
         );
 
         return app(GenerateReportExportUri::class)->__invoke($params);
+    }
+
+    public function getSlug(): string
+    {
+        $name = $this->getAttribute('name');
+
+        return Str::slug($name);
     }
 
 }

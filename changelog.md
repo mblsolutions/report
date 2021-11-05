@@ -1,3 +1,12 @@
+## v2.4.0
+
++ Add ReportChunkComplete event
++ Add support for queued export in multiple formats using new export interface (\MBLSolutions\Report\Interfaces\ExportDriver) 
+
+## v2.3.0
+
++ Fire event for each job chunk completed
+
 ## v2.2.0
 
 + Fix report export render to build report

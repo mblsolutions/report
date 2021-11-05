@@ -3,11 +3,10 @@
 namespace MBLSolutions\Report\Driver\Export;
 
 use Illuminate\Support\Collection;
-use MBLSolutions\Report\Interfaces\ExportDriver;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Services\BuildReportService;
 
-class CsvExport extends ReportExport implements ExportDriver
+class CsvExport extends ReportExport
 {
     /** @var string $name */
     public $name = 'CSV File (.csv)';

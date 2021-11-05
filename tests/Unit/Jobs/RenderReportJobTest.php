@@ -4,10 +4,14 @@ namespace MBLSolutions\Report\Tests\Unit\Jobs;
 
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use MBLSolutions\Report\Events\ReportChunkComplete;
+use MBLSolutions\Report\Events\ReportRenderComplete;
+use MBLSolutions\Report\Events\ReportRendered;
 use MBLSolutions\Report\Events\ReportRenderStarted;
 use MBLSolutions\Report\Jobs\ProcessReportExportChunk;
 use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
+use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 use MBLSolutions\Report\Tests\LaravelTestCase;
 
@@ -45,6 +49,20 @@ class RenderReportJobTest extends LaravelTestCase
         Event::assertDispatched(ReportRenderStarted::class, function ($event) {
             return $event->job->getKey() === 'aa5615b7-8489-4831-ad00-f50ae770b619';
         });
+    }
+
+    /** @test **/
+    public function creating_a_job_fires_report_job_chunk_complete(): void
+    {
+        Event::fake();
+
+        $job = factory(ReportJob::class)->create([
+            'report_id' => $this->report->getKey()
+        ]);
+
+        dispatch(new ProcessReportExportChunk($this->report, $job, [], 1));
+
+        Event::assertDispatched(ReportChunkComplete::class);
     }
 
     /** @test **/
@@ -90,6 +108,18 @@ class RenderReportJobTest extends LaravelTestCase
             'processed' => 5,
             'total' => 5
         ]);
+    }
+
+    /** @test **/
+    public function fire_report_rendered_once_report_completes(): void
+    {
+        Event::fake();
+
+        $this->createFakeUser(5);
+
+        dispatch(new RenderReport('aa5615b7-8489-4831-ad00-f50ae770b619', $this->report));
+
+        Event::assertDispatched(ReportRenderComplete::class);
     }
 
 }
