@@ -11,12 +11,12 @@ class ReportRepository
     /**
      * All Reports
      *
-     * @param int $limit
+     * @param int|null $limit
      * @return LengthAwarePaginator
      */
-    public function paginate($limit = 25): LengthAwarePaginator
+    public function paginate(int $limit = null): LengthAwarePaginator
     {
-        return Report::paginate($limit);
+        return Report::where('active', '=', true)->orderBy('name')->paginate($limit ?? 25);
     }
 
 }

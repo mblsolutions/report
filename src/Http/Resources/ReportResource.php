@@ -5,6 +5,8 @@ namespace MBLSolutions\Report\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
+use MBLSolutions\Report\Driver\Export\ReportExport;
+use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportMiddleware;
 
@@ -37,7 +39,9 @@ class ReportResource extends JsonResource
             'selects' => new ReportSelectCollection($this->getReportSelects()),
             'joins' => new ReportJoinCollection($this->getReportJoins()),
             'middleware' => new ReportMiddlewareCollection($this->getReportMiddleware()),
-            'deleted_at' => $this->deleted_at
+            'deleted_at' => $this->deleted_at,
+            'export_drivers' => $this->exportDrivers(),
+            'queued_export_drivers' => $this->queuedExportDrivers(),
         ];
     }
 
@@ -87,6 +91,55 @@ class ReportResource extends JsonResource
     protected function getReportMiddleware()
     {
         return $this->middleware;
+    }
+
+    /**
+     * Get the Export Drivers
+     *
+     * @return Collection|null
+     */
+    protected function exportDrivers(): ?Collection
+    {
+        $drivers = config('report.export_drivers');
+
+        if ($drivers) {
+            return collect($drivers)->map(fn($driver) => $this->exportDriverMap($driver));
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the Queued Export Drivers
+     *
+     * @return Collection|null
+     */
+    protected function queuedExportDrivers(): ?Collection
+    {
+        $drivers = config('report.queued_export_drivers');
+
+        if ($drivers) {
+            return collect($drivers)->map(fn($driver) => $this->exportDriverMap($driver));
+        }
+
+        return null;
+    }
+
+    /**
+     * Map Export Drivers
+     *
+     * @param string $namespace
+     * @return array
+     */
+    protected function exportDriverMap(string $namespace): array
+    {
+        /** @var ReportExport|QueuedReportExport $driver */
+        $driver = new $namespace;
+
+        return [
+            'value' => $namespace,
+            'name' => $driver->getName()
+        ];
     }
 
 }

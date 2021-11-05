@@ -3,8 +3,10 @@
 namespace MBLSolutions\Report\Jobs;
 
 use Exception;
-use Maatwebsite\Excel\Facades\Excel;
-use MBLSolutions\Report\Export\Report\ReportExport;
+use Illuminate\Support\Facades\Event;
+use MBLSolutions\Report\Driver\QueuedExport\CsvQueuedExport;
+use MBLSolutions\Report\Events\ReportChunkComplete;
+use MBLSolutions\Report\Events\ReportRenderComplete;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Support\Enums\JobStatus;
@@ -37,6 +39,9 @@ class ProcessReportExportChunk extends RenderReportJob
             } else {
                 $this->completeReportExport();
             }
+
+            Event::dispatch(new ReportChunkComplete($this->report, $this->reportJob));
+
         } catch (Exception $exception) {
             $this->handleJobException(
                 $exception,
@@ -68,19 +73,19 @@ class ProcessReportExportChunk extends RenderReportJob
         $service = $this->getBuildReportService();
 
         $filePath = sprintf(
-            '%s%s/Export-%s-of-%s.%s',
+            '%s%s/%s-%s-of-%s',
             config('report.filesystem_path', 'reports/'),
             $this->reportJob->getKey(),
-            $this->chunk,
+            $this->report->getSlug(),
+            $this->padFileNumber($this->chunk),
             $this->getTotalChunks(),
-            'csv'
          );
 
-        return Excel::store(
-            new ReportExport($service, $this->getOffset(), $this->chunkLimit),
-            $filePath,
-            config('report.filesystem')
-        );
+        $namespace = $this->request['export_driver'] ?? CsvQueuedExport::class;
+
+        $export = new $namespace($service, $this->getOffset(), $this->chunkLimit);
+
+        return $export->storeExportAs($filePath, config('report.filesystem'));
     }
 
     protected function updateReportJobStatus(): void
@@ -122,6 +127,8 @@ class ProcessReportExportChunk extends RenderReportJob
         $this->reportJob->update([
             'status' => JobStatus::COMPLETE,
         ]);
+
+        Event::dispatch(new ReportRenderComplete($this->report, $this->reportJob));
     }
 
     /**
@@ -173,6 +180,11 @@ class ProcessReportExportChunk extends RenderReportJob
     protected function getOffset()
     {
         return ($this->chunk - 1) * $this->chunkLimit;
+    }
+
+    public function padFileNumber($number): string
+    {
+        return str_pad($number, strlen($this->getTotalChunks()), 0, STR_PAD_LEFT);
     }
 
 }
