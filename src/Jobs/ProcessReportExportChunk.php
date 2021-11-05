@@ -81,11 +81,7 @@ class ProcessReportExportChunk extends RenderReportJob
             $this->getTotalChunks(),
          );
 
-        if ($this->request['export_driver']) {
-            $namespace = $this->request['export_driver'];
-        } else {
-            $namespace = CsvQueuedExport::class;
-        }
+        $namespace = $this->request['export_driver'] ?? CsvQueuedExport::class;
 
         $export = new $namespace($service, $this->getOffset(), $this->chunkLimit);
 
