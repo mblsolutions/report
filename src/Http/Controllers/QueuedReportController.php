@@ -9,7 +9,6 @@ use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Repositories\ReportJobRepository;
-use MBLSolutions\Report\Repositories\ReportRepository;
 use MBLSolutions\Report\Services\QueuedReportExportService;
 use MBLSolutions\Report\Support\Report\RenderJobUuidGenerator;
 
@@ -69,6 +68,12 @@ class QueuedReportController
         return new JsonResponse($job, 200);
     }
 
+    /**
+     * Generate Export links for Report Job
+     *
+     * @param ReportJob $job
+     * @return JsonResponse
+     */
     public function export(ReportJob $job): JsonResponse
     {
         $service = new QueuedReportExportService($job);

@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report\Jobs;
 
 use Exception;
+use Illuminate\Support\Facades\Event;
 use MBLSolutions\Report\Events\ReportRenderStarted;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
@@ -31,7 +32,8 @@ class RenderReport extends RenderReportJob
             $this->reportJob->update([
                 'status' => JobStatus::RUNNING,
                 'processed' => 0,
-                'total' => $this->getBuildReportService()->getTotalResults()
+                'total' => $this->getBuildReportService()->getTotalResults(),
+                'parameters' => json_encode($this->request, JSON_THROW_ON_ERROR | true)
             ]);
 
             ProcessReportExportChunk::dispatch($this->report, $this->reportJob, $this->request, 1);
@@ -57,7 +59,7 @@ class RenderReport extends RenderReportJob
 
         $model->save();
 
-        event(new ReportRenderStarted($this->report, $job = $model->refresh()));
+        Event::dispatch(new ReportRenderStarted($this->report, $job = $model->refresh()));
 
         return $job;
     }

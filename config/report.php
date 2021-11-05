@@ -110,4 +110,25 @@ return [
 
     'chunk_limit' => env('REPORT_CHUNK_LIMIT', 50000),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Queued Export Drivers
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the export drivers available for queued report
+    | results out of the application.
+    |
+    | Drivers: "csv", "xls", "xlsx", "ods", "tsv"
+    |
+    | @interface \MBLSolutions\Report\Interfaces\ExportDriver
+    */
+
+    'queued_export_drivers' => [
+        \MBLSolutions\Report\Driver\QueuedExport\CsvQueuedExport::class,
+        \MBLSolutions\Report\Driver\QueuedExport\XlsQueuedExport::class,
+        \MBLSolutions\Report\Driver\QueuedExport\XlsxQueuedExport::class,
+        \MBLSolutions\Report\Driver\QueuedExport\OdsQueuedExport::class,
+        \MBLSolutions\Report\Driver\QueuedExport\TsvQueuedExport::class,
+    ]
+
 ];

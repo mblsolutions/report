@@ -3,7 +3,7 @@
 namespace MBLSolutions\Report\Repositories;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use MBLSolutions\Report\Models\Report;
+use Illuminate\Support\Carbon;
 use MBLSolutions\Report\Models\ReportJob;
 
 class ReportJobRepository
@@ -12,12 +12,17 @@ class ReportJobRepository
     /**
      * All Reports
      *
-     * @param int $limit
+     * @param int|null $limit
      * @return LengthAwarePaginator
      */
-    public function paginate($limit = 25): LengthAwarePaginator
+    public function paginate(int $limit = null): LengthAwarePaginator
     {
-        return ReportJob::orderByDesc('updated_at')->paginate($limit);
+        return ReportJob::whereBetween('report_jobs.created_at', [
+            Carbon::now()->subDays(28)->toDateTimeString(),
+            Carbon::now()->toDateTimeString()
+        ])
+        ->orderByDesc('updated_at')
+        ->paginate($limit ?? null);
     }
 
 }

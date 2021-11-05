@@ -8,6 +8,8 @@ use MBLSolutions\Report\Models\Report;
 
 class FakeExportDriver implements ExportDriver
 {
+    public string $name = 'Fake Export Driver';
+
     /**
      * Export report result data
      *
@@ -21,6 +23,20 @@ class FakeExportDriver implements ExportDriver
             'report' => $report->toArray(),
             'params' => $params
         ]);
+    }
+
+    /**
+     * Get Export Driver Name
+     *
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        if ($this->name) {
+            return $this->name;
+        }
+
+        return null;
     }
 
 }
