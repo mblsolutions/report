@@ -11,6 +11,7 @@ use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportMiddleware;
+use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Models\ReportSelect;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 use MBLSolutions\Report\Tests\Fakes\Middleware\FakeMiddleware;
@@ -80,5 +81,16 @@ $factory->define(ReportJob::class, static function (Faker $faker) {
         },
         'status' => JobStatus::SCHEDULED,
         'authenticatable_id' => null,
+    ];
+});
+
+$factory->define(ScheduledReport::class, static function (Faker $faker) {
+    return [
+        'uuid' => Str::uuid(),
+        'schedule' => \MBLSolutions\Report\Support\Enums\ReportSchedule::MONTHLY,
+        'report_id' => factory(Report::class)->create(),
+        'authenticatable_id' => null,
+        'parameters' => null,
+        'last_run' => null,
     ];
 });

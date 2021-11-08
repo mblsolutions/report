@@ -73,6 +73,11 @@ class Report
             Route::get('report/data/type', 'DataTypeController@index')->name('data.type.list');
             Route::get('report/model', 'ModelController@index')->name('model.list');
 
+            // Scheduled Tasks
+            Route::get('report/schedule', 'ScheduledReportController@index')->name('schedule.index');
+            Route::post('report/schedule', 'ScheduledReportController@create')->name('schedule.create');
+            Route::delete('report/schedule/{schedule}', 'ScheduledReportController@destroy')->name('schedule.destroy');
+
             // Asynchronous
             Route::get('report/queue', 'QueuedReportController@index')->name('queue.index');
             Route::post('report/queue/{report}', 'QueuedReportController@render')->name('queue.render');

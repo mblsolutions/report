@@ -10,7 +10,7 @@ class ReportJobRepository
 {
 
     /**
-     * All Reports
+     * All Report Jobs
      *
      * @param int|null $limit
      * @return LengthAwarePaginator

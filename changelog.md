@@ -1,3 +1,12 @@
+## v2.4.0
+
++ Add scheduled report migration
++ Add scheduled report model
++ Add scheduled report routes
+  + GET /report/schedule
+  + POST /report/schedule
+  + DELETE /report/schedule/{schedule}
+
 ## v2.3.0
 
 + Fire event for each job chunk completed
