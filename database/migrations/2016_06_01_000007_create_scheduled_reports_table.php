@@ -17,11 +17,13 @@ class CreateScheduledReportsTable extends Migration
     {
         Schema::create('scheduled_reports', static function (Blueprint $table) {
             $table->uuid('uuid');
-            $table->string('schedule')->index()->default(ReportSchedule::MONTHLY);
             $table->unsignedInteger('report_id')->index();
-            $table->string('authenticatable_id')->nullable()->index();
             $table->text('parameters')->nullable();
+            $table->string('frequency')->index()->default(ReportSchedule::MONTHLY);
+            $table->dateTime('limit')->nullable();
+            $table->text('recipients')->nullable();
             $table->dateTime('last_run')->nullable();
+            $table->string('authenticatable_id')->nullable()->index();
             $table->timestamps();
             $table->softDeletes();
         });

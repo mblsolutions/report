@@ -140,6 +140,15 @@ Please Note: We recommend that large record sets are not used as select types, d
 ]
 ```
 
+### Scheduled Reporting
+
+To enable scheduled reporting add the following line into the `schedule` method of the `\App\Console\Kernel` file of your
+laravel application.
+
+```php
+$schedule->command(\MBLSolutions\Report\Console\Commands\DispatchScheduledReportsCommand::class)->hourly();
+```
+
 ### Report JSON API
 
 The following endpoints are available to you once the routes have been added:
@@ -168,6 +177,16 @@ The following endpoints are available to you once the routes have been added:
 | GET       | /api/report/queue/result/{job}    | report.queue.result       |
 | GET       | /api/report/queue/export/{job}    | report.queue.export       |
 
+
+### Scheduled Report Routes
+
+| Method    | URI                               | Name                          |
+| ---       | ---                               | ---                           |
+| GET       | /report/schedule/frequency        | report.schedule.frequencies   |
+| GET       | /report/schedule                  | report.schedule.index         |
+| POST      | /report/schedule                  | report.schedule.create        |
+| DELETE    | /report/schedule/{schedule}       | report.schedule.destroy       |
+
 #### Export Routes
 
 | Method    | URI                           | Name                      |
@@ -190,13 +209,14 @@ The following endpoints are available to you once the routes have been added:
 
 Events are fired at critical points during report creation/completion
 
-| Event                 | Description                                | Data                           | Namespace                                          |
-| ---                   | ---                                        | ---                            | ---                                                |
-| ReportCreated         | A new report was created.                  | Report $report                 |  MBLSolutions\Report\Events\ReportCreated          |
-| ReportUpdated         | A report was updated.                      | Report $report                 |  MBLSolutions\Report\Events\ReportUpdated          |
-| ReportDestroyed       | A report was deleted.                      | Report $report                 |  MBLSolutions\Report\Events\ReportDestroyed        |
-| ReportRendered        | A report was rendered.                     | Report $report                 |  MBLSolutions\Report\Events\ReportRendered         |
-| ReportExported        | A report was exported.                     | Report $report                 |  MBLSolutions\Report\Events\ReportExported         |
-| ReportRenderStarted   | A queued report job to render was started. | Report $report, ReportJob $job |  MBLSolutions\Report\Events\ReportRenderStarted    |
-| ReportChunkComplete   | A queued report job chunk was completed.   | Report $report, ReportJob $job |  MBLSolutions\Report\Events\ReportChunkComplete    |
-| ReportRenderComplete  | A queued report job render was completed.  | Report $report, ReportJob $job |  MBLSolutions\Report\Events\ReportRenderComplete   |
+| Event                      | Description                                | Data                           | Namespace                                          |
+| ---                        | ---                                        | ---                            | ---                                                |
+| ReportCreated              | A new report was created.                  | Report $report                 |  MBLSolutions\Report\Events\ReportCreated          |
+| ReportUpdated              | A report was updated.                      | Report $report                 |  MBLSolutions\Report\Events\ReportUpdated          |
+| ReportDestroyed            | A report was deleted.                      | Report $report                 |  MBLSolutions\Report\Events\ReportDestroyed        |
+| ReportRendered             | A report was rendered.                     | Report $report                 |  MBLSolutions\Report\Events\ReportRendered         |
+| ReportExported             | A report was exported.                     | Report $report                 |  MBLSolutions\Report\Events\ReportExported         |
+| ReportRenderStarted        | A queued report job to render was started. | Report $report, ReportJob $job |  MBLSolutions\Report\Events\ReportRenderStarted    |
+| ReportChunkComplete        | A queued report job chunk was completed.   | Report $report, ReportJob $job |  MBLSolutions\Report\Events\ReportChunkComplete    |
+| ReportRenderComplete       | A queued report job render was completed.  | Report $report, ReportJob $job |  MBLSolutions\Report\Events\ReportRenderComplete   |
+| ScheduledReportDispatched  | A scheduled report was run.                | ScheduledReport $schedule      |  MBLSolutions\Report\Events\ReportRenderComplete   |

@@ -16,8 +16,13 @@ class ScheduledReport extends Model
 
     protected $primaryKey = 'uuid';
 
-    /** {@inheritDoc} */
     protected $guarded = [];
+
+    protected $casts = [
+        'parameters' => 'array',
+        'limit' => 'integer',
+        'created_at' => 'datetime'
+    ];
 
     /**
      * Belongs to a Report

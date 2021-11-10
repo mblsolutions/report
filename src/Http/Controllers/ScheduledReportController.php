@@ -4,11 +4,13 @@ namespace MBLSolutions\Report\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use MBLSolutions\Report\Http\Resources\ScheduledReportCollection;
 use MBLSolutions\Report\Http\Resources\ScheduledReportResource;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Repositories\ScheduledReportRepository;
+use MBLSolutions\Report\Support\Enums\ReportSchedule;
 
 class ScheduledReportController
 {
@@ -34,6 +36,13 @@ class ScheduledReportController
 
     public function create(Request $request): ScheduledReportResource
     {
+        $request->validate([
+            'report_id' => 'required|exists:reports,id',
+            'parameters' => 'required',
+            'frequency' => 'required',
+            'limit' => 'nullable|integer',
+        ]);
+
         $schedule = new ScheduledReport(array_merge([
             'uuid' => Str::uuid()
         ], $request->toArray()));
@@ -44,18 +53,16 @@ class ScheduledReportController
         return new ScheduledReportResource($schedule);
     }
 
-    /**
-     * Delete a Scheduled Report
-     *
-     * @param ScheduledReport $schedule
-     * @return JsonResponse
-     * @throws \Exception
-     */
     public function destroy(ScheduledReport $schedule): JsonResponse
     {
         $schedule->delete();
 
         return new JsonResponse(null, 204);
+    }
+
+    public function frequencies(): Collection
+    {
+        return ReportSchedule::options();
     }
 
 }

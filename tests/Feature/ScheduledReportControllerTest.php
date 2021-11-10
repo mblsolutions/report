@@ -2,6 +2,7 @@
 
 namespace MBLSolutions\Report\Tests\Feature;
 
+use MBLSolutions\Report\Driver\QueuedExport\CsvQueuedExport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
@@ -19,13 +20,14 @@ class ScheduledReportControllerTest extends LaravelTestCase
     /** @test **/
     public function can_create_scheduled_report(): void
     {
-        $this->withoutExceptionHandling();
-
         $this->postJson(route('report.schedule.create'), [
-            'schedule' => ReportSchedule::MONTHLY,
             'report_id' => factory(Report::class)->create()->getKey(),
+            'parameters' => ['export_driver' => CsvQueuedExport::class],
+            'frequency' => ReportSchedule::MONTHLY,
+            'limit' => null,
+            'recipients' => null,
+            'last_run' => null,
             'authenticatable_id' => null,
-            'parameters' => null,
         ])->assertStatus(201);
     }
 

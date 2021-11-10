@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report;
 
 use Illuminate\Support\ServiceProvider;
+use MBLSolutions\Report\Console\Commands\DispatchScheduledReportsCommand;
 
 class ReportServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,12 @@ class ReportServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../resources/js' => base_path('resources/js/report'),
         ], 'report-components');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                DispatchScheduledReportsCommand::class
+            ]);
+        }
     }
 
     /**

@@ -12,10 +12,12 @@ use MBLSolutions\Report\Support\Enums\JobStatus;
 class RenderReport extends RenderReportJob
 {
 
-    public function __construct(string $uuid, Report $report, array $request = [])
+    public function __construct(string $uuid, Report $report, array $request = [], $authenticatable = null, string $schedule = null)
     {
         $this->report = $report;
         $this->request = $request;
+        $this->authenticatable = $authenticatable;
+        $this->schedule = $schedule;
         $this->chunkLimit = config('report.chunk_limit', 50000);
 
         $this->reportJob = $this->initiateRenderReportJob($uuid);
@@ -33,7 +35,9 @@ class RenderReport extends RenderReportJob
                 'status' => JobStatus::RUNNING,
                 'processed' => 0,
                 'total' => $this->getBuildReportService()->getTotalResults(),
-                'parameters' => json_encode($this->request, JSON_THROW_ON_ERROR | true)
+                'parameters' => json_encode($this->request, JSON_THROW_ON_ERROR | true),
+                'authenticatable_id' => $this->authenticatable,
+                'schedule_id' => $this->schedule,
             ]);
 
             ProcessReportExportChunk::dispatch($this->report, $this->reportJob, $this->request, 1);
