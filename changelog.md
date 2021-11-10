@@ -6,6 +6,7 @@
   + GET /report/schedule
   + POST /report/schedule
   + DELETE /report/schedule/{schedule}
++ Add new Command `\MBLSolutions\Report\Console\Commands\DispatchScheduledReportsCommand::class` 
 
 ## v2.3.0
 
