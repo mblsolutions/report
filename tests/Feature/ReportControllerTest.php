@@ -109,4 +109,14 @@ class ReportControllerTest extends LaravelTestCase
         $response->assertStatus(401);
     }
 
+    /** @test **/
+    public function can_view_report_preview(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $this->postJson(route('report.preview', [
+            'report' => factory(Report::class)->create()
+        ]), [])->assertStatus(200);
+    }
+
 }

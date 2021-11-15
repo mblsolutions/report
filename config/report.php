@@ -129,6 +129,18 @@ return [
         \MBLSolutions\Report\Driver\QueuedExport\XlsxQueuedExport::class,
         \MBLSolutions\Report\Driver\QueuedExport\OdsQueuedExport::class,
         \MBLSolutions\Report\Driver\QueuedExport\TsvQueuedExport::class,
-    ]
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Report Preview Limit
+    |--------------------------------------------------------------------------
+    |
+    | The maximum number of records that should be displayed as part of the
+    | report preview.
+    |
+    */
+
+    'preview_limit' => env('REPORT_PREVIEW_LIMIT', 1000),
 
 ];

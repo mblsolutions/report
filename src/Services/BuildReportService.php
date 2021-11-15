@@ -3,13 +3,18 @@
 namespace MBLSolutions\Report\Services;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use MBLSolutions\Report\Driver\Export\ReportExport;
+use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Events\ReportRendered;
 use MBLSolutions\Report\Interfaces\ReportMiddleware;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportExportDrivers;
 use MBLSolutions\Report\Models\ReportField;
+use MBLSolutions\Report\Models\ReportFieldType;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportSelect;
 use MBLSolutions\Report\Support\Maps\ReportResultMap;
@@ -31,6 +36,8 @@ class BuildReportService
     /** @var Builder $query */
     protected $query;
 
+    private $fields;
+
     /**
      * Create a new Render Report Service Instance
      *
@@ -43,6 +50,8 @@ class BuildReportService
         $this->paginate = $paginate;
         $this->report = $report;
         $this->parameters = collect($parameters);
+
+        $this->fields = $this->report->fields;
 
         $this->query = DB::connection($this->report->connection)->table($this->report->table);
     }
@@ -69,6 +78,96 @@ class BuildReportService
         return $result;
     }
 
+    /**
+     * Render the Report
+     *
+     * @param int $limit
+     * @return Collection
+     */
+    public function renderPreview(int $limit): Collection
+    {
+        $this->buildReportQuery();
+
+        $result = collect([
+            'headings' => $this->headings(),
+            'data' => $this->data(0, $limit),
+            'totals' => false,
+            'drivers' => $this->exportDrivers(),
+            'raw' => $this->getRawQuery(),
+            'parameters' => $this->parameters->map(fn ($value, $alias) => $this->formatParameters($value, $alias)),
+            'result_limit' => $limit
+        ]);
+
+        event(new ReportRendered($this->report));
+
+        return $result;
+    }
+
+    /**
+     * Format Parameters
+     *
+     * @param $value
+     * @param $alias
+     * @return array
+     */
+    protected function formatParameters($value, $alias): ?array
+    {
+        if ($alias === 'export_driver') {
+            /** @var QueuedReportExport|ReportExport $driver */
+            $driver = new $value;
+
+            return [
+                'name' => 'Export Driver',
+                'value' => $driver->getName()
+            ];
+        }
+
+        $field = $this->fields->firstWhere('alias', $alias);
+
+
+        $fieldValue = $field ? $this->formatParameterValue($value, $field) : $value;
+
+        return [
+            'name' => $field ? $field->getAttribute('label') : $alias,
+            'value' => $fieldValue ?? '-'
+        ];
+    }
+
+    /**
+     * Format Parameter Value
+     *
+     * @param null $value
+     * @param ReportField $field
+     * @return mixed
+     */
+    protected function formatParameterValue($value, ReportField $field)
+    {
+        switch ($field->getAttribute('type')) {
+            case ReportFieldType::SELECT:
+                $namespace = $field->getAttribute('model');
+
+                $model = $namespace::where($field->getAttribute('model_select_value'),  '=', $value)->first();
+
+                return $model ? $model->getAttribute($field->getAttribute('model_select_name')) : $value;
+            case ReportFieldType::DATE:
+                return Carbon::parse($value)->toDateString();
+            case ReportFieldType::TIME:
+                return Carbon::parse($value)->toTimeString();
+            case ReportFieldType::DATETIME:
+                return Carbon::parse($value)->toDateTimeString();
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get Rendered Report Chunk
+     *
+     * @param int $offset
+     * @param int $limit
+     * @param bool $toSql
+     * @return Collection|string
+     */
     public function getRenderedChunk(int $offset, int $limit, bool $toSql = false)
     {
         $builder = $this->buildReportQuery()->offset($offset)->limit($limit);
@@ -327,8 +426,12 @@ class BuildReportService
      *
      * @return mixed
      */
-    private function data()
+    private function data(int $offset = 0, int $limit = null)
     {
+        if ($limit) {
+            $this->query = $this->query->offset($offset)->limit($limit);
+        }
+
         if ($this->report->shouldShowData()) {
             if ($this->paginate) {
                 $results = $this->query->paginate($this->report->display_limit);

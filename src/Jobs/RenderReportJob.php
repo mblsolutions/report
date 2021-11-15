@@ -21,6 +21,11 @@ abstract class RenderReportJob implements ShouldQueue
 
     public ReportJob $reportJob;
 
+    /** @var null|mixed */
+    public $authenticatable = null;
+
+    public ?string $schedule = null;
+
     public array $request;
 
     public int $chunkLimit = 50000;

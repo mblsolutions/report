@@ -103,4 +103,18 @@ class ReportController
         return (new ExportReportService($report, $request))->handle();
     }
 
+    /**
+     * View the report preview
+     *
+     * @param Report $report
+     * @param Request $request
+     * @return mixed
+     */
+    public function preview(Report $report, Request $request)
+    {
+        $service = new BuildReportService($report, $request->toArray(), false);
+
+        return $service->renderPreview(config('report.preview_limit'));
+    }
+
 }
