@@ -1,3 +1,7 @@
+## v2.4.1
+
++ Loosen schedule validation to rush within the first minute (because CRONs are never on time it seems).
+
 ## v2.4.0
 
 + Add scheduled report migration

@@ -17,27 +17,27 @@ class ScheduledReportRepository extends EloquentRepository
     {
         $frequencies = collect([]);
 
-        if ($date->format('i:s') === '00:00') {
+        if ($date->format('i') === '00') {
             $frequencies->push(ReportSchedule::HOURLY);
         }
 
-        if ($date->format('H:i:s') === '00:00:00') {
+        if ($date->format('H:i') === '00:00') {
             $frequencies->push(ReportSchedule::DAILY);
         }
 
-        if ($date->format('l H:i:s') === 'Monday 00:00:00') {
+        if ($date->format('l H:i') === 'Monday 00:00') {
             $frequencies->push(ReportSchedule::WEEKLY);
         }
 
-        if ($date->format('d H:i:s') === '01 00:00:00') {
+        if ($date->format('d H:i') === '01 00:00') {
             $frequencies->push(ReportSchedule::MONTHLY);
         }
 
-        if ($date->format('d H:i:s') === '01 00:00:00' && in_array($date->format('m'), ['01', '04', '07', '10'])) {
+        if ($date->format('d H:i') === '01 00:00' && in_array($date->format('m'), ['01', '04', '07', '10'])) {
             $frequencies->push(ReportSchedule::QUARTERLY);
         }
 
-        if ($date->format('m-d H:i:s') === '01-01 00:00:00') {
+        if ($date->format('m-d H:i') === '01-01 00:00') {
             $frequencies->push(ReportSchedule::YEARLY);
         }
 

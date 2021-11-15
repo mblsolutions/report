@@ -140,4 +140,29 @@ class ScheduledReportRepositoryTest extends LaravelTestCase
         ], $this->repository->getScheduledReportsToRun($date)->pluck('uuid')->toArray());
     }
 
+    /** @test **/
+    public function can_run_schedule_within_first_minute(): void
+    {
+        $date = Carbon::parse('2021-11-10 09:00:40');
+
+        $this->assertEquals([
+            'd68a28d3-8544-4dd2-aeed-ed148eb37874', // HOURLY
+        ], $this->repository->getScheduledReportsToRun($date)->pluck('uuid')->toArray());
+    }
+
+    /** @test **/
+    public function can_run_all_schedules_within_first_minute(): void
+    {
+        $date = Carbon::parse('2018-01-01 00:00:43'); // Monday 1st of Jan 2018 at Midnight(ish...)
+
+        $this->assertEquals([
+            'c066524b-b5ad-46d1-961d-f96203c54181', // DAILY
+            'd68a28d3-8544-4dd2-aeed-ed148eb37874', // HOURLY
+            '56738a7e-4bec-4c14-a8f7-7ef0ea58f204', // MONTHLY
+            '417aa61e-3219-422d-9111-f701daf7e18f', // QUARTERLY
+            '404a1dbc-226a-46bd-9348-de2dd28f8d56', // WEEKLY
+            '2930826c-6732-44e6-9c19-f62153ad53a9', // YEARLY
+        ], $this->repository->getScheduledReportsToRun($date)->pluck('uuid')->toArray());
+    }
+
 }
