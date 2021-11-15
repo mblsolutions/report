@@ -31,14 +31,19 @@ class RenderReport extends RenderReportJob
     public function handle(): void
     {
         try {
-            $this->reportJob->update([
+            $data = [
                 'status' => JobStatus::RUNNING,
                 'processed' => 0,
                 'total' => $this->getBuildReportService()->getTotalResults(),
                 'parameters' => json_encode($this->request, JSON_THROW_ON_ERROR | true),
-                'authenticatable_id' => $this->authenticatable,
                 'schedule_id' => $this->schedule,
-            ]);
+            ];
+
+            if ($this->authenticatable) {
+                $data['authenticatable_id'] = $this->authenticatable;
+            }
+
+            $this->reportJob->update($data);
 
             ProcessReportExportChunk::dispatch($this->report, $this->reportJob, $this->request, 1);
 

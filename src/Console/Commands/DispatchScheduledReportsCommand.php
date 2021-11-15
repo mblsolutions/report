@@ -34,7 +34,8 @@ class DispatchScheduledReportsCommand extends Command
 
         $this->info('Running Report Schedules');
 
-        $repository->getScheduledReportsToRun($this->date)->each(function (ScheduledReport $schedule) {
+        // TODO put back
+        $repository->all($this->date)->each(function (ScheduledReport $schedule) {
             $this->info(
                 sprintf('Running Schedule for Report %s', $schedule->getKey())
             );

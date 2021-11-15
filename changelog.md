@@ -6,7 +6,8 @@
   + GET /report/schedule
   + POST /report/schedule
   + DELETE /report/schedule/{schedule}
-+ Add new Command `\MBLSolutions\Report\Console\Commands\DispatchScheduledReportsCommand::class` 
++ Add new Command `\MBLSolutions\Report\Console\Commands\DispatchScheduledReportsCommand::class`
++ Add a report render preview, limited to 1000 results (can be overridden use the `REPORT_PREVIEW_LIMIT` env)
 
 ## v2.3.0
 

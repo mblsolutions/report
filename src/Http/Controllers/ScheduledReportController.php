@@ -34,6 +34,12 @@ class ScheduledReportController
         );
     }
 
+    /**
+     * Create a Scheduled Report
+     *
+     * @param Request $request
+     * @return ScheduledReportResource
+     */
     public function create(Request $request): ScheduledReportResource
     {
         $request->validate([
@@ -53,6 +59,13 @@ class ScheduledReportController
         return new ScheduledReportResource($schedule);
     }
 
+    /**
+     * Delete a Scheduled Report
+     *
+     * @param ScheduledReport $schedule
+     * @return JsonResponse
+     * @throws \Exception
+     */
     public function destroy(ScheduledReport $schedule): JsonResponse
     {
         $schedule->delete();
@@ -60,6 +73,11 @@ class ScheduledReportController
         return new JsonResponse(null, 204);
     }
 
+    /**
+     * Get the report Run frequencies
+     *
+     * @return Collection
+     */
     public function frequencies(): Collection
     {
         return ReportSchedule::options();

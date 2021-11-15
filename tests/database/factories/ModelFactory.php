@@ -91,6 +91,7 @@ $factory->define(ReportJob::class, static function (Faker $faker) {
         },
         'status' => JobStatus::SCHEDULED,
         'authenticatable_id' => null,
+        'schedule_id' => null,
     ];
 });
 
