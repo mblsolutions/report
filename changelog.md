@@ -1,3 +1,14 @@
+## v2.4.0
+
++ Add scheduled report migration
++ Add scheduled report model
++ Add scheduled report routes
+  + GET /report/schedule
+  + POST /report/schedule
+  + DELETE /report/schedule/{schedule}
++ Add new Command `\MBLSolutions\Report\Console\Commands\DispatchScheduledReportsCommand::class`
++ Add a report render preview, limited to 1000 results (can be overridden use the `REPORT_PREVIEW_LIMIT` env)
+
 ## v2.3.0
 
 + Fire event for each job chunk completed

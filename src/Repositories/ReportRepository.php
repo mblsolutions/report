@@ -3,20 +3,24 @@
 namespace MBLSolutions\Report\Repositories;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Lerouse\LaravelRepository\EloquentRepository;
 use MBLSolutions\Report\Models\Report;
 
-class ReportRepository
+class ReportRepository extends EloquentRepository
 {
 
-    /**
-     * All Reports
-     *
-     * @param int|null $limit
-     * @return LengthAwarePaginator
-     */
     public function paginate(int $limit = null): LengthAwarePaginator
     {
-        return Report::where('active', '=', true)->orderBy('name')->paginate($limit ?? 25);
+        return $this->builder()
+                    ->where('active', '=', true)
+                    ->orderBy('name')
+                    ->paginate($limit ?? 25);
+    }
+
+    public function builder(): Builder
+    {
+        return Report::query();
     }
 
 }

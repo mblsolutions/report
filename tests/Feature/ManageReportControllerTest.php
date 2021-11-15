@@ -11,8 +11,6 @@ class ManageReportControllerTest extends LaravelTestCase
     /** @test **/
     public function can_view_manage_report_index(): void
     {
-        $this->withoutExceptionHandling();
-
         factory(Report::class)->create(['name' => 'Test Report']);
 
         $response = $this->getJson(route('report.manage.index'));

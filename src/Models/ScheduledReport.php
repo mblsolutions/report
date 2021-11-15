@@ -6,23 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ReportJob extends Model
+class ScheduledReport extends Model
 {
     use SoftDeletes;
-
-    protected $primaryKey = 'uuid';
 
     public $incrementing = false;
 
     protected $keyType = 'string';
 
-    /** {@inheritDoc} */
+    protected $primaryKey = 'uuid';
+
     protected $guarded = [];
 
-
     protected $casts = [
-        'processed' => 'integer',
-        'total' => 'integer',
+        'parameters' => 'array',
+        'limit' => 'integer',
+        'created_at' => 'datetime'
     ];
 
     /**

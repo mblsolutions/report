@@ -75,8 +75,6 @@ class QueuedReportControllerTest extends LaravelTestCase
     /** @test **/
     public function can_generate_export_link(): void
     {
-        $this->withoutExceptionHandling();
-
         Storage::fake();
 
         factory(ReportJob::class)->create([

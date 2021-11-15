@@ -20,6 +20,7 @@ class CreateReportJobsTable extends Migration
             $table->unsignedInteger('report_id')->index();
             $table->string('status', 20)->default(JobStatus::SCHEDULED);
             $table->string('authenticatable_id')->nullable()->index();
+            $table->string('schedule_id')->nullable()->index();
             $table->unsignedInteger('processed')->nullable();
             $table->unsignedInteger('total')->nullable();
             $table->text('parameters')->nullable();
