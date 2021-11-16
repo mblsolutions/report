@@ -12,7 +12,7 @@ class CreateReportSelectsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('report_selects', static function (Blueprint $table) {
             $table->increments('id');
@@ -30,7 +30,7 @@ class CreateReportSelectsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('report_selects');
     }

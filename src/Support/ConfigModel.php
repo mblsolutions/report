@@ -17,7 +17,7 @@ abstract class ConfigModel
      */
     public function __construct()
     {
-        $this->models = collect(config($this->key));
+        $this->models = new Collection(config($this->key));
     }
 
     /**

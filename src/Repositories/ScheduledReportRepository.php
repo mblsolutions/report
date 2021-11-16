@@ -15,7 +15,7 @@ class ScheduledReportRepository extends EloquentRepository
     
     public function getScheduledReportsToRun(Carbon $date): Collection
     {
-        $frequencies = collect([]);
+        $frequencies = new Collection([]);
 
         if ($date->format('i') === '00') {
             $frequencies->push(ReportSchedule::HOURLY);

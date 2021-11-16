@@ -13,7 +13,7 @@ class CreateScheduledReportsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('scheduled_reports', static function (Blueprint $table) {
             $table->uuid('uuid');
@@ -33,7 +33,7 @@ class CreateScheduledReportsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('scheduled_reports');
     }

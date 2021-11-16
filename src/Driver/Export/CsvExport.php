@@ -74,7 +74,7 @@ class CsvExport extends ReportExport
             }
 
             $chunk->each(static function ($row) {
-                print collect($row)->implode(',') . PHP_EOL;
+                print (new Collection($row))->implode(',') . PHP_EOL;
             });
         });
 

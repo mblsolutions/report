@@ -18,7 +18,7 @@ abstract class EnumModel
     {
         $reflectionClass = new ReflectionClass(static::class);
 
-        return collect($reflectionClass->getConstants());
+        return new Collection($reflectionClass->getConstants());
     }
 
     /**
@@ -43,7 +43,7 @@ abstract class EnumModel
      */
     public static function options(string $value = 'id', string $name = 'name'): Collection
     {
-        $options = collect();
+        $options = new Collection();
 
         self::all()->each(static function ($enum) use ($options) {
             $options->add(['id' => $enum, 'name' => self::name($enum)]);

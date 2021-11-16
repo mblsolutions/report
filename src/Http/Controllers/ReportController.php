@@ -5,7 +5,7 @@ namespace MBLSolutions\Report\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
-use MBLSolutions\Report\Http\Resources\ReportCollection;
+use MBLSolutions\Report\Http\Resources\ReportIndexCollection;
 use MBLSolutions\Report\Http\Resources\ReportResource;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Repositories\ReportRepository;
@@ -31,11 +31,11 @@ class ReportController
      * Report Index
      *
      * @param Request $request
-     * @return ReportCollection
+     * @return ReportIndexCollection
      */
-    public function index(Request $request): ReportCollection
+    public function index(Request $request): ReportIndexCollection
     {
-        return new ReportCollection(
+        return new ReportIndexCollection(
             $this->repository->paginate(
                 $request->get('limit', config('app.pagination_limit'))
             )

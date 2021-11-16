@@ -53,10 +53,41 @@ class ScheduledReportController
             'uuid' => Str::uuid()
         ], $request->toArray()));
 
-
         $schedule->save();
 
         return new ScheduledReportResource($schedule);
+    }
+
+    /**
+     * Show Scheduled Report
+     *
+     * @param ScheduledReport $schedule
+     * @return ScheduledReportResource
+     */
+    public function show(ScheduledReport $schedule): ScheduledReportResource
+    {
+        return new ScheduledReportResource($schedule);
+    }
+
+    /**
+     * Update Scheduled Report
+     *
+     * @param ScheduledReport $schedule
+     * @param Request $request
+     * @return ScheduledReportResource
+     */
+    public function update(ScheduledReport $schedule, Request $request): ScheduledReportResource
+    {
+        $request->validate([
+            'report_id' => 'required|exists:reports,id',
+            'parameters' => 'required',
+            'frequency' => 'required',
+            'limit' => 'nullable|integer',
+        ]);
+
+        return new ScheduledReportResource(
+            $this->repository->update($request->toArray(), $schedule->getKey())
+        );
     }
 
     /**

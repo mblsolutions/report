@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report\Services;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use MBLSolutions\Report\Events\ReportExported;
 use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
 use MBLSolutions\Report\Interfaces\ExportDriver;
@@ -39,7 +40,7 @@ class ExportReportService
     {
         $result = $this->getDriver()->export($this->report, $this->request->toArray());
 
-        event(new ReportExported($this->report));
+        Event::dispatch(new ReportExported($this->report));
 
         return $result;
     }

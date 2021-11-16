@@ -143,4 +143,23 @@ return [
 
     'preview_limit' => env('REPORT_PREVIEW_LIMIT', 1000),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Scheduled Report Date Fields
+    |--------------------------------------------------------------------------
+    |
+    | Any date/time parameters that should be replaced when running a scheduled
+    | report e.g. 'start_date' would be replaced with 2021-01-01 00:00:00 and
+    | 'end_date' would be replaced with 2021-12-31 23:59:59
+    |
+    */
+
+    'scheduled_date_start' => [
+        'start_date',
+    ],
+
+    'scheduled_date_end' => [
+        'end_date',
+    ],
+
 ];

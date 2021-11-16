@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use MBLSolutions\Report\Events\ReportRenderStarted;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
+use MBLSolutions\Report\Services\BuildReportService;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 
 class RenderReport extends RenderReportJob
@@ -35,7 +36,8 @@ class RenderReport extends RenderReportJob
                 'status' => JobStatus::RUNNING,
                 'processed' => 0,
                 'total' => $this->getBuildReportService()->getTotalResults(),
-                'parameters' => json_encode($this->request, JSON_THROW_ON_ERROR | true),
+                'parameters' => $this->request,
+                'formatted_parameters' => (new BuildReportService($this->report, $this->request))->getFormattedParameters($this->request),
                 'schedule_id' => $this->schedule,
             ];
 
