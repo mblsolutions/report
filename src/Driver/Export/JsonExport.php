@@ -62,15 +62,15 @@ class JsonExport extends ReportExport
      */
     public function getMeta(BuildReportService $service, Report $report, array $params = []): self
     {
-        print collect([
+        print (new Collection([
                 'report' => [
                     'name' => $report->name,
                     'description' => $report->description,
                     'date' => Carbon::now()->toIso8601String()
                 ],
                 'headings' => $service->headings(),
-                'params' => collect($params)->except(self::PROTECTED_KEYS),
-            ])->toJson() . ',';
+                'params' => (new Collection($params))->except(self::PROTECTED_KEYS),
+            ]))->toJson() . ',';
 
         return $this;
     }

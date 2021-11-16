@@ -185,6 +185,8 @@ The following endpoints are available to you once the routes have been added:
 | GET       | /report/schedule/frequency        | report.schedule.frequencies   |
 | GET       | /report/schedule                  | report.schedule.index         |
 | POST      | /report/schedule                  | report.schedule.create        |
+| GET       | /report/schedule{schedule}        | report.schedule.show          |
+| PATCH     | /report/schedule/{schedule}       | report.schedule.create        |
 | DELETE    | /report/schedule/{schedule}       | report.schedule.destroy       |
 
 #### Export Routes

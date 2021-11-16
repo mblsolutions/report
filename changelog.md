@@ -1,3 +1,11 @@
+## v2.5.0
+
++ Add report schedule show and update routes
+  + GET /report/schedule/{schedule}
+  + PATCH /report/schedule/{schedule}
++ Add formatted parameters to report jobs table
++ Update report builder service parameters with type hinting
+
 ## v2.4.1
 
 + Loosen schedule validation to rush within the first minute (because CRONs are never on time it seems).

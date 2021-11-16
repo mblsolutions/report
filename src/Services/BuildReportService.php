@@ -6,7 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Event;
 use MBLSolutions\Report\Driver\Export\ReportExport;
 use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Events\ReportRendered;
@@ -21,22 +21,17 @@ use MBLSolutions\Report\Support\Maps\ReportResultMap;
 
 class BuildReportService
 {
-    /** @var bool $paginate */
-    public $paginate;
+    public bool $paginate = true;
 
-    /** @var Report $report */
-    protected $report;
+    protected Report $report;
 
-    /** @var Collection $parameters */
-    protected $parameters;
+    protected Collection $parameters;
 
-    /** @var Collection $headings */
-    protected $headings;
+    protected ?Collection $headings = null;
 
-    /** @var Builder $query */
-    protected $query;
+    protected Collection $fields;
 
-    private $fields;
+    protected Builder $query;
 
     /**
      * Create a new Render Report Service Instance
@@ -49,7 +44,7 @@ class BuildReportService
     {
         $this->paginate = $paginate;
         $this->report = $report;
-        $this->parameters = collect($parameters);
+        $this->parameters = new Collection($parameters);
 
         $this->fields = $this->report->fields;
 
@@ -65,7 +60,7 @@ class BuildReportService
     {
         $this->buildReportQuery();
 
-        $result = collect([
+        $result = new Collection([
             'headings' => $this->headings(),
             'data' => $this->data(),
             'totals' => false,
@@ -73,7 +68,7 @@ class BuildReportService
             'raw' => $this->getRawQuery()
         ]);
 
-        event(new ReportRendered($this->report));
+        Event::dispatch(new ReportRendered($this->report));
 
         return $result;
     }
@@ -88,19 +83,34 @@ class BuildReportService
     {
         $this->buildReportQuery();
 
-        $result = collect([
+        $result = new Collection([
             'headings' => $this->headings(),
             'data' => $this->data(0, $limit),
             'totals' => false,
             'drivers' => $this->exportDrivers(),
             'raw' => $this->getRawQuery(),
-            'parameters' => $this->parameters->map(fn ($value, $alias) => $this->formatParameters($value, $alias)),
+            'parameters' => $this->getFormattedParameters($this->parameters),
             'result_limit' => $limit
         ]);
 
-        event(new ReportRendered($this->report));
+        Event::dispatch(new ReportRendered($this->report));
 
         return $result;
+    }
+
+    /**
+     * Get Parameters
+     *
+     * @param Collection|array $parameters
+     * @return Collection
+     */
+    public  function getFormattedParameters($parameters): Collection
+    {
+        if (is_array($parameters)) {
+            $parameters = new Collection($parameters);
+        }
+
+        return $parameters->map(fn ($value, $alias) => $this->formatParameters($value, $alias));
     }
 
     /**
@@ -123,7 +133,6 @@ class BuildReportService
         }
 
         $field = $this->fields->firstWhere('alias', $alias);
-
 
         $fieldValue = $field ? $this->formatParameterValue($value, $field) : $value;
 

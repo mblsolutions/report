@@ -18,7 +18,7 @@ class ManageSettingsController
      */
     public function index(): Collection
     {
-        return collect([
+        return new Collection([
             'connections' => (new ReportConnection)->all(),
             'middleware' => (new ReportMiddlewareOptions())->all(),
             'models' => (new ReportSelectField)->all(),

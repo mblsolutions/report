@@ -2,6 +2,7 @@
 
 namespace MBLSolutions\Report\Tests\Feature;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -32,7 +33,7 @@ class QueuedReportControllerTest extends LaravelTestCase
     /** @test **/
     public function can_render_a_queued_report(): void
     {
-        $data = collect([
+        $data = new Collection([
             'uuid' => '931c1666-a70f-422b-aefe-925ab8b59aeb',
             'href' => route('report.queue.job', ['job' => '931c1666-a70f-422b-aefe-925ab8b59aeb']),
         ]);

@@ -2,6 +2,7 @@
 
 namespace MBLSolutions\Report\Tests\Unit\Support\Maps;
 
+use Illuminate\Support\Collection;
 use MBLSolutions\Report\DataType\CastString;
 use MBLSolutions\Report\DataType\CastTitleCaseString;
 use MBLSolutions\Report\Models\ReportSelect;
@@ -16,7 +17,7 @@ class ReportResultMapTest extends LaravelTestCase
     /** @test **/
     public function can_map_report_result_and_format(): void
     {
-        $selects = collect([
+        $selects = new Collection([
             factory(ReportSelect::class)->create([
                 'column' => 'name',
                 'alias' => 'user_name',

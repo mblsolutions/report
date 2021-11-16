@@ -103,7 +103,7 @@ class ReportResource extends JsonResource
         $drivers = config('report.export_drivers');
 
         if ($drivers) {
-            return collect($drivers)->map(fn($driver) => $this->exportDriverMap($driver));
+            return (new Collection($drivers))->map(fn($driver) => $this->exportDriverMap($driver));
         }
 
         return null;
@@ -119,7 +119,7 @@ class ReportResource extends JsonResource
         $drivers = config('report.queued_export_drivers');
 
         if ($drivers) {
-            return collect($drivers)->map(fn($driver) => $this->exportDriverMap($driver));
+            return (new Collection($drivers))->map(fn($driver) => $this->exportDriverMap($driver));
         }
 
         return null;

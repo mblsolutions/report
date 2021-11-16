@@ -32,6 +32,35 @@ class ScheduledReportControllerTest extends LaravelTestCase
     }
 
     /** @test **/
+    public function can_show_scheduled_report(): void
+    {
+        $schedule = factory(ScheduledReport::class)->create();
+
+        $this->getJson(route('report.schedule.show', [
+            'schedule' => $schedule->getKey(),
+        ]))->assertStatus(200);
+    }
+
+    /** @test **/
+    public function can_updated_scheduled_report(): void
+    {
+        $schedule = factory(ScheduledReport::class)->create();
+
+        $this->patchJson(route('report.schedule.update', [
+            'schedule' => $schedule->getKey(),
+        ]),
+        [
+            'report_id' => factory(Report::class)->create()->getKey(),
+            'parameters' => ['export_driver' => CsvQueuedExport::class],
+            'frequency' => ReportSchedule::MONTHLY,
+            'limit' => null,
+            'recipients' => null,
+            'last_run' => null,
+            'authenticatable_id' => null,
+        ])->assertStatus(200);
+    }
+
+    /** @test **/
     public function can_delete_scheduled_report(): void
     {
         $this->deleteJson(route('report.schedule.destroy', [

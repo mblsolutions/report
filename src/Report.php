@@ -77,6 +77,8 @@ class Report
             Route::get('report/schedule/frequency', 'ScheduledReportController@frequencies')->name('schedule.frequencies');
             Route::get('report/schedule', 'ScheduledReportController@index')->name('schedule.index');
             Route::post('report/schedule', 'ScheduledReportController@create')->name('schedule.create');
+            Route::get('report/schedule/{schedule}', 'ScheduledReportController@show')->name('schedule.show');
+            Route::patch('report/schedule/{schedule}', 'ScheduledReportController@update')->name('schedule.update');
             Route::delete('report/schedule/{schedule}', 'ScheduledReportController@destroy')->name('schedule.destroy');
 
             // Asynchronous
