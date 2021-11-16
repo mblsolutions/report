@@ -13,7 +13,7 @@ class CreateReportJobsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('report_jobs', static function (Blueprint $table) {
             $table->uuid('uuid');
@@ -24,6 +24,7 @@ class CreateReportJobsTable extends Migration
             $table->unsignedInteger('processed')->nullable();
             $table->unsignedInteger('total')->nullable();
             $table->text('parameters')->nullable();
+            $table->text('formatted_parameters')->nullable();
             $table->text('exception')->nullable();
             $table->text('query')->nullable();
             $table->timestamps();
@@ -35,7 +36,7 @@ class CreateReportJobsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('report_jobs');
     }

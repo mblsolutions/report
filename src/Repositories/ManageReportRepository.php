@@ -8,6 +8,7 @@ use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use MBLSolutions\Report\Events\ReportCreated;
@@ -67,7 +68,7 @@ class ManageReportRepository
 
             DB::commit();
 
-            event(new ReportCreated($report));
+            Event::dispatch(new ReportCreated($report));
 
         } catch (Exception $exception) {
             DB::rollBack();
@@ -98,7 +99,7 @@ class ManageReportRepository
 
             DB::commit();
 
-            event(new ReportUpdated($report));
+            Event::dispatch(new ReportUpdated($report));
 
         } catch (Exception $exception) {
             DB::rollBack();
@@ -119,7 +120,7 @@ class ManageReportRepository
     {
         $report->delete();
 
-        event(new ReportDestroyed($report));
+        Event::dispatch(new ReportDestroyed($report));
 
         return $report->refresh();
     }
@@ -134,19 +135,19 @@ class ManageReportRepository
     public function handleReportRelations(Report $report, Request $request): ManageReportRepository
     {
         if ($request->get('fields')) {
-            $this->updateOrCreateFields($report, collect($request->get('fields')));
+            $this->updateOrCreateFields($report, new Collection($request->get('fields')));
         }
 
         if ($request->get('selects')) {
-            $this->updateOrCreateSelects($report, collect($request->get('selects')));
+            $this->updateOrCreateSelects($report, new Collection($request->get('selects')));
         }
 
         if ($request->get('joins')) {
-            $this->updateOrCreateJoins($report, collect($request->get('joins')));
+            $this->updateOrCreateJoins($report, new Collection($request->get('joins')));
         }
 
         if ($request->get('middleware')) {
-            $this->updateOrCreateMiddleware($report, collect($request->get('middleware')));
+            $this->updateOrCreateMiddleware($report, new Collection($request->get('middleware')));
         }
 
         return $this;

@@ -5,6 +5,7 @@ namespace MBLSolutions\Report\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use JsonException;
 
 class ReportJob extends Model
 {
@@ -19,8 +20,9 @@ class ReportJob extends Model
     /** {@inheritDoc} */
     protected $guarded = [];
 
-
     protected $casts = [
+        'parameters' => 'array',
+        'formatted_parameters' => 'array',
         'processed' => 'integer',
         'total' => 'integer',
     ];

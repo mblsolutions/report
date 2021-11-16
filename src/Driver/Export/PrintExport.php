@@ -63,7 +63,8 @@ class PrintExport extends ReportExport
      */
     protected function getParameters(array $params = []): array
     {
-        $params = collect($params);
+        $params = new Collection($params);
+
         $formatted = [];
 
         foreach ($params->except(self::PROTECTED_KEYS)->toArray() as $key => $param) {

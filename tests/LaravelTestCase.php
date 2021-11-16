@@ -123,7 +123,7 @@ class LaravelTestCase extends OTBTestCase
     protected function createFakeUser(int $count = 1)
     {
         if ($count > 1) {
-            $users = collect([]);
+            $users = new Collection([]);
 
             for ($i = 0; $i < $count; $i++) {
                 $users->push($this->createUser());
