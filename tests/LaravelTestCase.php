@@ -56,6 +56,8 @@ class LaravelTestCase extends OTBTestCase
         $app['config']->set('report.filesystem', $config['filesystem']);
         $app['config']->set('report.filesystem_path', $config['filesystem_path']);
         $app['config']->set('report.preview_limit', $config['preview_limit']);
+        $app['config']->set('report.scheduled_date_start', $config['scheduled_date_start']);
+        $app['config']->set('report.scheduled_date_end', $config['scheduled_date_end']);
 
     }
 

@@ -3,17 +3,22 @@
 namespace MBLSolutions\Report\Jobs;
 
 use Exception;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use MBLSolutions\Report\Events\ReportRenderStarted;
 use MBLSolutions\Report\Models\Report;
+use MBLSolutions\Report\Models\ReportFieldType;
 use MBLSolutions\Report\Models\ReportJob;
+use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Services\BuildReportService;
 use MBLSolutions\Report\Support\Enums\JobStatus;
+use MBLSolutions\Report\Support\Enums\ReportSchedule;
 
 class RenderReport extends RenderReportJob
 {
 
-    public function __construct(string $uuid, Report $report, array $request = [], $authenticatable = null, string $schedule = null)
+    public function __construct(string $uuid, Report $report, array $request = [], $authenticatable = null, ScheduledReport $schedule = null)
     {
         $this->report = $report;
         $this->request = $request;
@@ -32,6 +37,10 @@ class RenderReport extends RenderReportJob
     public function handle(): void
     {
         try {
+            if ($this->schedule) {
+                $this->updateRequestForSchedule($this->report->fields);
+            }
+
             $data = [
                 'status' => JobStatus::RUNNING,
                 'processed' => 0,
@@ -75,6 +84,77 @@ class RenderReport extends RenderReportJob
         return $job;
     }
 
+    /**
+     * Update date/time request fields for schedule
+     *
+     * @param Collection $fields
+     * @return void
+     */
+    protected function updateRequestForSchedule(Collection $fields): void
+    {
+        foreach ($this->request as $key => $value) {
+            $this->replaceRequestValue($key, $fields);
+        }
+    }
 
+    /**
+     * Replace a request value
+     *
+     * @param string $key
+     * @param Collection $fields
+     */
+    protected function replaceRequestValue(string $key, Collection $fields): void
+    {
+        $field = $fields->firstWhere('alias', $key);
+        $date = Carbon::now();
+
+        if ($field === null) {
+            return;
+        }
+
+        if (in_array($key, config('report.scheduled_date_start'), true)) {
+            if ($field->getAttribute('type') === ReportFieldType::DATE) {
+                $this->request[$key] = $this->handleStartDate($date)->format('Y-m-d');
+            } elseif ($field->getAttribute('type') === ReportFieldType::DATETIME) {
+                $this->request[$key] = $this->handleStartDate($date)->format('Y-m-d 00:00:00');
+            } elseif ($field->getAttribute('type') === ReportFieldType::TIME) {
+                $this->request[$key] = '00:00';
+            }
+        }
+
+        if (in_array($key, config('report.scheduled_date_end'), true)) {
+            if ($field->getAttribute('type') === ReportFieldType::DATE) {
+                $this->request[$key] = $date->subDay()->format('Y-m-d');
+            } elseif ($field->getAttribute('type') === ReportFieldType::DATETIME) {
+                $this->request[$key] = $date->subDay()->format('Y-m-d 23:59:59');
+            } elseif ($field->getAttribute('type') === ReportFieldType::TIME) {
+                $this->request[$key] = '23:59:59';
+            }
+        }
+    }
+
+    /**
+     * Alter date to the required frequency
+     *
+     * @param Carbon $date
+     * @return Carbon
+     */
+    protected function handleStartDate(Carbon $date): Carbon
+    {
+        switch ($this->schedule->getAttribute('frequency')) {
+            case ReportSchedule::DAILY:
+                return $date->subDay();
+            case ReportSchedule::WEEKLY:
+                return $date->subWeek();
+            case ReportSchedule::MONTHLY:
+                return $date->subMonth();
+            case ReportSchedule::QUARTERLY:
+                return $date->subQuarter();
+            case ReportSchedule::YEARLY:
+                return $date->subYear();
+        }
+
+        return $date;
+    }
 
 }

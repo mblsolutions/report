@@ -44,7 +44,7 @@ class DispatchScheduledReportsCommand extends Command
 
             Bus::dispatch(
                 new RenderReport(
-                    $uuid, $report, $schedule->getAttribute('parameters'), $schedule->getAttribute('authenticatable_id'), $schedule->getKey()
+                    $uuid, $report, $schedule->getAttribute('parameters'), $schedule->getAttribute('authenticatable_id'), $schedule
                 )
             );
 

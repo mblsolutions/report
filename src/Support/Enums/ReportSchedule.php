@@ -6,8 +6,6 @@ use MBLSolutions\Report\Support\EnumModel;
 
 class ReportSchedule extends EnumModel
 {
-    public const HOURLY = 'hourly';
-
     public const DAILY = 'daily';
 
     public const WEEKLY = 'weekly';

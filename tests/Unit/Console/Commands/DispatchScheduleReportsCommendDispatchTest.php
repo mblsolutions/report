@@ -26,12 +26,6 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
         $this->report = factory(Report::class)->create();
 
         factory(ScheduledReport::class)->create([
-            'uuid' => 'd68a28d3-8544-4dd2-aeed-ed148eb37874',
-            'frequency' => ReportSchedule::HOURLY,
-            'report_id' => $this->report->getKey()
-        ]);
-
-        factory(ScheduledReport::class)->create([
             'uuid' => 'c066524b-b5ad-46d1-961d-f96203c54181',
             'frequency' => ReportSchedule::DAILY,
             'report_id' => $this->report->getKey()
@@ -63,28 +57,12 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
     }
 
     /** @test **/
-    public function can_run_hourly_schedule(): void
-    {
-        Carbon::setTestNow('2021-11-10 09:00:00'); // on the hour (Wednesday)
-
-        $this->artisan('report:schedule');
-
-        $this->assertScheduledEventDispatch('d68a28d3-8544-4dd2-aeed-ed148eb37874');
-        $this->assertScheduledEventNotDispatched('c066524b-b5ad-46d1-961d-f96203c54181');
-        $this->assertScheduledEventNotDispatched('404a1dbc-226a-46bd-9348-de2dd28f8d56');
-        $this->assertScheduledEventNotDispatched('56738a7e-4bec-4c14-a8f7-7ef0ea58f204');
-        $this->assertScheduledEventNotDispatched('417aa61e-3219-422d-9111-f701daf7e18f');
-        $this->assertScheduledEventNotDispatched('2930826c-6732-44e6-9c19-f62153ad53a9');
-    }
-
-    /** @test **/
     public function can_run_daily_schedule(): void
     {
         Carbon::setTestNow('2021-11-10 00:00:00'); // daily at midnight (Wednesday)
 
         $this->artisan('report:schedule');
 
-        $this->assertScheduledEventDispatch('d68a28d3-8544-4dd2-aeed-ed148eb37874');
         $this->assertScheduledEventDispatch('c066524b-b5ad-46d1-961d-f96203c54181');
         $this->assertScheduledEventNotDispatched('404a1dbc-226a-46bd-9348-de2dd28f8d56');
         $this->assertScheduledEventNotDispatched('56738a7e-4bec-4c14-a8f7-7ef0ea58f204');
@@ -99,7 +77,6 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
 
         $this->artisan('report:schedule');
 
-        $this->assertScheduledEventDispatch('d68a28d3-8544-4dd2-aeed-ed148eb37874');
         $this->assertScheduledEventDispatch('c066524b-b5ad-46d1-961d-f96203c54181');
         $this->assertScheduledEventDispatch('404a1dbc-226a-46bd-9348-de2dd28f8d56');
         $this->assertScheduledEventNotDispatched('56738a7e-4bec-4c14-a8f7-7ef0ea58f204');
@@ -114,7 +91,6 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
 
         $this->artisan('report:schedule');
 
-        $this->assertScheduledEventDispatch('d68a28d3-8544-4dd2-aeed-ed148eb37874');
         $this->assertScheduledEventDispatch('c066524b-b5ad-46d1-961d-f96203c54181');
         $this->assertScheduledEventNotDispatched('404a1dbc-226a-46bd-9348-de2dd28f8d56');
         $this->assertScheduledEventDispatch('56738a7e-4bec-4c14-a8f7-7ef0ea58f204');
@@ -129,7 +105,6 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
 
         $this->artisan('report:schedule');
 
-        $this->assertScheduledEventDispatch('d68a28d3-8544-4dd2-aeed-ed148eb37874');
         $this->assertScheduledEventDispatch('c066524b-b5ad-46d1-961d-f96203c54181');
         $this->assertScheduledEventNotDispatched('404a1dbc-226a-46bd-9348-de2dd28f8d56');
         $this->assertScheduledEventDispatch('56738a7e-4bec-4c14-a8f7-7ef0ea58f204');
@@ -144,7 +119,6 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
 
         $this->artisan('report:schedule');
 
-        $this->assertScheduledEventDispatch('d68a28d3-8544-4dd2-aeed-ed148eb37874');
         $this->assertScheduledEventDispatch('c066524b-b5ad-46d1-961d-f96203c54181');
         $this->assertScheduledEventNotDispatched('404a1dbc-226a-46bd-9348-de2dd28f8d56');
         $this->assertScheduledEventDispatch('56738a7e-4bec-4c14-a8f7-7ef0ea58f204');
