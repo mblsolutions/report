@@ -9,6 +9,7 @@ use MBLSolutions\Report\DataType\CastTitleCaseString;
 use MBLSolutions\Report\Driver\QueuedExport\CsvQueuedExport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportField;
+use MBLSolutions\Report\Models\ReportFieldType;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportMiddleware;
@@ -75,9 +76,51 @@ $factory->define(ReportField::class, static function (Faker $faker) {
             return factory(Report::class)->create();
         },
         'label' => 'Created At',
-        'type' => 'datetime',
+        'type' => ReportFieldType::DATETIME,
         'model' => null,
         'alias' => 'users_created_date',
+        'model_select_value' => null,
+        'model_select_name' => null
+    ];
+});
+
+$factory->state(ReportField::class, 'time', static function (Faker $faker) {
+    return [
+        'report_id' => function () {
+            return factory(Report::class)->create();
+        },
+        'label' => 'Start Time',
+        'type' => ReportFieldType::TIME,
+        'model' => null,
+        'alias' => 'start_time',
+        'model_select_value' => null,
+        'model_select_name' => null
+    ];
+});
+
+$factory->state(ReportField::class, 'date', static function (Faker $faker) {
+    return [
+        'report_id' => function () {
+            return factory(Report::class)->create();
+        },
+        'label' => 'Start Date',
+        'type' => ReportFieldType::DATE,
+        'model' => null,
+        'alias' => 'start_date',
+        'model_select_value' => null,
+        'model_select_name' => null
+    ];
+});
+
+$factory->state(ReportField::class, 'datetime', static function (Faker $faker) {
+    return [
+        'report_id' => function () {
+            return factory(Report::class)->create();
+        },
+        'label' => 'Start DateTime',
+        'type' => ReportFieldType::DATETIME,
+        'model' => null,
+        'alias' => 'start_date',
         'model_select_value' => null,
         'model_select_name' => null
     ];

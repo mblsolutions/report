@@ -1,3 +1,9 @@
+## v2.6.0
+
++ Remove hourly from report schedule due to complexities on time based replacements (to be added back in once time permits)
++ Apply date filtering to scheduled reports 
+  + e.g. Today 2021-01-01 00:00:00 (daily report would replace parameters start_date 2020-12-31 00:00:00 end_date 2020-12-31 23:59:59)
+
 ## v2.5.0
 
 + Add report schedule show and update routes

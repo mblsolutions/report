@@ -17,10 +17,6 @@ class ScheduledReportRepository extends EloquentRepository
     {
         $frequencies = new Collection([]);
 
-        if ($date->format('i') === '00') {
-            $frequencies->push(ReportSchedule::HOURLY);
-        }
-
         if ($date->format('H:i') === '00:00') {
             $frequencies->push(ReportSchedule::DAILY);
         }
