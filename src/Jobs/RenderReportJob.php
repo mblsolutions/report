@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
+use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Services\BuildReportService;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 
@@ -24,7 +25,7 @@ abstract class RenderReportJob implements ShouldQueue
     /** @var null|mixed */
     public $authenticatable = null;
 
-    public ?string $schedule = null;
+    public ?ScheduledReport $schedule = null;
 
     public array $request;
 

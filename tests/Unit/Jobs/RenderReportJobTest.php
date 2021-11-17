@@ -2,17 +2,21 @@
 
 namespace MBLSolutions\Report\Tests\Unit\Jobs;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use MBLSolutions\Report\Driver\QueuedExport\CsvQueuedExport;
 use MBLSolutions\Report\Events\ReportChunkComplete;
 use MBLSolutions\Report\Events\ReportRenderComplete;
-use MBLSolutions\Report\Events\ReportRendered;
 use MBLSolutions\Report\Events\ReportRenderStarted;
 use MBLSolutions\Report\Jobs\ProcessReportExportChunk;
 use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
+use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportJob;
+use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Support\Enums\JobStatus;
+use MBLSolutions\Report\Support\Enums\ReportSchedule;
 use MBLSolutions\Report\Tests\LaravelTestCase;
 
 class RenderReportJobTest extends LaravelTestCase
@@ -25,6 +29,16 @@ class RenderReportJobTest extends LaravelTestCase
         parent::setUp();
 
         $this->report = factory(Report::class)->create();
+
+        factory(ReportField::class)->state('datetime')->create([
+            'report_id' => $this->report->getKey(),
+            'alias' => 'start_date'
+        ]);
+
+        factory(ReportField::class)->state('datetime')->create([
+            'report_id' => $this->report->getKey(),
+            'alias' => 'end_date'
+        ]);
     }
 
     /** @test **/
@@ -120,6 +134,141 @@ class RenderReportJobTest extends LaravelTestCase
         dispatch(new RenderReport('aa5615b7-8489-4831-ad00-f50ae770b619', $this->report));
 
         Event::assertDispatched(ReportRenderComplete::class);
+    }
+
+    /** @test **/
+    public function running_an_daily_scheduled_report_replaces_report_date_params(): void
+    {
+        factory(ReportField::class)->state('datetime')->create([
+            'report_id' => $this->report->getKey(),
+            'alias' => 'start_date'
+        ]);
+
+        factory(ReportField::class)->state('datetime')->create([
+            'report_id' => $this->report->getKey(),
+            'alias' => 'end_date'
+        ]);
+
+        $dummy = $this->setupDummyScheduledReport(ReportSchedule::DAILY);
+
+        Carbon::setTestNow('2021-10-16 00:00:00');
+
+        dispatch(new RenderReport('aa5615b7-8489-4831-ad00-f50ae770b619', $this->report, $dummy['parameters'], $dummy['user']->getKey(), $dummy['schedule']));
+
+        $this->assertDatabaseHas('report_jobs', [
+            'uuid' => 'aa5615b7-8489-4831-ad00-f50ae770b619',
+            'parameters' => json_encode([
+                'export_driver' => CsvQueuedExport::class,
+                'start_date' => '2021-10-15 00:00:00',
+                'end_date' => '2021-10-15 23:59:59',
+            ], JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+
+    /** @test **/
+    public function running_an_weekly_scheduled_report_replaces_report_date_params(): void
+    {
+        $dummy = $this->setupDummyScheduledReport(ReportSchedule::WEEKLY);
+
+        Carbon::setTestNow('2021-10-15 00:00:00');
+
+        dispatch(new RenderReport('aa5615b7-8489-4831-ad00-f50ae770b619', $this->report, $dummy['parameters'], $dummy['user']->getKey(), $dummy['schedule']));
+
+        $this->assertDatabaseHas('report_jobs', [
+            'uuid' => 'aa5615b7-8489-4831-ad00-f50ae770b619',
+            'parameters' => json_encode([
+                'export_driver' => CsvQueuedExport::class,
+                'start_date' => '2021-10-08 00:00:00',
+                'end_date' => '2021-10-14 23:59:59',
+            ], JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /** @test **/
+    public function running_an_monthly_scheduled_report_replaces_report_date_params(): void
+    {
+        $dummy = $this->setupDummyScheduledReport(ReportSchedule::MONTHLY);
+
+        Carbon::setTestNow('2021-03-01 00:00:00');
+
+        dispatch(new RenderReport('aa5615b7-8489-4831-ad00-f50ae770b619', $this->report, $dummy['parameters'], $dummy['user']->getKey(), $dummy['schedule']));
+
+        $this->assertDatabaseHas('report_jobs', [
+            'uuid' => 'aa5615b7-8489-4831-ad00-f50ae770b619',
+            'parameters' => json_encode([
+                'export_driver' => CsvQueuedExport::class,
+                'start_date' => '2021-02-01 00:00:00',
+                'end_date' => '2021-02-28 23:59:59',
+            ], JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /** @test **/
+    public function running_an_quarterly_scheduled_report_replaces_report_date_params(): void
+    {
+        $dummy = $this->setupDummyScheduledReport(ReportSchedule::QUARTERLY);
+
+        Carbon::setTestNow('2021-07-01 00:00:00');
+
+        dispatch(new RenderReport('aa5615b7-8489-4831-ad00-f50ae770b619', $this->report, $dummy['parameters'], $dummy['user']->getKey(), $dummy['schedule']));
+
+        $this->assertDatabaseHas('report_jobs', [
+            'uuid' => 'aa5615b7-8489-4831-ad00-f50ae770b619',
+            'parameters' => json_encode([
+                'export_driver' => CsvQueuedExport::class,
+                'start_date' => '2021-04-01 00:00:00',
+                'end_date' => '2021-06-30 23:59:59',
+            ], JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /** @test **/
+    public function running_an_yearly_scheduled_report_replaces_report_date_params(): void
+    {
+        $dummy = $this->setupDummyScheduledReport(ReportSchedule::YEARLY);
+
+        Carbon::setTestNow('2021-01-01 00:00:00');
+
+        dispatch(new RenderReport('aa5615b7-8489-4831-ad00-f50ae770b619', $this->report, $dummy['parameters'], $dummy['user']->getKey(), $dummy['schedule']));
+
+        $this->assertDatabaseHas('report_jobs', [
+            'uuid' => 'aa5615b7-8489-4831-ad00-f50ae770b619',
+            'parameters' => json_encode([
+                'export_driver' => CsvQueuedExport::class,
+                'start_date' => '2020-01-01 00:00:00',
+                'end_date' => '2020-12-31 23:59:59',
+            ], JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * Set up a dummy Scheduled Report
+     *
+     * @param string $frequency
+     * @return array
+     */
+    private function setupDummyScheduledReport(string $frequency): array
+    {
+        $user = $this->createFakeUser();
+
+        $parameters = [
+            'export_driver' => CsvQueuedExport::class,
+            'start_date' => null,
+            'end_date' => null
+        ];
+
+        $schedule = factory(ScheduledReport::class)->create([
+            'report_id' => $this->report->getKey(),
+            'parameters' => $parameters,
+            'frequency' => $frequency,
+            'limit' => null,
+            'recipients' => null,
+            'last_run' => null,
+            'authenticatable_id' => $user->getKey(),
+        ]);
+
+        return compact(['parameters', 'schedule', 'user']);
     }
 
 }
