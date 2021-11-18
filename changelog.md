@@ -1,3 +1,11 @@
+## v2.6.2
+
++ Updated middleware to allow injection of Authenticated model when running reports on a queue
+
+## v2.6.1
+
++ Added License
+
 ## v2.6.0
 
 + Remove hourly from report schedule due to complexities on time based replacements (to be added back in once time permits)

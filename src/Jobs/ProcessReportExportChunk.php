@@ -16,11 +16,12 @@ class ProcessReportExportChunk extends RenderReportJob
 {
     public int $chunk;
 
-    public function __construct(Report $report, ReportJob $reportJob, array $request, int $chunk)
+    public function __construct(Report $report, ReportJob $reportJob, array $request, int $chunk, $authenticatable = null)
     {
         $this->report = $report;
         $this->reportJob = $reportJob;
         $this->request = $request;
+        $this->authenticatable = $authenticatable;
 
         $this->chunkLimit = config('report.chunk_limit', 50000);
         $this->chunk = $chunk;
