@@ -1,3 +1,8 @@
+## v2.6.3
+
++ Inject authenticatable into Report Render Job
++ Inject authenticatable into fields middleware to toggle display of hidden fields
+
 ## v2.6.2
 
 + Updated middleware to allow injection of Authenticated model when running reports on a queue

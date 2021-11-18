@@ -5,6 +5,7 @@ namespace MBLSolutions\Report\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use MBLSolutions\Report\Driver\Export\ReportExport;
 use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Models\ReportField;
@@ -53,9 +54,11 @@ class ReportResource extends JsonResource
      */
     protected function getReportFields(): Collection
     {
-        return $this->fields->reject(function (ReportField $field) {
-            $disabled = $this->middleware->filter(static function (ReportMiddleware $reportMiddleware) use ($field) {
-                return ! (new $reportMiddleware->middleware)->field($field);
+        $user = Auth::user();
+
+        return $this->fields->reject(function (ReportField $field) use ($user) {
+            $disabled = $this->middleware->filter(static function (ReportMiddleware $reportMiddleware) use ($field, $user) {
+                return ! (new $reportMiddleware->middleware($user))->field($field);
             });
 
             return $disabled->count() > 0;

@@ -18,6 +18,15 @@ use MBLSolutions\Report\Support\Enums\ReportSchedule;
 class RenderReport extends RenderReportJob
 {
 
+    /**
+     * Render Report
+     *
+     * @param string $uuid
+     * @param Report $report
+     * @param array $request
+     * @param null $authenticatable
+     * @param ScheduledReport|null $schedule
+     */
     public function __construct(string $uuid, Report $report, array $request = [], $authenticatable = null, ScheduledReport $schedule = null)
     {
         $this->report = $report;
