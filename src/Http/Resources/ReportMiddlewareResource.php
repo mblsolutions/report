@@ -4,7 +4,6 @@ namespace MBLSolutions\Report\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use MBLSolutions\Report\Models\ReportJoinType;
 
 class ReportMiddlewareResource extends JsonResource
 {

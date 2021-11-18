@@ -4,6 +4,7 @@ namespace MBLSolutions\Report\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
@@ -52,7 +53,7 @@ class QueuedReportController
     {
         $data = app(RenderJobUuidGenerator::class)->__invoke();
 
-        Bus::dispatch(new RenderReport($data->get('uuid'), $report, $request->toArray()));
+        Bus::dispatch(new RenderReport($data->get('uuid'), $report, $request->toArray(), Auth::id()));
 
         return new JsonResponse($data, 202);
     }

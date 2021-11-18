@@ -36,7 +36,8 @@ class BuildReportService
 
     protected Builder $query;
 
-    protected $authenticatable_id;
+    /** @var mixed|null */
+    protected $authenticatable;
 
     /**
      * Create a new Render Report Service Instance
@@ -44,13 +45,14 @@ class BuildReportService
      * @param Report $report
      * @param array $parameters
      * @param bool $paginate
+     * @param mixed|null $authenticatable
      */
-    public function __construct(Report $report, array $parameters = [], bool $paginate = true, $authenticatable_id = null)
+    public function __construct(Report $report, array $parameters = [], bool $paginate = true, $authenticatable = null)
     {
         $this->paginate = $paginate;
         $this->report = $report;
         $this->parameters = new Collection($parameters);
-        $this->authenticatable_id = $authenticatable_id;
+        $this->authenticatable = $authenticatable;
 
         $this->fields = $this->report->fields;
 
@@ -479,13 +481,11 @@ class BuildReportService
      */
     public function getAuthenticatable()
     {
-        $authenticatable = Auth::user();
-
-        if ($this->authenticatable_id && $authModel = config('report.authenticatable_model')) {
-            $authenticatable = $authModel::find($this->authenticatable_id);
+        if ($this->authenticatable && $authModel = config('report.authenticatable_model')) {
+            return $authModel::find($this->authenticatable);
         }
 
-        return $authenticatable;
+        return Auth::user();
     }
 
 }
