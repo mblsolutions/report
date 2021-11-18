@@ -1,7 +1,7 @@
 {
   "name": "mblsolutions/report",
-  "description": "MBL Solutions Laravel Reports",
-  "keywords": ["mblsolutions", "report", "laravel"],
+  "description": "Laravel Report package",
+  "keywords": ["redu", "report", "laravel"],
   "type": "package",
   "license": "MIT",
   "authors": [
@@ -15,7 +15,7 @@
     "ext-json": "*",
     "illuminate/cache": "^6.0|^7.0|^8.0",
     "illuminate/console": "^6.0|^7.0|^8.0",
-    "illuminate/database": "^6.0|^7.0|^8.0",
+    "illuminate/database": "^6.0|^7.30.5|^8.0",
     "illuminate/events": "^6.0|^7.0|^8.0",
     "illuminate/filesystem": "^6.0|^7.0|^8.0",
     "illuminate/queue": "^6.0|^7.0|^8.0",

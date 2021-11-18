@@ -23,7 +23,7 @@ abstract class RenderReportJob implements ShouldQueue
     public ReportJob $reportJob;
 
     /** @var null|mixed */
-    public $authenticatable = null;
+    public $authenticatable;
 
     public ?ScheduledReport $schedule = null;
 
@@ -38,7 +38,7 @@ abstract class RenderReportJob implements ShouldQueue
      */
     protected function getBuildReportService(): BuildReportService
     {
-        return new BuildReportService($this->report, $this->request, false);
+        return new BuildReportService($this->report, $this->request, false, $this->authenticatable);
     }
 
     /**
