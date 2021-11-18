@@ -139,7 +139,7 @@ class ProcessReportExportChunk extends RenderReportJob
      */
     protected function processNextChunk(): void
     {
-        self::dispatch($this->report, $this->reportJob, $this->request, $this->chunk + 1);
+        self::dispatch($this->report, $this->reportJob, $this->request, $this->chunk + 1, $this->authenticatable);
     }
 
     /**
