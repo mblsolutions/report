@@ -1,5 +1,5 @@
 # Laravel Report License
-MIT License
+## MIT License
 
 Copyright (c)2021 Redu Group LTD
 
