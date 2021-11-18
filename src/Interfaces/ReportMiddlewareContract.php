@@ -5,7 +5,7 @@ namespace MBLSolutions\Report\Interfaces;
 use Illuminate\Database\Query\Builder;
 use MBLSolutions\Report\Models\ReportField;
 
-interface ReportMiddleware
+interface ReportMiddlewareContract
 {
 
     /**

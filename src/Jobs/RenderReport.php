@@ -46,7 +46,7 @@ class RenderReport extends RenderReportJob
                 'processed' => 0,
                 'total' => $this->getBuildReportService()->getTotalResults(),
                 'parameters' => $this->request,
-                'formatted_parameters' => (new BuildReportService($this->report, $this->request))->getFormattedParameters($this->request),
+                'formatted_parameters' => (new BuildReportService($this->report, $this->request, true, $this->authenticatable))->getFormattedParameters($this->request),
                 'schedule_id' => $this->schedule,
             ];
 
@@ -56,7 +56,7 @@ class RenderReport extends RenderReportJob
 
             $this->reportJob->update($data);
 
-            ProcessReportExportChunk::dispatch($this->report, $this->reportJob, $this->request, 1);
+            ProcessReportExportChunk::dispatch($this->report, $this->reportJob, $this->request, 1, $this->authenticatable);
 
         } catch (Exception $exception) {
             $this->handleJobException($exception);

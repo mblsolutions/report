@@ -2,15 +2,18 @@
 
 namespace MBLSolutions\Report\Services;
 
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use MBLSolutions\Report\Driver\Export\ReportExport;
 use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Events\ReportRendered;
-use MBLSolutions\Report\Interfaces\ReportMiddleware;
+use MBLSolutions\Report\Middleware\ReportMiddleware;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportExportDrivers;
 use MBLSolutions\Report\Models\ReportField;
@@ -33,6 +36,8 @@ class BuildReportService
 
     protected Builder $query;
 
+    protected $authenticatable_id;
+
     /**
      * Create a new Render Report Service Instance
      *
@@ -40,11 +45,12 @@ class BuildReportService
      * @param array $parameters
      * @param bool $paginate
      */
-    public function __construct(Report $report, array $parameters = [], bool $paginate = true)
+    public function __construct(Report $report, array $parameters = [], bool $paginate = true, $authenticatable_id = null)
     {
         $this->paginate = $paginate;
         $this->report = $report;
         $this->parameters = new Collection($parameters);
+        $this->authenticatable_id = $authenticatable_id;
 
         $this->fields = $this->report->fields;
 
@@ -198,6 +204,11 @@ class BuildReportService
         return $this->query->toSql();
     }
 
+    /**
+     * Get the total results
+     *
+     * @return int
+     */
     public function getTotalResults(): int
     {
         return $this->buildReportQuery()->count();
@@ -374,7 +385,7 @@ class BuildReportService
     {
         $this->report->middleware->each(function ($reportMiddleware) {
             /** @var ReportMiddleware $middleware */
-            $middleware = new $reportMiddleware->middleware;
+            $middleware = new $reportMiddleware->middleware($this->getAuthenticatable());
 
             $this->query = $middleware->handle($this->query);
         });
@@ -458,6 +469,23 @@ class BuildReportService
         }
 
         return false;
+    }
+
+
+    /**
+     * Get the Authenticatable Model
+     *
+     * @return Authenticatable|Model|null
+     */
+    public function getAuthenticatable()
+    {
+        $authenticatable = Auth::user();
+
+        if ($this->authenticatable_id && $authModel = config('report.authenticatable_model')) {
+            $authenticatable = $authModel::find($this->authenticatable_id);
+        }
+
+        return $authenticatable;
     }
 
 }
