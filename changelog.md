@@ -1,3 +1,6 @@
+## v2.6.1
++ Added License
+
 ## v2.6.0
 
 + Remove hourly from report schedule due to complexities on time based replacements (to be added back in once time permits)
