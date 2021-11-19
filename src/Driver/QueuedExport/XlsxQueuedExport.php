@@ -3,7 +3,7 @@
 namespace MBLSolutions\Report\Driver\QueuedExport;
 
 use Maatwebsite\Excel\Facades\Excel;
-use MBLSolutions\Report\Export\Report\ReportExport;
+use MBLSolutions\Report\Export\Report\SheetedReportExport;
 
 class XlsxQueuedExport extends QueuedReportExport
 {
@@ -11,7 +11,7 @@ class XlsxQueuedExport extends QueuedReportExport
 
     public function storeExportAs(string $path, string $filesystem): bool
     {
-        $export = new ReportExport($this->service, $this->offset, $this->limit);
+        $export = new SheetedReportExport($this->service, $this->offset, $this->limit);
 
         return Excel::store($export, $path . '.xlsx', $filesystem, \Maatwebsite\Excel\Excel::XLSX);
     }

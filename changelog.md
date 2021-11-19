@@ -1,3 +1,8 @@
+## v2.6.4
+
++ Add parameters to supported export types (xls, xlsx and ods)
++ Fixed an issue where schedule ids were being incorrectly saved to report_jobs
+
 ## v2.6.3
 
 + Inject authenticatable into Report Render Job
