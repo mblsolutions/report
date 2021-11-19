@@ -56,7 +56,7 @@ class RenderReport extends RenderReportJob
                 'total' => $this->getBuildReportService()->getTotalResults(),
                 'parameters' => $this->request,
                 'formatted_parameters' => (new BuildReportService($this->report, $this->request, true, $this->authenticatable))->getFormattedParameters($this->request),
-                'schedule_id' => $this->schedule,
+                'schedule_id' => optional($this->schedule)->getKey(),
             ];
 
             if ($this->authenticatable) {
