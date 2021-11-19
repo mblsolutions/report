@@ -26,9 +26,9 @@ class BuildReportService
 {
     public bool $paginate = true;
 
-    protected Report $report;
+    public Report $report;
 
-    protected Collection $parameters;
+    public Collection $parameters;
 
     protected ?Collection $headings = null;
 
