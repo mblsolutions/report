@@ -668,14 +668,4 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertInstanceOf(Collection::class, $method->invoke($service));
     }
 
-    /** @test */
-    public function can_get_the_total_number_of_records_for_a_report(): void
-    {
-        $this->createFakeUser(5);
-
-        $service = new BuildReportService($this->report, []);
-
-        $this->assertEquals(5, $service->getTotalResults());
-    }
-
 }

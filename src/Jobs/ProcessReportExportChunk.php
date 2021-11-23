@@ -23,7 +23,7 @@ class ProcessReportExportChunk extends RenderReportJob
         $this->request = $request;
         $this->authenticatable = $authenticatable;
 
-        $this->chunkLimit = config('report.chunk_limit', 50000);
+        $this->limit = config('report.chunk_limit', 50000);
         $this->chunk = $chunk;
     }
 
@@ -35,7 +35,13 @@ class ProcessReportExportChunk extends RenderReportJob
     public function handle(): void
     {
         try {
+            $total = $this->getChunkIncrementalResultsHelper()->getTotalResultsForChunk($this->chunk * $this->limit);
+
             if ($this->checkReportHasResults()) {
+                $this->reportJob->update([
+                    'total' => $this->reportJob->total += $total
+                ]);
+
                 $this->startExportProcess();
             } else {
                 $this->completeReportExport();
@@ -46,7 +52,7 @@ class ProcessReportExportChunk extends RenderReportJob
         } catch (Exception $exception) {
             $this->handleJobException(
                 $exception,
-                $this->getBuildReportService()->getRenderedChunk($this->getOffset(), $this->chunkLimit, true)
+                $this->getBuildReportService()->getRenderedChunk($this->getOffset(), $this->limit, true)
             );
         }
     }
@@ -84,7 +90,7 @@ class ProcessReportExportChunk extends RenderReportJob
 
         $namespace = $this->request['export_driver'] ?? CsvQueuedExport::class;
 
-        $export = new $namespace($service, $this->getOffset(), $this->chunkLimit);
+        $export = new $namespace($service, $this->getOffset(), $this->limit);
 
         return $export->storeExportAs($filePath, config('report.filesystem'));
     }
@@ -94,15 +100,14 @@ class ProcessReportExportChunk extends RenderReportJob
         $job = $this->reportJob->refresh();
 
         $total = $job->getAttribute('total');
-        $processed = $job->getAttribute('processed') + $this->chunkLimit;
-
+        $processed = $job->getAttribute('processed') + $this->limit;
 
         $data = [
-            'processed' => $processed > $total ? $total : $processed,
+            'processed' => $processed > $total ? $total : $processed
         ];
 
         if ($this->chunk === 1) {
-            $data['query'] = $this->getBuildReportService()->getRenderedChunk($this->getOffset(), $this->chunkLimit, true);
+            $data['query'] = $this->getBuildReportService()->getRenderedChunk($this->getOffset(), $this->limit, true);
         }
 
         $this->reportJob->update($data);
@@ -160,7 +165,7 @@ class ProcessReportExportChunk extends RenderReportJob
      */
     protected function getTotalChunks(): int
     {
-        return ceil($this->reportJob->getAttribute('total') / $this->chunkLimit);
+        return ceil($this->reportJob->getAttribute('total') / $this->limit);
     }
 
     /**
@@ -180,7 +185,7 @@ class ProcessReportExportChunk extends RenderReportJob
      */
     protected function getOffset()
     {
-        return ($this->chunk - 1) * $this->chunkLimit;
+        return ($this->chunk - 1) * $this->limit;
     }
 
     public function padFileNumber($number): string

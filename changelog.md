@@ -1,3 +1,9 @@
+## v2.7.0
+
++ Update report total calculations to account for SQL group bys
++ Report Totals are now calculated on a chunk by chunk basis to avoid large reports timing out when calculating reports 
+  with large many results (> 100k)
+
 ## v2.6.4
 
 + Add parameters to supported export types (xls, xlsx and ods)
