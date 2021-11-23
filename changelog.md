@@ -1,3 +1,8 @@
+## v2.7.1
+
++ Bug fix, formatted parameter dates are being set as current date
++ Bug fix, file name changes due to the chunk totalling introduced in v2.7.0
+
 ## v2.7.0
 
 + Update report total calculations to account for SQL group bys

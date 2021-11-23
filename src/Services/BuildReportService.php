@@ -125,7 +125,7 @@ class BuildReportService
     /**
      * Format Parameters
      *
-     * @param $value
+     * @param mixed|null $value
      * @param $alias
      * @return array
      */
@@ -160,6 +160,10 @@ class BuildReportService
      */
     protected function formatParameterValue($value, ReportField $field)
     {
+        if ($value === null) {
+            return null;
+        }
+
         switch ($field->getAttribute('type')) {
             case ReportFieldType::SELECT:
                 $namespace = $field->getAttribute('model');
