@@ -4,6 +4,7 @@ namespace MBLSolutions\Report\Jobs;
 
 use Exception;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
 use MBLSolutions\Report\Driver\QueuedExport\CsvQueuedExport;
 use MBLSolutions\Report\Events\ReportChunkComplete;
 use MBLSolutions\Report\Events\ReportRenderComplete;
@@ -80,13 +81,12 @@ class ProcessReportExportChunk extends RenderReportJob
         $service = $this->getBuildReportService();
 
         $filePath = sprintf(
-            '%s%s/%s-%s-of-%s',
+            '%s%s/%s-%s',
             config('report.filesystem_path', 'reports/'),
             $this->reportJob->getKey(),
-            $this->report->getSlug(),
-            $this->padFileNumber($this->chunk),
-            $this->getTotalChunks(),
-         );
+            Str::limit($this->report->getSlug(), 32, ''),
+            $this->padFileNumber($this->chunk)
+        );
 
         $namespace = $this->request['export_driver'] ?? CsvQueuedExport::class;
 
@@ -190,7 +190,7 @@ class ProcessReportExportChunk extends RenderReportJob
 
     public function padFileNumber($number): string
     {
-        return str_pad($number, strlen($this->getTotalChunks()), 0, STR_PAD_LEFT);
+        return str_pad($number, 3, 0, STR_PAD_LEFT);
     }
 
 }
