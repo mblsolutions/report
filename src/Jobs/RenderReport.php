@@ -12,6 +12,7 @@ use MBLSolutions\Report\Models\ReportFieldType;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Services\BuildReportService;
+use MBLSolutions\Report\Support\Builder\ChunkIncrementalResults;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 
@@ -33,7 +34,7 @@ class RenderReport extends RenderReportJob
         $this->request = $request;
         $this->authenticatable = $authenticatable;
         $this->schedule = $schedule;
-        $this->chunkLimit = config('report.chunk_limit', 50000);
+        $this->limit = config('report.chunk_limit', 50000);
 
         $this->reportJob = $this->initiateRenderReportJob($uuid);
     }
@@ -53,9 +54,9 @@ class RenderReport extends RenderReportJob
             $data = [
                 'status' => JobStatus::RUNNING,
                 'processed' => 0,
-                'total' => $this->getBuildReportService()->getTotalResults(),
+                'total' => $this->getChunkIncrementalResultsHelper()->getTotalResultsForChunk(0),
                 'parameters' => $this->request,
-                'formatted_parameters' => (new BuildReportService($this->report, $this->request, true, $this->authenticatable))->getFormattedParameters($this->request),
+                'formatted_parameters' => $this->getBuildReportService()->getFormattedParameters($this->request),
                 'schedule_id' => optional($this->schedule)->getKey(),
             ];
 
