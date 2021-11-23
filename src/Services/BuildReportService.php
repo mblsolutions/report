@@ -20,6 +20,7 @@ use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportFieldType;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportSelect;
+use MBLSolutions\Report\Support\Builder\ChunkIncrementalResults;
 use MBLSolutions\Report\Support\Maps\ReportResultMap;
 
 class BuildReportService
@@ -207,16 +208,6 @@ class BuildReportService
     }
 
     /**
-     * Get the total results
-     *
-     * @return int
-     */
-    public function getTotalResults(): int
-    {
-        return $this->buildReportQuery()->count();
-    }
-
-    /**
      * Get available Export Drivers
      *
      * @return Collection
@@ -265,35 +256,37 @@ class BuildReportService
     /**
      * Build Report Query
      *
+     * @param array $except
      * @return Builder
      */
-    public function buildReportQuery(): Builder
+    public function buildReportQuery(array $except = []): Builder
     {
-        if ($this->report->joins->count()) {
+
+        if (!in_array('join', $except, true) && $this->report->joins->count()) {
             $this->addJoins();
         }
 
-        if ($this->report->selects->count()) {
+        if (!in_array('select', $except, true) && $this->report->selects->count()) {
             $this->addSelects();
         }
 
-        if (!empty($this->report->where)) {
+        if (!in_array('where', $except, true) && !empty($this->report->where)) {
             $this->addWhere();
         }
 
-        if ($this->report->middleware) {
+        if (!in_array('middleware', $except, true) && $this->report->middleware) {
             $this->handleMiddleware();
         }
 
-        if (!empty($this->report->groupby)) {
+        if (!in_array('group', $except, true) && !empty($this->report->groupby)) {
             $this->addGroupBy();
         }
 
-        if (!empty($this->report->having)) {
+        if (!in_array('having', $except, true) && !empty($this->report->having)) {
             $this->addHaving();
         }
 
-        if (!empty($this->report->orderby)) {
+        if (!in_array('order', $except, true) && !empty($this->report->orderby)) {
             $this->addOrderBy();
         }
 

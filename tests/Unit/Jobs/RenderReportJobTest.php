@@ -271,4 +271,17 @@ class RenderReportJobTest extends LaravelTestCase
         return compact(['parameters', 'schedule', 'user']);
     }
 
+    /** @test **/
+    public function check_if_the_correct_number_of_chunks_is_being_dispatched(): void
+    {
+        $this->createFakeUser(15);
+
+        dispatch(new RenderReport('aa5615b7-8489-4831-ad00-f50ae770b619', $this->report));
+
+        $this->assertDatabaseHas('report_jobs', [
+            'uuid' => 'aa5615b7-8489-4831-ad00-f50ae770b619',
+            'total' => 15
+        ]);
+    }
+    
 }

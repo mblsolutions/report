@@ -12,6 +12,7 @@ use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Services\BuildReportService;
+use MBLSolutions\Report\Support\Builder\ChunkIncrementalResults;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 
 abstract class RenderReportJob implements ShouldQueue
@@ -29,7 +30,7 @@ abstract class RenderReportJob implements ShouldQueue
 
     public array $request;
 
-    public int $chunkLimit = 50000;
+    public int $limit = 50000;
 
     /**
      * Get the Service
@@ -39,6 +40,16 @@ abstract class RenderReportJob implements ShouldQueue
     protected function getBuildReportService(): BuildReportService
     {
         return new BuildReportService($this->report, $this->request, false, $this->authenticatable);
+    }
+
+    /**
+     * Get the Chunk Incremental Results Helper
+     *
+     * @return ChunkIncrementalResults
+     */
+    public function getChunkIncrementalResultsHelper(): ChunkIncrementalResults
+    {
+        return new ChunkIncrementalResults($this->getBuildReportService()->buildReportQuery(), $this->limit);
     }
 
     /**
