@@ -1,5 +1,6 @@
 ## v2.7.2
 
++ Update default User model location based on framework defaults
 + Update Authenticated report middleware to use $this->authenticatable (for queued reports) 
 
 ## v2.7.1

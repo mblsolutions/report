@@ -14,7 +14,7 @@ return [
     */
 
     'models' => [
-        \App\User::class
+        \App\Models\User::class
     ],
 
     /*
@@ -63,7 +63,7 @@ return [
     | The authenticatable model (normally User) injected into middleware
     */
 
-    'authenticatable_model' => \App\Model\User::class,
+    'authenticatable_model' => \App\Models\User::class,
 
     /*
     |--------------------------------------------------------------------------
