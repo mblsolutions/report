@@ -12,25 +12,26 @@ use MBLSolutions\Report\Tests\LaravelTestCase;
 
 class AuthenticatedTest extends LaravelTestCase
 {
-    /** @var Authenticated $middleware */
-    protected $middleware;
+    protected User $user;
 
     /** {@inheritdoc} **/
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->middleware = new Authenticated;
+        $this->user = new User;
     }
-    
+
     /** @test **/
     public function can_handle_middleware(): void
     {
-        Auth::login(new User);
+        $middleware = new Authenticated($this->user);
+
+        Auth::login($this->user);
 
         $builder = DB::table('users');
 
-        $this->assertEquals($builder, $this->middleware->handle($builder));
+        $this->assertEquals($builder, $middleware->handle($builder));
     }
 
     /** @test **/
@@ -38,15 +39,19 @@ class AuthenticatedTest extends LaravelTestCase
     {
         $this->expectException(UnauthorizedException::class);
 
+        $middleware = new Authenticated();
+
         $builder = DB::table('users');
 
-        $this->middleware->handle($builder);
+       $middleware->handle($builder);
     }
 
     /** @test **/
     public function can_check_if_field_should_be_shown(): void
     {
-        $this->assertTrue($this->middleware->field(new ReportField()));
+        $middleware = new Authenticated();
+
+        $this->assertTrue($middleware->field(new ReportField()));
     }
 
 }
