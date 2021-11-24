@@ -24,7 +24,7 @@ class ConfigModelTest extends LaravelTestCase
         $configModel = new ReportSelectField();
 
         $this->assertEquals([
-            ['value' => 'App\User', 'name' => 'User']
+            ['value' => 'App\Models\User', 'name' => 'User']
         ], $configModel->all()->toArray());
     }
 
