@@ -17,7 +17,7 @@ class Authenticated extends ReportMiddleware
      */
     public function handle(Builder $builder): Builder
     {
-        if (auth()->guest()) {
+        if ($this->authenticatable === null) {
             throw new UnauthorizedException('You must be authenticated to view this report.');
         }
 
