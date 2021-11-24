@@ -1,3 +1,7 @@
+## v2.7.3
+
++ Allow 0 values on exports using `WithStrictNullComparison`
+
 ## v2.7.2
 
 + Update default User model namespace based on framework defaults
