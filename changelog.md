@@ -1,3 +1,7 @@
+## v2.7.2
+
++ Update Authenticated report middleware to use $this->authenticatable (for queued reports) 
+
 ## v2.7.1
 
 + Bug fix, formatted parameter dates are being set as current date
