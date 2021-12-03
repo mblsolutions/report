@@ -1,3 +1,8 @@
+## v2.7.4
+
++ Add new pending queued report job index route
++ Add resources to queued report job routes
+
 ## v2.7.3
 
 + Allow 0 values on exports using `WithStrictNullComparison`

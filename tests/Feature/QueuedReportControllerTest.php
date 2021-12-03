@@ -29,6 +29,12 @@ class QueuedReportControllerTest extends LaravelTestCase
     {
         $this->getJson(route('report.queue.index'))->assertStatus(200);
     }
+
+    /** @test **/
+    public function can_view_report_queue_pending_index(): void
+    {
+        $this->getJson(route('report.queue.pending.index'))->assertStatus(200);
+    }
     
     /** @test **/
     public function can_render_a_queued_report(): void

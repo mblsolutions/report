@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
+use MBLSolutions\Report\Http\Resources\ReportJobIndexCollection;
 use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
@@ -32,13 +33,25 @@ class QueuedReportController
      * View Report Job Index
      *
      * @param Request $request
-     * @return JsonResponse
+     * @return ReportJobIndexCollection
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): ReportJobIndexCollection
     {
-        return new JsonResponse(
-            $this->repository->paginate($request->get('limit', config('app.pagination_limit'))),
-            200
+        return new ReportJobIndexCollection(
+            $this->repository->paginate($request->get('limit', config('app.pagination_limit')))
+        );
+    }
+
+    /**
+     * View Report Job Index
+     *
+     * @param Request $request
+     * @return ReportJobIndexCollection
+     */
+    public function pending(Request $request): ReportJobIndexCollection
+    {
+        return new ReportJobIndexCollection(
+            $this->repository->pendingJobs($request->get('limit', config('app.pagination_limit')))
         );
     }
 
