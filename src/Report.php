@@ -83,6 +83,7 @@ class Report
 
             // Asynchronous
             Route::get('report/queue', 'QueuedReportController@index')->name('queue.index');
+            Route::get('report/queue/pending', 'QueuedReportController@pending')->name('queue.pending.index');
             Route::post('report/queue/{report}', 'QueuedReportController@render')->name('queue.render');
             Route::get('report/queue/job/{job}', 'QueuedReportController@job')->name('queue.job');
             Route::get('report/queue/export/{job}', 'QueuedReportController@export')->name('queue.export');

@@ -169,13 +169,14 @@ The following endpoints are available to you once the routes have been added:
 
 ### Queued View Routes (asynchronous)
 
-| Method    | URI                               | Name                      |
-| ---       | ---                               | ---                       |
-| GET       | /api/report/queue                 | report.queue.index        |
-| POST      | /api/report/queue/{report}        | report.queue.render       |
-| GET       | /api/report/queue/job/{job}       | report.queue.job          |
-| GET       | /api/report/queue/result/{job}    | report.queue.result       |
-| GET       | /api/report/queue/export/{job}    | report.queue.export       |
+| Method    | URI                               | Name                          |
+| ---       | ---                               | ---                           |
+| GET       | /api/report/queue                 | report.queue.index            |
+| GET       | /api/report/queue/pending         | report.queue.pending.index    |
+| POST      | /api/report/queue/{report}        | report.queue.render           |
+| GET       | /api/report/queue/job/{job}       | report.queue.job              |
+| GET       | /api/report/queue/result/{job}    | report.queue.result           |
+| GET       | /api/report/queue/export/{job}    | report.queue.export           |
 
 
 ### Scheduled Report Routes
