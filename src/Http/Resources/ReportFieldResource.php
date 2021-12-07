@@ -43,7 +43,7 @@ class ReportFieldResource extends JsonResource
      */
     public function getOptions(PopulatesReportOption $model): array
     {
-        return $model::options($this->model_select_value, $this->model_select_name)->toArray();
+        return $model::options($this->model_select_value, $this->model_select_name)->sortBy($this->model_select_name)->toArray();
     }
 
 }

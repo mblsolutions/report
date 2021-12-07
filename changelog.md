@@ -1,3 +1,9 @@
+## v2.7.5
+
++ Sort selectable report parameters by the report model name
++ Inactive reports showing when using all on ReportRepository
++ Allow Enums to be selectable report parameters 
+
 ## v2.7.4
 
 + Add new pending queued report job index route
