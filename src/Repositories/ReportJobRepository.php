@@ -27,7 +27,7 @@ class ReportJobRepository extends EloquentRepository
                         Carbon::now()->subDays(28)->toDateTimeString(),
                         Carbon::now()->toDateTimeString()
                     ])
-                    ->orderByDesc('updated_at')
+                    ->orderByDesc('report_jobs.created_at')
                     ->paginate($limit ?? null);
     }
 

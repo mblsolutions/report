@@ -168,9 +168,13 @@ class BuildReportService
             case ReportFieldType::SELECT:
                 $namespace = $field->getAttribute('model');
 
-                $model = $namespace::where($field->getAttribute('model_select_value'),  '=', $value)->first();
+                if (new $namespace instanceof Model) {
+                    $model = $namespace::where($field->getAttribute('model_select_value'),  '=', $value)->first();
 
-                return $model ? $model->getAttribute($field->getAttribute('model_select_name')) : $value;
+                    return $model ? $model->getAttribute($field->getAttribute('model_select_name')) : $value;
+                }
+
+                return $value;
             case ReportFieldType::DATE:
                 return Carbon::parse($value)->toDateString();
             case ReportFieldType::TIME:
