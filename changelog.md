@@ -1,3 +1,7 @@
+## v2.7.6
+
++ Update the expiration time on queued report export links
+
 ## v2.7.5
 
 + Sort selectable report parameters by the report model name

@@ -56,14 +56,19 @@ class QueuedReportExportService
         $name = $this->getFileName($path);
 
         try {
-            $url = Storage::disk(config('report.filesystem'))->temporaryUrl($path, Carbon::now()->addDay(),
+            $url = Storage::disk(config('report.filesystem'))->temporaryUrl($path, Carbon::now()->addDays(config('report.link_expiration', 32)),
                 [
                     'ResponseContentType' => 'application/octet-stream',
                     'ResponseContentDisposition' => 'attachment; filename=' . $name,
                 ]
             );
         } catch (RuntimeException $exception) {
-            $url = Storage::disk(config('report.filesystem'))->url($path);
+            $url = Storage::disk(config('report.filesystem'))->temporaryUrl($path, Carbon::now()->addDays(config('report.link_expiration', 32)),
+                [
+                    'ResponseContentType' => 'application/octet-stream',
+                    'ResponseContentDisposition' => 'attachment; filename=' . $name,
+                ]
+            );
         }
 
         return [
