@@ -172,4 +172,15 @@ return [
         'end_date',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Export Link Expiration
+    |--------------------------------------------------------------------------
+    |
+    | The length of time that an export link may remain valid in days.
+    |
+    */
+
+    'link_expiration' => env('REPORT_LINK_EXPIRATION', 32),
+
 ];

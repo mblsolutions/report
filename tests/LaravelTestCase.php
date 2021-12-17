@@ -59,6 +59,7 @@ class LaravelTestCase extends OTBTestCase
         $app['config']->set('report.scheduled_date_start', $config['scheduled_date_start']);
         $app['config']->set('report.scheduled_date_end', $config['scheduled_date_end']);
         $app['config']->set('report.chunk_limit', 5);
+        $app['config']->set('report.link_expiration', $config['link_expiration']);
 
     }
 
