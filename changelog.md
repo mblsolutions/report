@@ -1,3 +1,7 @@
+## v2.7.7
+
++ AWS temp URLs are only available upto 7 days
+
 ## v2.7.6
 
 + Update the expiration time on queued report export links
