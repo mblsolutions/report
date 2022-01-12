@@ -1,3 +1,8 @@
+## v3.0.0
+
++ PHP supported versions are now ^8.0|^8.1
++ Remove support for Laravel ^v5.x|^v6.x|^v7.x
+
 ## v2.7.7
 
 + AWS temp URLs are only available upto 7 days

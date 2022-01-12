@@ -15,7 +15,7 @@
     "ext-json": "*",
     "illuminate/cache": "^8.0",
     "illuminate/console": "^8.0",
-    "illuminate/database": "^7.30.5|^8.0",
+    "illuminate/database": "^8.0",
     "illuminate/events": "^8.0",
     "illuminate/filesystem": "^8.0",
     "illuminate/queue": "^8.0",
