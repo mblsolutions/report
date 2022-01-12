@@ -373,7 +373,7 @@ class BuildReportService
     public function replaceParameter(string $field, $value, $subject)
     {
         if ($value == null) {
-            return preg_replace("/((AND\s*)?([a-z._]+)(\s?)(>=|<=|=|<|>|!=|<>)(\s?)(\\'?)(\{{$field}\})(\s?)([0-9:]*)(\\'?)?)/", null, $subject);
+            return preg_replace("/((AND\s*)?([a-z._]+)(\s?)(>=|<=|=|<|>|!=|<>)(\s?)(\\'?)(\{{$field}\})(\s?)([0-9:]*)(\\'?)?)/", '', $subject);
         }
 
         return preg_replace("/(\{{$field}\}|\{\{{$field}\}\})/i", $value, $subject);

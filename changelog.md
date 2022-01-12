@@ -1,3 +1,7 @@
+## v3.0.1
+
++ Fix deprecation warning for PHP 8.1 "preg_replace() Passing null to parameter #2"
+
 ## v3.0.0
 
 + PHP supported versions are now ^8.0|^8.1
