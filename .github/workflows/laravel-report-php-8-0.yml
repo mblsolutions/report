@@ -1,4 +1,4 @@
-name: Laravel Report PHP 8.0
+name: Laravel Report PHP 7.4
 on:
   push:
     branches:
