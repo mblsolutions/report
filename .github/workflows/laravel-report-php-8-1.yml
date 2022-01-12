@@ -1,4 +1,4 @@
-name: Laravel Report PHP 7.4
+name: Laravel Report PHP 8.1
 on:
   push:
     branches:
@@ -16,7 +16,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-            php-version: '7.4'
+            php-version: '8.1'
       - name: Validate composer.json and composer.lock
         run: composer validate
       - name: Install dependencies
