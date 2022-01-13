@@ -1,0 +1,44 @@
+name: Laravel Report Build and Test
+
+on:
+  push:
+    branches:
+      - master
+      - v*.*
+  pull_request:
+    branches:
+      - master
+      - v*.*
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: true
+      matrix:
+        php: ["7.4", "8.0", "8.1"]
+        laravel: [ 6, 7, 8, 9 ]
+        exclude:
+          - php: 7.4
+            laravel: 9
+
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Execute tests via PHPUnit
+        run: vendor/bin/phpunit
