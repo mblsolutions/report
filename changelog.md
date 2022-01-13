@@ -1,3 +1,7 @@
+## v3.1.1
+
++ Update GitHub workflow to use PHP and Laravel run matrix
+
 ## v3.1.0
 
 + Update GitHub workflow to use PHP and Laravel run matrix
