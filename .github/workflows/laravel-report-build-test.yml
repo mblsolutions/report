@@ -38,7 +38,8 @@ jobs:
         run: composer validate
 
       - name: Install dependencies
-        run: composer update --prefer-dist --no-interaction --no-progress
+        run: composer require "illuminate/contracts=^${{ matrix.laravel }}" --no-update 
+             composer update --prefer-dist --no-interaction --no-progress
 
       - name: Execute tests via PHPUnit
         run: vendor/bin/phpunit
