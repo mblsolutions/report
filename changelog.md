@@ -1,7 +1,7 @@
 ## v3.1.0
 
 + Update GitHub workflow to use PHP and Laravel run matrix
-+ Re-Introduce support for PHP ^7.3 and Laravel ^6
++ Re-Introduce support for PHP ^7.4 and Laravel ^6
 
 ## v3.0.1
 
