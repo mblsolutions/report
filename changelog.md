@@ -1,4 +1,4 @@
-## v3.1.2
+## v3.2.0
 
 + Add report run date to report parameters when export occurs
 + Add report job run date to filename 

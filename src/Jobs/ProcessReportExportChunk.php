@@ -85,7 +85,7 @@ class ProcessReportExportChunk extends RenderReportJob
             config('report.filesystem_path', 'reports/'),
             $this->reportJob->getKey(),
             Str::limit($this->report->getSlug(), 32, ''),
-            $this->reportJob->getAttribute('created_at')->format('Y-m-d_H-i-s'),
+            $this->reportJob->getAttribute('created_at')->format('Y-m-d_H-i'),
             $this->padFileNumber($this->chunk)
         );
 
