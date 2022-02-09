@@ -1,3 +1,8 @@
+## v3.1.2
+
++ Add report run date to report parameters when export occurs
++ Add report job run date to filename 
+
 ## v3.1.1
 
 + Update GitHub workflow to use PHP and Laravel run matrix
