@@ -119,7 +119,9 @@ class BuildReportService
             $parameters = new Collection($parameters);
         }
 
-        return $parameters->map(fn ($value, $alias) => $this->formatParameters($value, $alias));
+        return $parameters->map(fn ($value, $alias) => $this->formatParameters($value, $alias))->merge([
+            'Report Run Date' => now()->toDateTimeString()
+        ]);
     }
 
     /**
