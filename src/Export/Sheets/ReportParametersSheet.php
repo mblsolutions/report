@@ -13,7 +13,10 @@ class ReportParametersSheet extends ExportableReport implements FromCollection, 
 
     public function collection()
     {
-        return $this->service->getFormattedParameters($this->service->parameters);
+        return $this->service->getFormattedParameters($this->service->parameters)->merge([
+            'name' => 'Report Run Date',
+            'value' => now()->toDateTimeString()
+        ]);
     }
 
     public function headings(): array
