@@ -10,9 +10,11 @@ use MBLSolutions\Report\Driver\Export\ReportExport;
 use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportMiddleware;
+use MBLSolutions\Report\Support\HandlesAuthenticatable;
 
 class ReportResource extends JsonResource
 {
+    use HandlesAuthenticatable;
 
     /**
      * Transform the resource into an array.
@@ -25,21 +27,21 @@ class ReportResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'connection' => $this->connection ?? config('database.default'),
+            'connection' => $this->when($this->authenticatableIsAdmin(), $this->connection ?? config('database.default')),
             'description' => $this->description,
             'display_limit' => $this->display_limit ?? 25,
             'show_data' => $this->show_data ?? true,
             'show_totals' =>  $this->show_totals ?? false,
-            'table' => $this->table,
-            'where' => $this->where,
-            'groupby' => $this->groupby,
-            'having' => $this->having,
-            'orderby' => $this->orderby,
+            'table' => $this->when($this->authenticatableIsAdmin(), $this->table),
+            'where' => $this->when($this->authenticatableIsAdmin(), $this->where),
+            'groupby' => $this->when($this->authenticatableIsAdmin(), $this->groupby),
+            'having' => $this->when($this->authenticatableIsAdmin(), $this->having),
+            'orderby' => $this->when($this->authenticatableIsAdmin(), $this->orderby),
             'active' =>  $this->active ?? true,
             'fields' => new ReportFieldCollection($this->getReportFields()),
-            'selects' => new ReportSelectCollection($this->getReportSelects()),
-            'joins' => new ReportJoinCollection($this->getReportJoins()),
-            'middleware' => new ReportMiddlewareCollection($this->getReportMiddleware()),
+            'selects' => $this->when($this->authenticatableIsAdmin(), new ReportSelectCollection($this->getReportSelects())),
+            'joins' => $this->when($this->authenticatableIsAdmin(), new ReportJoinCollection($this->getReportJoins())),
+            'middleware' => $this->when($this->authenticatableIsAdmin(), new ReportMiddlewareCollection($this->getReportMiddleware())),
             'deleted_at' => $this->deleted_at,
             'export_drivers' => $this->exportDrivers(),
             'queued_export_drivers' => $this->queuedExportDrivers(),

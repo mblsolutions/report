@@ -92,33 +92,6 @@ Route::middleware(['can:view-reports'])->group(function () {
 });
 ```
 
-### Front End Components
-
-Once the packages api routing has been added to your project you have the option to create your own frontend 
-that will interact with the api routes.
-
-This package comes with pre-built `VueJS` components that you can use directly in your application.
-
-To publish these assets, use the ```vendor:publish``` artisan command:
-
-```bash
-php artisan vendor:publish --tag=report-components
-```
-
-The published components will be placed the ```resources/js/report``` directory. Once the components have been 
-published, you should register them in your ```reousrces/js/app.js``` file.
-
-```javascript
-const app = new Vue({
-    el: '#app',
-    components: {
-        // Laravel Report Package components
-        'mbl-manage-report': require('./report/components/ManageReport').default,
-        'mbl-show-report': require('./report/components/ShowReport').default
-    }
-});
-```
-
 ### Report Select Parameter Models
 
 To enable select options when creating/rendering reports, you must add the available model types to be reported on in the 

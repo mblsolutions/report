@@ -26,7 +26,8 @@ class Report extends Model
         'display_limit' => 'integer',
         'show_data' => 'boolean',
         'show_totals' => 'boolean',
-        'active' => 'boolean'
+        'admin_only' => 'boolean',
+        'active' => 'boolean',
     ];
 
     /**

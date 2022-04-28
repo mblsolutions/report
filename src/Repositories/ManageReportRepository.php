@@ -249,6 +249,7 @@ class ManageReportRepository
             'orderby' => 'nullable',
             'show_data' => 'required|boolean',
             'show_totals' => 'required|boolean',
+            'admin_only' => 'nullable|boolean',
             'active' => 'required|boolean',
             // Middleware Validation
             'middleware.*.middleware' => [
