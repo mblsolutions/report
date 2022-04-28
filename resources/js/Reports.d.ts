@@ -35,25 +35,25 @@ interface IReport {
 
 interface RenderRender {
     active: boolean
-    connection: string
+    connection?: string
     deleted_at: Date | string | null
     description: string
     display_limit: number
     export_drivers: Array<ReportOptions>
-    groupby: string | null
-    having: string | null
+    groupby?: string | null
+    having?: string | null
     id: number
     name: string
-    orderby: string | null
+    orderby?: string | null
     queued_export_drivers: Array<ReportOptions>
     show_data: boolean
     show_totals: boolean
-    table: string
+    table?: string
     where?: string
-    middleware: Array<ReportMiddleware>
+    middleware?: Array<ReportMiddleware>
     fields: Array<ReportField>
-    selects: Array<ReportSelect>
-    joins: Array<ReportJoin>
+    selects?: Array<ReportSelect>
+    joins?: Array<ReportJoin>
 }
 
 interface ReportResults {
