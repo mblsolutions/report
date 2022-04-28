@@ -5,7 +5,6 @@ namespace MBLSolutions\Report\Repositories;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Lerouse\LaravelRepository\EloquentRepository;
 use MBLSolutions\Report\Models\Report;
 
 class ReportRepository extends PackageReportRepository
@@ -29,7 +28,11 @@ class ReportRepository extends PackageReportRepository
 
     public function builder(): Builder
     {
-        return Report::query();
+        return Report::query()
+            ->selectRaw('reports.*')
+            ->when($this->canCheckIfAdmin() && $this->authenticatableIsNotAdmin(), function (Builder $builder) {
+                $builder->where('reports.admin_only', '=', false);
+            });
     }
 
 }

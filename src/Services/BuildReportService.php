@@ -20,11 +20,13 @@ use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportFieldType;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportSelect;
-use MBLSolutions\Report\Support\Builder\ChunkIncrementalResults;
+use MBLSolutions\Report\Support\HandlesAuthenticatable;
 use MBLSolutions\Report\Support\Maps\ReportResultMap;
 
 class BuildReportService
 {
+    use HandlesAuthenticatable;
+
     public bool $paginate = true;
 
     public Report $report;
@@ -97,10 +99,13 @@ class BuildReportService
             'data' => $this->data(0, $limit),
             'totals' => false,
             'drivers' => $this->exportDrivers(),
-            'raw' => $this->getRawQuery(),
             'parameters' => $this->getFormattedParameters($this->parameters),
             'result_limit' => $limit
         ]);
+
+        if ($this->authenticatableIsAdmin()) {
+            $result->push(['raw' => $this->getRawQuery()]);
+        }
 
         Event::dispatch(new ReportRendered($this->report));
 

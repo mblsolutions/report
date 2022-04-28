@@ -1,3 +1,8 @@
+## v3.4.0
+
++ Add `admin_only` column to reports, defaulted to `false`
++ Hide sensitive query fields when not authenticated as an admin
+
 ## v3.3.1
 
 + Report Jobs retrieve the authenticatable model attribute name
