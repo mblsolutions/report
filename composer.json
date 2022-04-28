@@ -25,7 +25,7 @@
     "maatwebsite/excel": "^3.1",
     "lerouse/laravel-repository": "^1.0||^2.0",
     "laravel/legacy-factories": "^1.2",
-    "doctrine/dbal": "^3.3"
+    "doctrine/dbal": "^2.6||^3.3"
   },
   "require-dev": {
     "mockery/mockery": "~1.0",
