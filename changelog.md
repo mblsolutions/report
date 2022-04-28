@@ -1,3 +1,7 @@
+## v3.3.1
+
++ Report Jobs retrieve the authenticatable model attribute name
+
 ## v3.3.0
 
 + Add extended parameters to report_jobs queries (e.g. report_name)

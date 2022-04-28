@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Lerouse\LaravelRepository\EloquentRepository;
 use MBLSolutions\Report\Models\Report;
 
-class ReportRepository extends EloquentRepository
+class ReportRepository extends PackageReportRepository
 {
 
     public function all(): EloquentCollection
