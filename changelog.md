@@ -1,17 +1,17 @@
-## v3.4.1
+## v4.2.0
 
 + Limit report_jobs to only display for current user is not an admin and authenticated
 
-## v3.4.0
+## v4.1.0
 
 + Add `admin_only` column to reports, defaulted to `false`
 + Hide sensitive query fields when not authenticated as an admin
 
-## v3.3.1
+## v4.0.1
 
 + Report Jobs retrieve the authenticatable model attribute name
 
-## v3.3.0
+## v4.0.0
 
 + Add extended parameters to report_jobs queries (e.g. report_name)
 + Remove dated vue components
