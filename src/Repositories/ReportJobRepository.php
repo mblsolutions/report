@@ -80,6 +80,9 @@ class ReportJobRepository extends PackageReportRepository
                 ->when(
                     $authModel !== null,
                     fn (Builder $builder) => $this->authNameQuery($builder, $authModel, 'report_jobs.authenticatable_id')
+                )->when(
+               $this->getAuthenticatedUser() && $this->authenticatableIsNotAdmin(),
+                    fn (Builder $builder) => $builder->where('report_jobs.authenticatable_id', '=', $this->getAuthenticatedUser()->getKey()),
                 );
     }
 

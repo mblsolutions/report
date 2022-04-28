@@ -1,3 +1,7 @@
+## v3.4.1
+
++ Limit report_jobs to only display for current user is not an admin and authenticated
+
 ## v3.4.0
 
 + Add `admin_only` column to reports, defaulted to `false`

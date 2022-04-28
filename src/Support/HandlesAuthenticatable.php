@@ -53,15 +53,6 @@ trait HandlesAuthenticatable
         return $this->currentAuthenticatable;
     }
 
-    protected function authNameQuery(Builder $builder, Model $authModel, string $join): Builder
-    {
-        return $builder->selectRaw(
-            $authModel->getTable() . '.' . $this->getAuthenticatableModelName() . ' as authenticatable_name'
-        )->leftJoin(
-            $authModel->getTable(), $authModel->getTable() . '.' . $authModel->getKeyName(), '=', $join
-        );
-    }
-
     protected function canCheckIfAdmin(): bool
     {
         if ($this->getAuthenticatedUser()) {
@@ -79,7 +70,7 @@ trait HandlesAuthenticatable
         return optional($auth)->isAuthenticatableAnAdmin() ?? false;
     }
 
-    public function authenticatableIsNotAdmin(): bool
+    protected function authenticatableIsNotAdmin(): bool
     {
         return ! $this->authenticatableIsAdmin();
     }
