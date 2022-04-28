@@ -13,16 +13,16 @@ interface IReport {
     id?: number
     name: string | null
     description: string | null
-    connection: string | null
+    connection?: string | null
     display_limit: number
-    table: string | null
-    where: string | null
-    groupby: string | null
-    having: string |null
-    orderby: string | null
+    table?: string | null
+    where?: string | null
+    groupby?: string | null
+    having?: string |null
+    orderby?: string | null
     show_data: boolean
     show_totals: boolean
-    admin_only: boolean
+    admin_only?: boolean
     active: boolean
     created_at?: Date
     updated_at?: Date
@@ -111,7 +111,7 @@ interface QueuedReportJob {
     formatted_parameters: [],
     parameters: [],
     processed: number
-    query: string
+    query?: string
     report_id: number | string
     schedule_id: number | string | null
     status: 'scheduled' | 'running' | 'complete' | 'failed'
