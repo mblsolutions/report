@@ -71,7 +71,10 @@ class ReportJobRepository extends EloquentRepository
 
     public function builder(): Builder
     {
-       return ReportJob::query();
+       return ReportJob::query()
+                ->selectRaw('report_jobs.*')
+                ->selectRaw('reports.name as report_name')
+                ->leftJoin('reports', 'reports.id', '=', 'report_jobs.report_id');
     }
 
 }

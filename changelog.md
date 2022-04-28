@@ -1,3 +1,9 @@
+## v3.3.0
+
++ Add extended parameters to report_jobs queries (e.g. report_name)
++ Remove dated vue components
++ Add typescript definitions file
+
 ## v3.2.0
 
 + Add report run date to report parameters when export occurs
