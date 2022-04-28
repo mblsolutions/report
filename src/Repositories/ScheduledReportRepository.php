@@ -6,11 +6,10 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Lerouse\LaravelRepository\EloquentRepository;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 
-class ScheduledReportRepository extends EloquentRepository
+class ScheduledReportRepository extends PackageReportRepository
 {
     
     public function getScheduledReportsToRun(Carbon $date): Collection

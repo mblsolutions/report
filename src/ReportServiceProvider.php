@@ -22,11 +22,6 @@ class ReportServiceProvider extends ServiceProvider
             __DIR__ . '/../config/report.php' => config_path('report.php'),
         ], 'report-config');
 
-        // Publish Report Components
-        $this->publishes([
-            __DIR__.'/../resources/js' => base_path('resources/js/report'),
-        ], 'report-components');
-
         if ($this->app->runningInConsole()) {
             $this->commands([
                 DispatchScheduledReportsCommand::class

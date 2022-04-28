@@ -4,13 +4,13 @@ namespace MBLSolutions\Report\Repositories;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Lerouse\LaravelRepository\EloquentRepository;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 
-class ReportJobRepository extends EloquentRepository
+class ReportJobRepository extends PackageReportRepository
 {
     public int $days = 28;
 
@@ -71,7 +71,21 @@ class ReportJobRepository extends EloquentRepository
 
     public function builder(): Builder
     {
-       return ReportJob::query();
+        $authModel = $this->getAuthenticatableModel();
+
+       return ReportJob::query()
+                ->selectRaw('report_jobs.*')
+                ->selectRaw('reports.name as report_name')
+                ->leftJoin('reports', 'reports.id', '=', 'report_jobs.report_id')
+                ->when(
+                    $authModel !== null,
+                    fn (Builder $builder) => $this->authNameQuery($builder, $authModel, 'report_jobs.authenticatable_id')
+                )->when(
+               $this->getAuthenticatedUser() && $this->authenticatableIsNotAdmin(),
+                    fn (Builder $builder) => $builder->where('report_jobs.authenticatable_id', '=', $this->getAuthenticatedUser()->getKey()),
+                );
     }
+
+
 
 }
