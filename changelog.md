@@ -1,3 +1,7 @@
+## v4.3.1
+
++ Add extended attributes to schedule frequency
+
 ## v4.3.0
 
 + Add report all endpoint to allow display of lists and non paginated report indexes 

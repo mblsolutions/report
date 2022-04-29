@@ -33,7 +33,7 @@ interface IReport {
     joins: Array<ReportJoin>
 }
 
-interface RenderRender {
+interface ReportRender {
     active: boolean
     connection?: string
     deleted_at: Date | string | null
@@ -135,4 +135,17 @@ interface ReportExportUrls {
     url: string
 }
 
-export {ReportConnection, ReportOptions, IReport, RenderRender, ReportResults, ReportMiddleware, ReportField, ReportSelect, ReportJoin, QueuedReportJob, ReportExport}
+interface IReportSchedule {
+    uuid?: string
+    authenticatable_name?: string | null
+    report_description?: string
+    report_name?: string
+    report_id: number | null
+    parameters: any
+    frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+    recipients: null
+    created_at?: Date | string
+    updated_at?: Date | string
+}
+
+export {ReportConnection, ReportOptions, IReport, ReportRender, ReportResults, ReportMiddleware, ReportField, ReportSelect, ReportJoin, QueuedReportJob, ReportExport, IReportSchedule}

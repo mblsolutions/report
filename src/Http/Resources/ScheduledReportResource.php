@@ -19,9 +19,12 @@ class ScheduledReportResource extends JsonResource
     {
         return [
             'uuid' => $this->getKey(),
+            'report_name' => $this->getAttribute('report_name'),
+            'report_description' => $this->getAttribute('report_description'),
             'frequency' => $this->getAttribute('frequency'),
             'report_id' => $this->getAttribute('report_id'),
             'authenticatable_id' => $this->getAttribute('authenticatable_id'),
+            'authenticatable_name' => $this->getAttribute('authenticatable_name'),
             'parameters' => $this->getAttribute('parameters'),
             'recipients' => $this->getAttribute('recipients'),
             'last_run' => $this->getAttribute('last_run'),
