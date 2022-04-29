@@ -31,6 +31,23 @@ class ReportControllerTest extends LaravelTestCase
     }
 
     /** @test **/
+    public function can_view_all_reports(): void
+    {
+        factory(Report::class)->create(['name' => 'Test Report']);
+
+        $response = $this->getJson(route('report.all'));
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    [
+                        'name' => 'Test Report',
+                    ]
+                ],
+            ]);
+    }
+
+    /** @test **/
     public function can_show_report(): void
     {
         $report = factory(Report::class)->create(['name' => 'Test Report']);
