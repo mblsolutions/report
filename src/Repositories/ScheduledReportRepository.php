@@ -41,12 +41,25 @@ class ScheduledReportRepository extends PackageReportRepository
 
     public function paginate(int $limit = null): LengthAwarePaginator
     {
-        return $this->builder()->orderByDesc('updated_at')->paginate($limit ?? null);
+        return $this->builder()->orderByDesc('scheduled_reports.updated_at')->paginate($limit ?? null);
     }
 
     public function builder(): Builder
     {
-        return ScheduledReport::query();
+        $authModel = $this->getAuthenticatableModel();
+
+        return ScheduledReport::query()
+                ->selectRaw('scheduled_reports.*')
+                ->selectRaw('reports.name as report_name')
+                ->selectRaw('reports.description as report_description')
+                ->leftJoin('reports', 'reports.id', '=', 'scheduled_reports.report_id')
+                ->when(
+                    $authModel !== null,
+                    fn (Builder $builder) => $this->authNameQuery($builder, $authModel, 'scheduled_reports.authenticatable_id')
+                )->when(
+                    $this->getAuthenticatedUser() && $this->authenticatableIsNotAdmin(),
+                    fn (Builder $builder) => $builder->where('scheduled_reports.authenticatable_id', '=', $this->getAuthenticatedUser()->getKey()),
+                );
     }
 
 }

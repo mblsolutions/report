@@ -5,6 +5,7 @@ namespace MBLSolutions\Report\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use MBLSolutions\Report\Http\Resources\ScheduledReportCollection;
 use MBLSolutions\Report\Http\Resources\ScheduledReportResource;
@@ -50,7 +51,8 @@ class ScheduledReportController
         ]);
 
         $schedule = new ScheduledReport(array_merge([
-            'uuid' => Str::uuid()
+            'uuid' => Str::uuid(),
+            'authenticatable_id' => optional(Auth::user())->getKey(),
         ], $request->toArray()));
 
         $schedule->save();
