@@ -43,6 +43,18 @@ class ReportController
     }
 
     /**
+     * All Reports
+     *
+     * @return ReportIndexCollection
+     */
+    public function all(): ReportIndexCollection
+    {
+        return new ReportIndexCollection(
+            $this->repository->all()
+        );
+    }
+
+    /**
      * Show a Report
      *
      * @param Report $report

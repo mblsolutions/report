@@ -1,3 +1,7 @@
+## v4.3.0
+
++ Add report all endpoint to allow display of lists and non paginated report indexes 
+
 ## v4.2.0
 
 + Limit report_jobs to only display for current user is not an admin and authenticated
