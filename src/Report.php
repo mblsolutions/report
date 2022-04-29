@@ -90,6 +90,7 @@ class Report
 
             // Synchronous
             Route::get('report', 'ReportController@index')->name('index');
+            Route::get('report/all', 'ReportController@all')->name('all');
             Route::get('report/{report}', 'ReportController@show')->name('show');
             Route::post('report/{report}', 'ReportController@render')->name('render');
             Route::post('report/{report}/preview', 'ReportController@preview')->name('preview');
