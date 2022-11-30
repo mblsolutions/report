@@ -2,7 +2,6 @@
 
 namespace MBLSolutions\Report\Tests;
 
-use Faker\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
@@ -14,6 +13,7 @@ use MBLSolutions\Report\Tests\Fakes\ExportDriver\FakeExportDriver;
 use MBLSolutions\Report\Tests\Fakes\Middleware\FakeMiddleware;
 use MBLSolutions\Report\Tests\Fakes\User;
 use Orchestra\Testbench\TestCase as OTBTestCase;
+use Illuminate\Support\Facades\DB;
 
 class LaravelTestCase extends OTBTestCase
 {
@@ -24,11 +24,13 @@ class LaravelTestCase extends OTBTestCase
     {
         parent::setUp();
 
+        DB::setDefaultConnection('sqlite');
+
         $this->setupEnvVariables();
 
-        $this->runPackageMigrations();
-
         $this->loadTestMigrations();
+
+        $this->runPackageMigrations();
 
         $this->loadModelFactories();
 
@@ -41,7 +43,7 @@ class LaravelTestCase extends OTBTestCase
      * @param  Application  $app
      * @return void
      */
-    protected function getEnvironmentSetUp($app): void
+    protected function defineEnvironment($app): void
     {
         $config = include __DIR__ . '/../config/report.php';
 
@@ -60,7 +62,6 @@ class LaravelTestCase extends OTBTestCase
         $app['config']->set('report.scheduled_date_end', $config['scheduled_date_end']);
         $app['config']->set('report.chunk_limit', 5);
         $app['config']->set('report.link_expiration', $config['link_expiration']);
-
     }
 
     /**
@@ -83,8 +84,6 @@ class LaravelTestCase extends OTBTestCase
     private function runPackageMigrations(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-
-        $this->artisan('migrate')->run();
     }
 
     /**
