@@ -1,3 +1,7 @@
+## v5.0.0
+
++ Update dependencies to support Laravel 9
+
 ## v4.3.1
 
 + Add extended attributes to schedule frequency
