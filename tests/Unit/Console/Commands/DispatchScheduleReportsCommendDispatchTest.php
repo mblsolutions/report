@@ -59,8 +59,11 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
     /** @test **/
     public function can_run_daily_schedule(): void
     {
-        Carbon::setTestNow('2021-11-10 00:00:00'); // daily at midnight (Wednesday)
+        $testTime = now();
+        $testTime->setTime(0,0,0);
 
+        Carbon::setTestNow($testTime);
+        
         $this->artisan('report:schedule');
 
         $this->assertScheduledEventDispatch('c066524b-b5ad-46d1-961d-f96203c54181');

@@ -20,6 +20,11 @@ class DispatchScheduledReportsCommandTest extends LaravelTestCase
 
         Bus::fake();
 
+        $testNow = now();
+        $testNow->setTime(0,0,0);
+
+        Carbon::setTestNow($testNow);
+
         $this->report = factory(Report::class)->create();
     }
     
