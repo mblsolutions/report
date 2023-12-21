@@ -23,7 +23,7 @@ $factory->define(Report::class, static function (Faker $faker) {
     return [
         'name' => $faker->words(3, true),
         'description' => $faker->sentence(),
-        'connection' => 'sqlite',
+        'connection' => 'testing',
         'display_limit' => 25,
         'table' => 'users',
         'where' => null,
