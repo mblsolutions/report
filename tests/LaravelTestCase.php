@@ -2,7 +2,6 @@
 
 namespace MBLSolutions\Report\Tests;
 
-use Faker\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
@@ -95,6 +94,8 @@ class LaravelTestCase extends OTBTestCase
     private function loadTestMigrations(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+
+        $this->artisan('migrate')->run();
     }
 
     /**
