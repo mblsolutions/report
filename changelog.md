@@ -1,6 +1,10 @@
+## v5.1.0
+
++ Update dependencies to support Laravel 10
+
 ## v5.0.0
 
-+ Update dependencies to support Laravel 9
++ Update dependencies to require Laravel 9 minimum
 
 ## v4.3.1
 
