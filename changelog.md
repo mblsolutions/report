@@ -1,3 +1,7 @@
+## v4.4.0
+
++ Publish database migration files
+
 ## v4.3.1
 
 + Add extended attributes to schedule frequency

@@ -18,6 +18,12 @@ Copy the package config to your local config.
 php artisan vendor:publish --tag=report-config
 ```
 
+Copy the package database migrations.
+
+```bash
+php artisan vendor:publish --tag=report-migrations
+```
+
 Laravel Report comes with its own database migrations, once the package has been installed run the
 migrations.
 
