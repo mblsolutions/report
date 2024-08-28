@@ -6,4 +6,3 @@ composer.lock
 package.lock
 phpunit.xml
 .phpunit.result.cache
-.vscode

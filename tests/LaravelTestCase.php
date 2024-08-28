@@ -94,8 +94,6 @@ class LaravelTestCase extends OTBTestCase
     private function loadTestMigrations(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-
-        $this->artisan('migrate')->run();
     }
 
     /**

@@ -3,7 +3,7 @@
   "description": "Laravel Report package",
   "keywords": ["redu", "report", "laravel"],
   "type": "package",
-  "license": "proprietary",
+  "license": "MIT",
   "authors": [
     {
       "name": "MBL Solutions Ltd.",

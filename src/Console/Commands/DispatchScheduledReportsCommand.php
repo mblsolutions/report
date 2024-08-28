@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
@@ -14,19 +15,26 @@ use MBLSolutions\Report\Repositories\ScheduledReportRepository;
 
 class DispatchScheduledReportsCommand extends Command
 {
+    protected \Carbon\Carbon $date;
+
     protected $signature = 'report:schedule';
 
     protected $description = 'Dispatch scheduled reports';
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->date = Carbon::now();
+    }
+
     public function handle(): int
     {
-        $date = now();
-
         $repository = new ScheduledReportRepository();
 
         $this->info('Running Report Schedules');
 
-        $repository->getScheduledReportsToRun($date)->each(function (ScheduledReport $schedule) {
+        $repository->getScheduledReportsToRun($this->date)->each(function (ScheduledReport $schedule) {
             $this->info(
                 sprintf('Running Schedule for Report %s', $schedule->getKey())
             );
