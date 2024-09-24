@@ -1,6 +1,7 @@
 ## v5.2.0
 
 + Conditionally publish and load database migration files to prevent conflicts in table names
++ Removed class names from database migrations to prevent conflicts
 
 ## v5.1.0
 

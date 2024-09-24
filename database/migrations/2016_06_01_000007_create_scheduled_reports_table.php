@@ -5,9 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 
-class CreateScheduledReportsTable extends Migration
+return new class extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -37,5 +36,4 @@ class CreateScheduledReportsTable extends Migration
     {
         Schema::dropIfExists('scheduled_reports');
     }
-
-}
+};

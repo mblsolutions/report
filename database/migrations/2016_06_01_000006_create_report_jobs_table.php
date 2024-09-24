@@ -5,9 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 
-class CreateReportJobsTable extends Migration
+return new class extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -40,5 +39,4 @@ class CreateReportJobsTable extends Migration
     {
         Schema::dropIfExists('report_jobs');
     }
-
-}
+};
