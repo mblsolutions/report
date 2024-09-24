@@ -1,3 +1,7 @@
+## v5.2.0
+
++ Conditionally publish and load database migration files to prevent conflicts in table names
+
 ## v5.1.0
 
 + Update dependencies to support Laravel 10
