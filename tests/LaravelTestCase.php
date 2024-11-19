@@ -3,7 +3,6 @@
 namespace MBLSolutions\Report\Tests;
 
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\ExcelServiceProvider;
@@ -17,8 +16,6 @@ use Illuminate\Support\Facades\DB;
 
 class LaravelTestCase extends OTBTestCase
 {
-    use RefreshDatabase;
-
     /** {@inheritdoc} **/
     protected function setUp(): void
     {

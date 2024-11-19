@@ -193,4 +193,44 @@ return [
 
     'link_expiration' => env('REPORT_LINK_EXPIRATION', 6),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Load Migrations
+    |--------------------------------------------------------------------------
+    |
+    | This option controls whether the package will automatically load its
+    | own database migrations from its 'database/migrations' directory.
+    |
+    | When set to true, the package's migrations will be loaded and executed
+    | during migration commands (e.g., when you run 'php artisan migrate').
+    | This is the default behavior, allowing the package to manage its
+    | database schema requirements seamlessly.
+    |
+    | When set to false, the package will not load its own migrations. This
+    | is useful in scenarios where you have published the package's migrations
+    | to your application's 'database/migrations' directory—perhaps to modify
+    | them or to prevent conflicts with existing tables. By disabling the
+    | automatic loading of the package's migrations, you gain full control
+    | over when and how these migrations are executed.
+    |
+    | Use Cases:
+    | - **Customizing Migrations:** If you've published and modified the
+    |   package's migration files to suit your application's needs.
+    | - **Avoiding Conflicts:** If the package's migrations create tables or
+    |   modify schemas that already exist in your database, disabling automatic
+    |   loading prevents errors and data loss.
+    | - **Renaming Migrations:** If you've renamed the migration files after
+    |   publishing them to avoid filename collisions or to enforce a specific
+    |   migration order.
+    |
+    | **Note:** After setting this option to false, ensure that you've published
+    | the migrations using the package's publish command:
+    |   'php artisan vendor:publish --tag=report-config'
+    | and that they are placed in your application's 'database/migrations' directory.
+    |
+    | Default: true
+    |
+    */
+    'load_migrations' => true,
+
 ];

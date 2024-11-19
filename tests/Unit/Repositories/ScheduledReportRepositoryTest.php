@@ -14,8 +14,6 @@ use MBLSolutions\Report\Tests\LaravelTestCase;
 
 class ScheduledReportRepositoryTest extends LaravelTestCase
 {
-    use RefreshDatabase;
-
     protected ScheduledReportRepository $repository;
 
     protected Report $report;

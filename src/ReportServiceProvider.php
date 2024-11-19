@@ -22,6 +22,11 @@ class ReportServiceProvider extends ServiceProvider
             __DIR__ . '/../config/report.php' => config_path('report.php'),
         ], 'report-config');
 
+        // Publish MBL Solutions report database migrations
+        $this->publishes([
+            __DIR__.'/../database/migrations' => database_path('migrations'),
+        ], 'report-migrations');
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 DispatchScheduledReportsCommand::class
@@ -36,7 +41,9 @@ class ReportServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        if (config('report.load_migrations', true)) {
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        }
     }
 
 }
