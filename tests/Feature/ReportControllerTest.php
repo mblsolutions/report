@@ -129,9 +129,41 @@ class ReportControllerTest extends LaravelTestCase
     /** @test **/
     public function can_view_report_preview(): void
     {
-        $this->postJson(route('report.preview', [
+        Auth::login(new User());
+
+        $response = $this->postJson(route('report.preview', [
             'report' => factory(Report::class)->create()
-        ]), [])->assertStatus(200);
+        ]), []);
+
+        $response->assertStatus(200);
+    }
+
+    /** @test **/
+    public function returns_sql_for_admins(): void
+    {
+        $adminUser = new User();
+        $adminUser->setIsAdmin(true);
+
+        Auth::login($adminUser);
+
+        $response = $this->postJson(route('report.preview', [
+            'report' => factory(Report::class)->create()
+        ]), []);
+
+        $response->assertStatus(200);
+        $this->assertArrayHasKey('raw', $response->json());
+
+        $nonAdminUser = new User();
+        $nonAdminUser->setIsAdmin(false);
+
+        Auth::login($nonAdminUser);
+
+        $response = $this->postJson(route('report.preview', [
+            'report' => factory(Report::class)->create()
+        ]), []);
+
+        $response->assertStatus(200);
+        $this->assertArrayNotHasKey('raw', $response->json());
     }
 
 }

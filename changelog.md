@@ -1,3 +1,7 @@
+## v5.2.1
+
++ Fix issue with `raw` key not being set on report preview response.
+
 ## v5.2.0
 
 + Conditionally publish and load database migration files to prevent conflicts in table names

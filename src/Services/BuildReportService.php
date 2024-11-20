@@ -104,7 +104,7 @@ class BuildReportService
         ]);
 
         if ($this->authenticatableIsAdmin()) {
-            $result->push(['raw' => $this->getRawQuery()]);
+            $result->put('raw', $this->getRawQuery());
         }
 
         Event::dispatch(new ReportRendered($this->report));
