@@ -364,7 +364,7 @@ class BuildReportService
      */
     protected function cleanWhereSyntax(): string
     {
-        return preg_replace('/\A(\s*)(AND)|\A(\s*)(OR)/i', '', $this->report->where, 1);
+        return preg_replace('/\A(\s*)(AND|OR|IN)(?=\s)/i', '', $this->report->where, 1);
     }
 
     /**
