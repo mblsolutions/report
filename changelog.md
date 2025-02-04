@@ -1,3 +1,7 @@
+## v5.2.2
+
++ Fix bug that trimmed the leading and,or,in from a WHERE clause, which required `1=1 AND` temp fix.
+
 ## v5.2.1
 
 + Fix issue with `raw` key not being set on report preview response.

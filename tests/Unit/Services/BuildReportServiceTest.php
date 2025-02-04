@@ -314,7 +314,7 @@ class BuildReportServiceTest extends LaravelTestCase
     public function can_clean_where_syntax_with_remaining_and(): void
     {
         $this->report->update([
-            'where' => ' AND'
+            'where' => ' AND '
         ]);
 
         $service = new BuildReportService($this->report, []);
@@ -329,7 +329,7 @@ class BuildReportServiceTest extends LaravelTestCase
     public function can_clean_where_syntax_with_remaining_or(): void
     {
         $this->report->update([
-            'where' => ' OR'
+            'where' => 'OR '
         ]);
 
         $service = new BuildReportService($this->report, []);
@@ -338,6 +338,66 @@ class BuildReportServiceTest extends LaravelTestCase
         $method->setAccessible(true);
 
         $this->assertEquals('', $method->invoke($service));
+    }
+
+    /** @test **/
+    public function can_clean_where_syntax_with_remaining_order(): void
+    {
+        $this->report->update([
+            'where' => 'order'
+        ]);
+
+        $service = new BuildReportService($this->report, []);
+
+        $method = new \ReflectionMethod(BuildReportService::class, 'cleanWhereSyntax');
+        $method->setAccessible(true);
+
+        $this->assertEquals('order', $method->invoke($service));
+    }
+
+    /** @test **/
+    public function can_clean_where_syntax_with_remaining_or_order(): void
+    {
+        $this->report->update([
+            'where' => 'OR order'
+        ]);
+
+        $service = new BuildReportService($this->report, []);
+
+        $method = new \ReflectionMethod(BuildReportService::class, 'cleanWhereSyntax');
+        $method->setAccessible(true);
+
+        $this->assertEquals('order', $method->invoke($service));
+    }
+
+    /** @test **/
+    public function can_clean_where_syntax_with_remaining_invoice(): void
+    {
+        $this->report->update([
+            'where' => 'invoice'
+        ]);
+
+        $service = new BuildReportService($this->report, []);
+
+        $method = new \ReflectionMethod(BuildReportService::class, 'cleanWhereSyntax');
+        $method->setAccessible(true);
+
+        $this->assertEquals('invoice', $method->invoke($service));
+    }
+
+    /** @test **/
+    public function can_clean_where_syntax_with_remaining_in_invoice(): void
+    {
+        $this->report->update([
+            'where' => ' IN invoice'
+        ]);
+
+        $service = new BuildReportService($this->report, []);
+
+        $method = new \ReflectionMethod(BuildReportService::class, 'cleanWhereSyntax');
+        $method->setAccessible(true);
+
+        $this->assertEquals('invoice', $method->invoke($service));
     }
 
     /** @test **/
