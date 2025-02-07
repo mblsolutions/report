@@ -437,6 +437,63 @@ class BuildReportServiceTest extends LaravelTestCase
     }
 
     /** @test **/
+    public function can_replace_parameter_if_supplied_null_leading_and_or(): void
+    {
+        $service = new BuildReportService($this->report, []);
+
+        $method = new \ReflectionMethod(BuildReportService::class, 'replaceParameter');
+        $method->setAccessible(true);
+
+        $this->assertEquals(
+            'users.created_at > \'{users_created_at}\'',
+            $method->invoke(
+                $service,
+                'client_name',
+                null,
+                'users.created_at > \'{users_created_at}\' OR users.client_name > \'{client_name}\''
+            )
+        );
+    }
+
+    /** @test **/
+    public function can_replace_parameter_if_supplied_null_trailing_and_or(): void
+    {
+        $service = new BuildReportService($this->report, []);
+
+        $method = new \ReflectionMethod(BuildReportService::class, 'replaceParameter');
+        $method->setAccessible(true);
+
+        $this->assertEquals(
+            'users.created_at > \'{users_created_at}\'',
+            $method->invoke(
+                $service,
+                'client_name',
+                null,
+                'users.client_name > \'{client_name}\' AND users.created_at > \'{users_created_at}\''
+            )
+        );
+    }
+
+    /** @test **/
+    public function can_replace_parameter_if_supplied_null_leading_and_trailing_and_or(): void
+    {
+        $service = new BuildReportService($this->report, []);
+
+        $method = new \ReflectionMethod(BuildReportService::class, 'replaceParameter');
+        $method->setAccessible(true);
+
+        $this->assertEquals(
+            'users.role > \'{users_role}\' AND users.created_at > \'{users_created_at}\'',
+            $method->invoke(
+                $service,
+                'client_name',
+                null,
+                'users.role > \'{users_role}\' OR users.client_name > \'{client_name}\' AND users.created_at > \'{users_created_at}\''
+            )
+        );
+    }
+
+    /** @test **/
     public function can_replace_parameter_if_supplied_null_with_extended_time_stamp(): void
     {
         $report = factory(Report::class)->create([

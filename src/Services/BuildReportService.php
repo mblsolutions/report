@@ -378,7 +378,26 @@ class BuildReportService
     public function replaceParameter(string $field, $value, $subject)
     {
         if ($value == null) {
-            return preg_replace("/((AND\s*)?([a-z._]+)(\s?)(>=|<=|=|<|>|!=|<>)(\s?)(\\'?)(\{{$field}\})(\s?)([0-9:]*)(\\'?)?)/", '', $subject);
+            preg_match_all("/([a-z._]+)(\s?)(>=|<=|=|<|>|!=|<>)(\s?)(\\'?)(\{{$field}\})(\s?)([0-9:]*)(\\'?)/", $subject, $matches);
+
+            foreach ($matches[0] as $match) {
+                $match = trim($match);
+
+                // Check for a leading "AND" or "OR"
+                if (preg_match("/\s*(AND|OR)\s+" . preg_quote($match, '/') . "/i", $subject)) {
+                    $subject = preg_replace("/\s*(AND|OR)\s+" . preg_quote($match, '/') . "/i", '', $subject);
+                }
+                // Check for a trailing "AND" or "OR"
+                else if (preg_match("/" . preg_quote($match, '/') . "\s+(AND|OR)\s*/i", $subject)) {
+                    $subject = preg_replace("/" . preg_quote($match, '/') . "\s+(AND|OR)\s*/i", '', $subject);
+                }
+                // If neither, simply remove the match (no AND/OR condition)
+                else {
+                    $subject = str_replace($match, '', $subject);
+                }
+            }
+
+            return $subject;
         }
 
         return preg_replace("/(\{{$field}\}|\{\{{$field}\}\})/i", $value, $subject);
