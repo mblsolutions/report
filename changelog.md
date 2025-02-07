@@ -1,3 +1,7 @@
+## v5.2.3
+
++ Fix bug for replaceParameter to correctly remove NULL values from query
+
 ## v5.2.2
 
 + Fix bug that trimmed the leading and,or,in from a WHERE clause, which required `1=1 AND` temp fix.
