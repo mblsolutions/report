@@ -132,6 +132,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Preview Dataset Limit
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the maximum number of results to be used before a GROUP BY
+    | takes place. This is only used for Report preview, not in the final CSV export.
+    |
+    */
+
+    'preview_results_limit' => env('REPORT_PREVIEW_RESULTS_LIMIT', 15000),
+
+    /*
+    |--------------------------------------------------------------------------
     | Queued Export Drivers
     |--------------------------------------------------------------------------
     |

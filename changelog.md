@@ -1,3 +1,8 @@
+## v5.2.4
+
++ GROUP BY for Report Preview is set outside the query after results are limited using an inner query
++ Prevent preview timeouts for grouping on large datasets
+
 ## v5.2.3
 
 + Fix bug for replaceParameter to correctly remove NULL values from query
