@@ -92,7 +92,7 @@ class BuildReportService
      */
     public function renderPreview(int $limit): Collection
     {
-        $this->buildReportQuery();
+        $this->buildReportQuery([], true);
 
         $result = new Collection([
             'headings' => $this->headings(),
@@ -272,7 +272,7 @@ class BuildReportService
      * @param array $except
      * @return Builder
      */
-    public function buildReportQuery(array $except = []): Builder
+    public function buildReportQuery(array $except = [], $preview = false): Builder
     {
 
         if (!in_array('join', $except, true) && $this->report->joins->count()) {
@@ -291,7 +291,7 @@ class BuildReportService
             $this->handleMiddleware();
         }
 
-        if (!in_array('group', $except, true) && !empty($this->report->groupby)) {
+        if (!$preview && !in_array('group', $except, true) && !empty($this->report->groupby)) {
             $this->addGroupBy();
         }
 
@@ -301,6 +301,25 @@ class BuildReportService
 
         if (!in_array('order', $except, true) && !empty($this->report->orderby)) {
             $this->addOrderBy();
+        }
+
+        // Used only for Previews to wrap query with GROUP BY after setting a limit
+        if ($preview && !in_array('group', $except, true) && !empty($this->report->groupby)) {
+            // Find the Group By alias from Selects
+            $groupby_alias = '';
+            $this->report->selects->each(function (ReportSelect $select) use (&$groupby_alias) {
+                if($select->column == $this->report->groupby){
+                    $groupby_alias = $select->alias;
+                }
+            });
+
+            if($groupby_alias) {
+                $this->query->limit(config('report.preview_results_limit', 15000));
+                // Wrap the query inside another SELECT with GROUP BY
+                $this->query = DB::table(DB::raw("({$this->query->toSql()}) AS query_data"))
+                    ->mergeBindings($this->query); // Merge bindings to preserve the query parameters
+                $this->query->groupBy($groupby_alias); // Add the GROUP BY clause
+            }
         }
 
         return $this->query;
