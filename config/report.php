@@ -144,6 +144,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Include CSV Download Links in Emails
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure if the report email should contain download links
+    | of the generated CSV files
+    |
+    */
+
+    'csv_links_in_emails' => env('REPORT_CSV_LINKS_IN_EMAIL', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Queued Export Drivers
     |--------------------------------------------------------------------------
     |
