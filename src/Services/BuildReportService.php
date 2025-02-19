@@ -291,7 +291,15 @@ class BuildReportService
             $this->handleMiddleware();
         }
 
-        if (!$preview && !in_array('group', $except, true) && !empty($this->report->groupby)) {
+        // Check if query contains aggregates, as without the GROUP BY in inner query, aggregates won't work
+        $has_aggregate = false;
+        if ($preview) {
+            $has_aggregate = $this->report->selects->some(function (ReportSelect $select) {
+                return preg_match('/\b(SUM|MAX|MIN|COUNT|AVG)\s*\([^\)]*\)/i', $select->column);
+            });
+        }
+
+        if ((!$preview || $has_aggregate) && !in_array('group', $except, true) && !empty($this->report->groupby)) {
             $this->addGroupBy();
         }
 
@@ -304,21 +312,49 @@ class BuildReportService
         }
 
         // Used only for Previews to wrap query with GROUP BY after setting a limit
-        if ($preview && !in_array('group', $except, true) && !empty($this->report->groupby)) {
+        if ($preview && !$has_aggregate && !in_array('group', $except, true) && !empty($this->report->groupby)) {
+
+            // Split groupby string by commas and trim spaces
+            $groupby_fields = array_map('trim', explode(',', $this->report->groupby));
+
+            $groupby_alias = [];
+            $outer_query_selects = [];
+            $select_aliases = [];
+
             // Find the Group By alias from Selects
-            $groupby_alias = '';
-            $this->report->selects->each(function (ReportSelect $select) use (&$groupby_alias) {
-                if($select->column == $this->report->groupby){
-                    $groupby_alias = $select->alias;
+            $this->report->selects->each(function (ReportSelect $select) use (&$groupby_fields, &$groupby_alias, &$select_aliases, &$outer_query_selects) {
+                $outer_query_selects[] = $select->alias ? $select->alias : $select->column;
+                foreach ($groupby_fields as $field) {
+                    if ($select->column == $field) {
+                        $groupby_alias[] = $select->alias;
+                        $select_aliases[] = $select->column;
+                    }
                 }
             });
 
-            if($groupby_alias) {
+            // Check for missing groupby fields
+            foreach ($groupby_fields as $field) {
+                if (!in_array($field, $select_aliases)) {
+                    // If the field is not in selects, we need to inject it
+                    $field_alias = str_replace('.', '_', $field);
+                    $this->query->addSelect(DB::raw($field . ' AS ' . $field_alias)); // Injecting into SELECT
+                    $groupby_alias[] = $field_alias;
+                }
+            }
+
+            // If we have a valid groupby alias
+            if (!empty($groupby_alias)) {
                 $this->query->limit(config('report.preview_results_limit', 15000));
+
                 // Wrap the query inside another SELECT with GROUP BY
                 $this->query = DB::table(DB::raw("({$this->query->toSql()}) AS query_data"))
-                    ->mergeBindings($this->query); // Merge bindings to preserve the query parameters
-                $this->query->groupBy($groupby_alias); // Add the GROUP BY clause
+                    ->mergeBindings($this->query);
+
+                $this->query->groupBy(...$groupby_alias);
+
+                $this->query->select($outer_query_selects); // Apply the select columns from the inner query to outer query
+            } else {
+                $this->addGroupBy();
             }
         }
 

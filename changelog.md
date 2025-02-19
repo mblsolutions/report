@@ -1,3 +1,8 @@
+## v5.2.5
+
++ Allow use of multiple comma-delimited GROUP BY in preview inner/outer queries
++ Override added for queries with aggregates that require GROUP BY
+
 ## v5.2.4
 
 + GROUP BY for Report Preview is set outside the query after results are limited using an inner query
