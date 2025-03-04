@@ -336,7 +336,7 @@ class BuildReportService
             foreach ($groupby_fields as $field) {
                 if (!in_array($field, $select_aliases)) {
                     // If the field is not in selects, we need to inject it
-                    $field_alias = str_replace('.', '_', $field);
+                    $field_alias = str_replace('.', '_', preg_replace('/[^a-zA-Z0-9.]+/', '', $field));
                     $this->query->addSelect(DB::raw($field . ' AS ' . $field_alias)); // Injecting into SELECT
                     $groupby_alias[] = $field_alias;
                 }

@@ -1,3 +1,7 @@
+## v5.2.6
+
++ Minor bug fix to preview query
+
 ## v5.2.5
 
 + Allow use of multiple comma-delimited GROUP BY in preview inner/outer queries
