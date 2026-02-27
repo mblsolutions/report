@@ -7,6 +7,6 @@ use MBLSolutions\Report\Support\ConfigModel;
 class ReportSelectField extends ConfigModel
 {
     /** {@inheritDoc} */
-    protected $key = 'report.models';
+    protected string $key = 'report.models';
 
 }

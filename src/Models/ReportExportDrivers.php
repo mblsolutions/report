@@ -10,7 +10,7 @@ use MBLSolutions\Report\Support\ConfigModel;
 class ReportExportDrivers extends ConfigModel
 {
     /** {@inheritDoc} */
-    protected $key = 'report.export_drivers';
+    protected string $key = 'report.export_drivers';
 
     /**
      * Get all Config Models

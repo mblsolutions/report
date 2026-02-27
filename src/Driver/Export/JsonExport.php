@@ -10,7 +10,7 @@ use MBLSolutions\Report\Services\BuildReportService;
 class JsonExport extends ReportExport
 {
     /** @var string $name */
-    public $name = 'JSON File (.json)';
+    public string $name = 'JSON File (.json)';
 
     /**
      * Export report result data
@@ -63,14 +63,14 @@ class JsonExport extends ReportExport
     public function getMeta(BuildReportService $service, Report $report, array $params = []): self
     {
         print (new Collection([
-                'report' => [
-                    'name' => $report->name,
-                    'description' => $report->description,
-                    'date' => Carbon::now()->toIso8601String()
-                ],
-                'headings' => $service->headings(),
-                'params' => (new Collection($params))->except(self::PROTECTED_KEYS),
-            ]))->toJson() . ',';
+            'report' => [
+                'name' => $report->name,
+                'description' => $report->description,
+                'date' => Carbon::now()->toIso8601String()
+            ],
+            'headings' => $service->headings(),
+            'params' => (new Collection($params))->except(self::PROTECTED_KEYS),
+        ]))->toJson() . ',';
 
         return $this;
     }
@@ -95,5 +95,5 @@ class JsonExport extends ReportExport
 
         return $this;
     }
-    
+
 }

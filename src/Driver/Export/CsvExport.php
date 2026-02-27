@@ -9,7 +9,7 @@ use MBLSolutions\Report\Services\BuildReportService;
 class CsvExport extends ReportExport
 {
     /** @var string $name */
-    public $name = 'CSV File (.csv)';
+    public string $name = 'CSV File (.csv)';
 
     /**
      * Export report result data

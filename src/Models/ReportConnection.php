@@ -8,7 +8,7 @@ use MBLSolutions\Report\Support\ConfigModel;
 class ReportConnection extends ConfigModel
 {
     /** {@inheritDoc} */
-    protected $key = 'database.connections';
+    protected string $key = 'database.connections';
 
     /**
      * Get all Select Field Models

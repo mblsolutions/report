@@ -10,7 +10,7 @@ use MBLSolutions\Report\Services\BuildReportService;
 class PrintExport extends ReportExport
 {
     /** @var string $name */
-    public $name = 'Print Report';
+    public string $name = 'Print Report';
 
     /**
      * Export report result data

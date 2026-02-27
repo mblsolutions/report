@@ -8,7 +8,7 @@ use MBLSolutions\Report\Support\ConfigModel;
 class ReportDataType extends ConfigModel
 {
     /** {@inheritDoc} */
-    protected $key = 'report.data_types';
+    protected string $key = 'report.data_types';
 
     /**
      * Get all Config Models

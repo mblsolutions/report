@@ -8,7 +8,7 @@ use MBLSolutions\Report\Support\ConfigModel;
 class ReportMiddlewareOptions extends ConfigModel
 {
     /** {@inheritDoc} */
-    protected $key = 'report.middleware';
+    protected string $key = 'report.middleware';
 
     /**
      * Get all Config Models
