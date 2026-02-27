@@ -19,6 +19,7 @@ use MBLSolutions\Report\Models\ReportSelect;
 use MBLSolutions\Report\Services\BuildReportService;
 use MBLSolutions\Report\Tests\Fakes\User;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class BuildReportServiceTest extends LaravelTestCase
 {
@@ -39,7 +40,7 @@ class BuildReportServiceTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function can_render_a_report(): void
     {
         $service = new BuildReportService($this->report, []);
@@ -47,7 +48,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertInstanceOf(Collection::class, $service->render());
     }
 
-    /** @test **/
+    #[Test]
     public function rendering_a_report_dispatches_event(): void
     {
         Event::fake();
@@ -61,7 +62,7 @@ class BuildReportServiceTest extends LaravelTestCase
         });
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_raw_query(): void
     {
         $service = new BuildReportService($this->report, []);
@@ -69,7 +70,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals('select * from "users"', $service->getRawQuery());
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_export_drivers(): void
     {
         $service = new BuildReportService($this->report, []);
@@ -85,7 +86,7 @@ class BuildReportServiceTest extends LaravelTestCase
         ], $method->invoke($service)->pluck('name')->toArray());
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_headings(): void
     {
         factory(ReportSelect::class)->create([
@@ -103,7 +104,7 @@ class BuildReportServiceTest extends LaravelTestCase
         ], $service->headings()->toArray());
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_report_selects(): void
     {
         $selects = factory(ReportSelect::class, 3)->create([
@@ -115,7 +116,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals($selects->pluck('id')->toArray(), $service->selects()->pluck('id')->toArray());
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_query(): void
     {
         $service = new BuildReportService($this->report, []);
@@ -126,7 +127,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertInstanceOf(Builder::class, $method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_add_selects(): void
     {
         factory(ReportSelect::class)->create([
@@ -145,7 +146,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals('select users.id AS \'User ID\' from "users"', $service->getRawQuery());
     }
 
-    /** @test **/
+    #[Test]
     public function can_add_joins(): void
     {
         factory(ReportJoin::class)->create([
@@ -170,7 +171,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_add_where(): void
     {
         $this->report->update([
@@ -190,7 +191,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_add_group_by(): void
     {
         $this->report->update([
@@ -210,7 +211,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_add_having(): void
     {
         $this->report->update([
@@ -230,7 +231,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_add_order_by(): void
     {
         $this->report->update([
@@ -250,7 +251,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_check_where_is_not_empty(): void
     {
         $this->report->update([
@@ -265,7 +266,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertTrue($method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_check_where_is_empty(): void
     {
         $this->report->update([
@@ -280,7 +281,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertFalse($method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_check_where_is_empty_if_null(): void
     {
         $this->report->update([
@@ -295,7 +296,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertFalse($method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_check_where_is_empty_with_spaces(): void
     {
         $this->report->update([
@@ -310,7 +311,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertFalse($method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_clean_where_syntax_with_remaining_and(): void
     {
         $this->report->update([
@@ -325,7 +326,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals('', $method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_clean_where_syntax_with_remaining_or(): void
     {
         $this->report->update([
@@ -340,7 +341,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals('', $method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_clean_where_syntax_with_remaining_order(): void
     {
         $this->report->update([
@@ -355,7 +356,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals('order', $method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_clean_where_syntax_with_remaining_or_order(): void
     {
         $this->report->update([
@@ -370,7 +371,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals('order', $method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_clean_where_syntax_with_remaining_invoice(): void
     {
         $this->report->update([
@@ -385,7 +386,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals('invoice', $method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_clean_where_syntax_with_remaining_in_invoice(): void
     {
         $this->report->update([
@@ -400,7 +401,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals('invoice', $method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function can_replace_parameters(): void
     {
         $service = new BuildReportService($this->report, []);
@@ -418,7 +419,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_replace_parameter_if_supplied_null(): void
     {
         $service = new BuildReportService($this->report, []);
@@ -436,7 +437,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_replace_parameter_if_supplied_null_leading_and_or(): void
     {
         $service = new BuildReportService($this->report, []);
@@ -455,7 +456,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_replace_parameter_if_supplied_null_trailing_and_or(): void
     {
         $service = new BuildReportService($this->report, []);
@@ -474,7 +475,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_replace_parameter_if_supplied_null_leading_and_trailing_and_or(): void
     {
         $service = new BuildReportService($this->report, []);
@@ -493,7 +494,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_replace_parameter_if_supplied_null_with_extended_time_stamp(): void
     {
         $report = factory(Report::class)->create([
@@ -529,7 +530,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals("select users.id AS 'user_id' from \"users\"", $service->getRawQuery());
     }
 
-    /** @test **/
+    #[Test]
     public function replace_parameters_that_are_supplied(): void
     {
         $report = factory(Report::class)->create([
@@ -565,7 +566,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals("select users.id AS 'user_id' from \"users\" where users.id = 'replaced_value'", $service->getRawQuery());
     }
 
-    /** @test **/
+    #[Test]
     public function replace_parameters_that_are_not_supplied(): void
     {
         $report = factory(Report::class)->create([
@@ -601,7 +602,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals("select users.id AS 'user_id' from \"users\"", $service->getRawQuery());
     }
 
-    /** @test **/
+    #[Test]
     public function can_handle_middleware(): void
     {
         factory(ReportMiddleware::class)->create([
@@ -618,7 +619,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertEquals('select * from "users" where users.id < 100', $service->getRawQuery());
     }
 
-    /** @test **/
+    #[Test]
     public function can_build_left_join(): void
     {
         $join = factory(ReportJoin::class)->create([
@@ -643,7 +644,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_build_right_join(): void
     {
         $join = factory(ReportJoin::class)->create([
@@ -668,7 +669,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_build_inner_join(): void
     {
         $join = factory(ReportJoin::class)->create([
@@ -693,7 +694,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_build_report_query(): void
     {
         $this->report->update([
@@ -740,7 +741,7 @@ class BuildReportServiceTest extends LaravelTestCase
         );
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_data(): void
     {
         $report = factory(Report::class)->create();
@@ -754,7 +755,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertNotInstanceOf(Collection::class, $method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function getting_data_if_show_data_is_false_returns_false(): void
     {
         $report = factory(Report::class)->create([
@@ -769,7 +770,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $this->assertFalse($method->invoke($service));
     }
 
-    /** @test **/
+    #[Test]
     public function getting_data_if_paginate_is_false_returns_full_collection(): void
     {
         $report = factory(Report::class)->create();

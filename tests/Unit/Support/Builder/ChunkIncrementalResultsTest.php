@@ -8,6 +8,7 @@ use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Support\Builder\ChunkIncrementalResults;
 use MBLSolutions\Report\Tests\LaravelTestCase;
 use ReflectionClass;
+use PHPUnit\Framework\Attributes\Test;
 
 class ChunkIncrementalResultsTest extends LaravelTestCase
 {
@@ -27,13 +28,13 @@ class ChunkIncrementalResultsTest extends LaravelTestCase
         $this->helper = new ChunkIncrementalResults($this->builder, 5);
     }
 
-    /** @test **/
+    #[Test]
     public function can_create_object(): void
     {
         $this->assertInstanceOf(ChunkIncrementalResults::class, $this->helper);
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_a_cleaned_query_for_accurate_result_counting(): void
     {
         $reflection = new ReflectionClass(ChunkIncrementalResults::class);
@@ -44,7 +45,7 @@ class ChunkIncrementalResultsTest extends LaravelTestCase
         $this->assertEquals('select * from "reports"', $method->invoke($this->helper)->toSql());
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_the_count_limit(): void
     {
         $reflection = new ReflectionClass(ChunkIncrementalResults::class);
@@ -57,13 +58,13 @@ class ChunkIncrementalResultsTest extends LaravelTestCase
         $this->assertEquals(50001, $method->invoke($helper));
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_the_total_results_for_a_chunk(): void
     {
         $this->assertEquals(5, $this->helper->getTotalResultsForChunk(0));
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_the_total_results_for_a_chunk_with_less_than_chunk_limit(): void
     {
         $helper = new ChunkIncrementalResults($this->builder, 100);
@@ -71,13 +72,13 @@ class ChunkIncrementalResultsTest extends LaravelTestCase
         $this->assertEquals(12, $helper->getTotalResultsForChunk(0));
     }
     
-    /** @test **/
+    #[Test]
     public function can_check_if_there_are_more_results(): void
     {
         $this->assertTrue($this->helper->hasMoreResults(0));
     }
     
-    /** @test **/
+    #[Test]
     public function can_check_if_there_are_more_results_on_last_chunk(): void
     {
         $helper = new ChunkIncrementalResults($this->builder, 4);

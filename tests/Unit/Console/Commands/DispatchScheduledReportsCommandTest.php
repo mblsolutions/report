@@ -8,11 +8,12 @@ use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class DispatchScheduledReportsCommandTest extends LaravelTestCase
 {
     protected Report $report;
-    
+
     /** {@inheritdoc} **/
     protected function setUp(): void
     {
@@ -22,14 +23,14 @@ class DispatchScheduledReportsCommandTest extends LaravelTestCase
 
         $this->report = factory(Report::class)->create();
     }
-    
-    /** @test **/
+
+    #[Test]
     public function can_run_command(): void
     {
         $this->artisan('report:schedule')->assertExitCode(0);
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_scheduled_report(): void
     {
         Carbon::setTestNow('2021-05-01 00:00:00');

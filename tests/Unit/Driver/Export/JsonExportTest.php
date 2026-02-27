@@ -6,6 +6,7 @@ use MBLSolutions\Report\Driver\Export\CsvExport;
 use MBLSolutions\Report\Driver\Export\JsonExport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class JsonExportTest extends LaravelTestCase
@@ -21,7 +22,7 @@ class JsonExportTest extends LaravelTestCase
         $this->report = factory(Report::class)->create();
     }
 
-    /** @test **/
+    #[Test]
     public function can_export(): void
     {
         $csv = new JsonExport();

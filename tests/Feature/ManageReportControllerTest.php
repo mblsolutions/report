@@ -4,11 +4,12 @@ namespace MBLSolutions\Report\Tests\Feature;
 
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ManageReportControllerTest extends LaravelTestCase
 {
 
-    /** @test **/
+    #[Test]
     public function can_view_manage_report_index(): void
     {
         factory(Report::class)->create(['name' => 'Test Report']);
@@ -24,8 +25,8 @@ class ManageReportControllerTest extends LaravelTestCase
                 ],
             ]);
     }
-    
-    /** @test **/
+
+    #[Test]
     public function can_show_manage_report(): void
     {
         $report = factory(Report::class)->create(['name' => 'Test Report']);
@@ -40,7 +41,7 @@ class ManageReportControllerTest extends LaravelTestCase
             ]);
     }
 
-    /** @test **/
+    #[Test]
     public function can_show_manage_report_for_new_report(): void
     {
         $response = $this->getJson(route('report.manage.show', ['report' => 'null']));
@@ -53,7 +54,7 @@ class ManageReportControllerTest extends LaravelTestCase
             ]);
     }
 
-    /** @test **/
+    #[Test]
     public function can_store_a_new_report(): void
     {
         $response = $this->postJson(route('report.manage.store'), [
@@ -70,15 +71,15 @@ class ManageReportControllerTest extends LaravelTestCase
         $response->assertStatus(201);
     }
 
-    /** @test **/
+    #[Test]
     public function create_missing_or_invalid_data_returns_422(): void
     {
         $response = $this->postJson(route('report.manage.store'));
 
         $response->assertStatus(422);
     }
-    
-    /** @test **/
+
+    #[Test]
     public function can_update_a_report(): void
     {
         $report = factory(Report::class)->create([
@@ -100,7 +101,7 @@ class ManageReportControllerTest extends LaravelTestCase
         $response->assertStatus(200);
     }
 
-    /** @test **/
+    #[Test]
     public function update_missing_or_invalid_data_returns_422(): void
     {
         $report = factory(Report::class)->create([
@@ -113,7 +114,7 @@ class ManageReportControllerTest extends LaravelTestCase
         $response->assertStatus(422);
     }
 
-    /** @test **/
+    #[Test]
     public function can_delete_a_report(): void
     {
         $report = factory(Report::class)->create();
@@ -122,8 +123,8 @@ class ManageReportControllerTest extends LaravelTestCase
 
         $response->assertStatus(200);
     }
-    
-    /** @test **/
+
+    #[Test]
     public function can_test_if_a_report_is_successful(): void
     {
         $report = factory(Report::class)->create();
@@ -131,12 +132,12 @@ class ManageReportControllerTest extends LaravelTestCase
         $response = $this->postJson(route('report.manage.test', ['report' => $report->getKey()]));
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true
-                ]);
+            ->assertJson([
+                'success' => true
+            ]);
     }
 
-    /** @test **/
+    #[Test]
     public function can_test_if_a_report_has_failed(): void
     {
         $report = factory(Report::class)->create([
@@ -146,9 +147,9 @@ class ManageReportControllerTest extends LaravelTestCase
         $response = $this->postJson(route('report.manage.test', ['report' => $report->getKey()]));
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => false
-                 ]);
+            ->assertJson([
+                'success' => false
+            ]);
     }
 
 }

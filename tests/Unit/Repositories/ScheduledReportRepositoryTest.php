@@ -11,6 +11,7 @@ use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Repositories\ScheduledReportRepository;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ScheduledReportRepositoryTest extends LaravelTestCase
 {
@@ -60,7 +61,7 @@ class ScheduledReportRepositoryTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_daily_schedule(): void
     {
         $date = Carbon::parse('2021-11-10 00:00:00'); // daily at midnight (Wednesday)
@@ -70,7 +71,7 @@ class ScheduledReportRepositoryTest extends LaravelTestCase
         ], $this->repository->getScheduledReportsToRun($date)->pluck('uuid')->toArray());
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_weekly_schedule(): void
     {
         $date = Carbon::parse('2021-02-08 00:00:00'); // weekly at midnight on a Monday (Monday)
@@ -81,7 +82,7 @@ class ScheduledReportRepositoryTest extends LaravelTestCase
         ], $this->repository->getScheduledReportsToRun($date)->pluck('uuid')->toArray());
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_monthly_schedule(): void
     {
         $date = Carbon::parse('2021-05-01 00:00:00'); // monthly on the first of the month (Saturday)
@@ -92,7 +93,7 @@ class ScheduledReportRepositoryTest extends LaravelTestCase
         ], $this->repository->getScheduledReportsToRun($date)->pluck('uuid')->toArray());
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_quarterly_schedule(): void
     {
         $date = Carbon::parse('2021-04-01 00:00:00'); // quarterly on the first of the start of the next quarter (Thursday 1st April)
@@ -104,7 +105,7 @@ class ScheduledReportRepositoryTest extends LaravelTestCase
         ], $this->repository->getScheduledReportsToRun($date)->pluck('uuid')->toArray());
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_yearly_schedule(): void
     {
         $date = Carbon::parse('2021-01-01 00:00:00'); // first of every year (Friday)
@@ -117,7 +118,7 @@ class ScheduledReportRepositoryTest extends LaravelTestCase
         ], $this->repository->getScheduledReportsToRun($date)->pluck('uuid')->toArray());
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_schedule_within_first_minute(): void
     {
         $date = Carbon::parse('2021-11-10 09:00:40');
@@ -127,7 +128,7 @@ class ScheduledReportRepositoryTest extends LaravelTestCase
         ], $this->repository->getScheduledReportsToRun($date)->pluck('uuid')->toArray());
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_all_schedules_within_first_minute(): void
     {
         $date = Carbon::parse('2018-01-01 00:00:43'); // Monday 1st of Jan 2018 at Midnight(ish...)

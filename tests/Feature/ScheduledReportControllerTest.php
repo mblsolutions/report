@@ -7,17 +7,18 @@ use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ScheduledReportControllerTest extends LaravelTestCase
 {
 
-    /** @test **/
+    #[Test]
     public function can_view_scheduled_report_index(): void
     {
         $this->getJson(route('report.schedule.index'))->assertStatus(200);
     }
 
-    /** @test **/
+    #[Test]
     public function can_create_scheduled_report(): void
     {
         $this->postJson(route('report.schedule.create'), [
@@ -31,7 +32,7 @@ class ScheduledReportControllerTest extends LaravelTestCase
         ])->assertStatus(201);
     }
 
-    /** @test **/
+    #[Test]
     public function can_show_scheduled_report(): void
     {
         $schedule = factory(ScheduledReport::class)->create();
@@ -41,26 +42,28 @@ class ScheduledReportControllerTest extends LaravelTestCase
         ]))->assertStatus(200);
     }
 
-    /** @test **/
+    #[Test]
     public function can_updated_scheduled_report(): void
     {
         $schedule = factory(ScheduledReport::class)->create();
 
-        $this->patchJson(route('report.schedule.update', [
-            'schedule' => $schedule->getKey(),
-        ]),
-        [
-            'report_id' => factory(Report::class)->create()->getKey(),
-            'parameters' => ['export_driver' => CsvQueuedExport::class],
-            'frequency' => ReportSchedule::MONTHLY,
-            'limit' => null,
-            'recipients' => null,
-            'last_run' => null,
-            'authenticatable_id' => null,
-        ])->assertStatus(200);
+        $this->patchJson(
+            route('report.schedule.update', [
+                'schedule' => $schedule->getKey(),
+            ]),
+            [
+                'report_id' => factory(Report::class)->create()->getKey(),
+                'parameters' => ['export_driver' => CsvQueuedExport::class],
+                'frequency' => ReportSchedule::MONTHLY,
+                'limit' => null,
+                'recipients' => null,
+                'last_run' => null,
+                'authenticatable_id' => null,
+            ]
+        )->assertStatus(200);
     }
 
-    /** @test **/
+    #[Test]
     public function can_delete_scheduled_report(): void
     {
         $this->deleteJson(route('report.schedule.destroy', [

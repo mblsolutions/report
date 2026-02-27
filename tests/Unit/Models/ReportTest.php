@@ -7,11 +7,12 @@ use MBLSolutions\Report\GenerateReportExportUri;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Tests\Fakes\User;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ReportTest extends LaravelTestCase
 {
 
-    /** @test **/
+    #[Test]
     public function can_get_export_link(): void
     {
         $this->actingAs(new User);

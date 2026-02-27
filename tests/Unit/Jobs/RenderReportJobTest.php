@@ -18,6 +18,7 @@ use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class RenderReportJobTest extends LaravelTestCase
 {
@@ -41,7 +42,7 @@ class RenderReportJobTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function can_create_a_report_render_job(): void
     {
         new RenderReport('aa5615b7-8489-4831-ad00-f50ae770b619', $this->report);
@@ -53,7 +54,7 @@ class RenderReportJobTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function creating_a_job_fires_report_job_started_event(): void
     {
         Event::fake();
@@ -65,7 +66,7 @@ class RenderReportJobTest extends LaravelTestCase
         });
     }
 
-    /** @test **/
+    #[Test]
     public function creating_a_job_fires_report_job_chunk_complete(): void
     {
         Event::fake();
@@ -79,7 +80,7 @@ class RenderReportJobTest extends LaravelTestCase
         Event::assertDispatched(ReportChunkComplete::class);
     }
 
-    /** @test **/
+    #[Test]
     public function dispatching_render_report_job_dispatches_chunk(): void
     {
         Bus::fake(ProcessReportExportChunk::class);
@@ -91,7 +92,7 @@ class RenderReportJobTest extends LaravelTestCase
         });
     }
 
-    /** @test **/
+    #[Test]
     public function dispatching_render_job_sets_report_records(): void
     {
         $this->createFakeUser(5);
@@ -108,7 +109,7 @@ class RenderReportJobTest extends LaravelTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function dispatching_render_report_completes_job_status(): void
     {
         $this->createFakeUser(5);
@@ -124,7 +125,7 @@ class RenderReportJobTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function fire_report_rendered_once_report_completes(): void
     {
         Event::fake();
@@ -136,7 +137,7 @@ class RenderReportJobTest extends LaravelTestCase
         Event::assertDispatched(ReportRenderComplete::class);
     }
 
-    /** @test **/
+    #[Test]
     public function running_an_daily_scheduled_report_replaces_report_date_params(): void
     {
         factory(ReportField::class)->state('datetime')->create([
@@ -166,7 +167,7 @@ class RenderReportJobTest extends LaravelTestCase
     }
 
 
-    /** @test **/
+    #[Test]
     public function running_an_weekly_scheduled_report_replaces_report_date_params(): void
     {
         $dummy = $this->setupDummyScheduledReport(ReportSchedule::WEEKLY);
@@ -185,7 +186,7 @@ class RenderReportJobTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function running_an_monthly_scheduled_report_replaces_report_date_params(): void
     {
         $dummy = $this->setupDummyScheduledReport(ReportSchedule::MONTHLY);
@@ -204,7 +205,7 @@ class RenderReportJobTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function running_an_quarterly_scheduled_report_replaces_report_date_params(): void
     {
         $dummy = $this->setupDummyScheduledReport(ReportSchedule::QUARTERLY);
@@ -223,7 +224,7 @@ class RenderReportJobTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function running_an_yearly_scheduled_report_replaces_report_date_params(): void
     {
         $dummy = $this->setupDummyScheduledReport(ReportSchedule::YEARLY);
@@ -271,7 +272,7 @@ class RenderReportJobTest extends LaravelTestCase
         return compact(['parameters', 'schedule', 'user']);
     }
 
-    /** @test **/
+    #[Test]
     public function check_if_the_correct_number_of_chunks_is_being_dispatched(): void
     {
         $this->createFakeUser(15);

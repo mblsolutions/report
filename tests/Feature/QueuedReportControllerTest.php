@@ -11,6 +11,7 @@ use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Support\Report\RenderJobUuidGenerator;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class QueuedReportControllerTest extends LaravelTestCase
 {
@@ -24,19 +25,19 @@ class QueuedReportControllerTest extends LaravelTestCase
         Bus::fake();
     }
 
-    /** @test **/
+    #[Test]
     public function can_view_report_queue_index(): void
     {
         $this->getJson(route('report.queue.index'))->assertStatus(200);
     }
 
-    /** @test **/
+    #[Test]
     public function can_view_report_queue_pending_index(): void
     {
         $this->getJson(route('report.queue.pending.index'))->assertStatus(200);
     }
-    
-    /** @test **/
+
+    #[Test]
     public function can_render_a_queued_report(): void
     {
         $data = new Collection([
@@ -51,11 +52,11 @@ class QueuedReportControllerTest extends LaravelTestCase
         $this->postJson(route('report.queue.render', [
             'report' => factory(Report::class)->create()->getKey()
         ]))
-        ->assertStatus(202)
-        ->assertJson($data->toArray());
+            ->assertStatus(202)
+            ->assertJson($data->toArray());
     }
-    
-    /** @test **/
+
+    #[Test]
     public function rendering_a_queued_report_dispatches_render_report_job(): void
     {
         $this->postJson(route('report.queue.render', [
@@ -67,7 +68,7 @@ class QueuedReportControllerTest extends LaravelTestCase
         });
     }
 
-    /** @test **/
+    #[Test]
     public function can_view_job_status(): void
     {
         factory(ReportJob::class)->create([
@@ -79,7 +80,7 @@ class QueuedReportControllerTest extends LaravelTestCase
         ]))->assertStatus(200);
     }
 
-    /** @test **/
+    #[Test]
     public function can_generate_export_link(): void
     {
         Storage::fake();

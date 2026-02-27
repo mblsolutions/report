@@ -12,6 +12,7 @@ use MBLSolutions\Report\Models\ReportExportDrivers;
 use MBLSolutions\Report\Services\ExportReportService;
 use MBLSolutions\Report\Tests\Fakes\ExportDriver\FakeExportDriver;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ExportReportServiceTest extends LaravelTestCase
 {
@@ -26,7 +27,7 @@ class ExportReportServiceTest extends LaravelTestCase
         $this->report = factory(Report::class)->create();
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_the_report_driver(): void
     {
         $service = new ExportReportService($this->report, new Request([
@@ -36,7 +37,7 @@ class ExportReportServiceTest extends LaravelTestCase
         $this->assertInstanceOf(FakeExportDriver::class, $service->getDriver());
     }
 
-    /** @test **/
+    #[Test]
     public function can_handle_export(): void
     {
         $service = new ExportReportService($this->report, new Request([
@@ -56,7 +57,7 @@ class ExportReportServiceTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function exporting_a_report_dispatches_event(): void
     {
         $service = new ExportReportService($this->report, new Request([

@@ -6,6 +6,7 @@ use Illuminate\View\View;
 use MBLSolutions\Report\Driver\Export\PrintExport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PrintExportTest extends LaravelTestCase
@@ -21,7 +22,7 @@ class PrintExportTest extends LaravelTestCase
         $this->report = factory(Report::class)->create();
     }
 
-    /** @test **/
+    #[Test]
     public function can_export(): void
     {
         $csv = new PrintExport();

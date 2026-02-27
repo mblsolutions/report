@@ -10,6 +10,7 @@ use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
 {
@@ -56,7 +57,7 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_daily_schedule(): void
     {
         Carbon::setTestNow('2021-11-10 00:00:00'); // daily at midnight (Wednesday)
@@ -70,7 +71,7 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
         $this->assertScheduledEventNotDispatched('2930826c-6732-44e6-9c19-f62153ad53a9');
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_weekly_schedule(): void
     {
         Carbon::setTestNow('2021-02-08 00:00:00'); // weekly at midnight on a Monday (Monday)
@@ -84,7 +85,7 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
         $this->assertScheduledEventNotDispatched('2930826c-6732-44e6-9c19-f62153ad53a9');
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_monthly_schedule(): void
     {
         Carbon::setTestNow('2021-05-01 00:00:00'); // monthly on the first of the month (Saturday)
@@ -98,7 +99,7 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
         $this->assertScheduledEventNotDispatched('2930826c-6732-44e6-9c19-f62153ad53a9');
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_quarterly_schedule(): void
     {
         Carbon::setTestNow('2021-04-01 00:00:00'); // quarterly on the first of the start of the next quarter (Thursday 1st April)
@@ -112,7 +113,7 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
         $this->assertScheduledEventNotDispatched('2930826c-6732-44e6-9c19-f62153ad53a9');
     }
 
-    /** @test **/
+    #[Test]
     public function can_run_yearly_schedule(): void
     {
         Carbon::setTestNow('2021-01-01 00:00:00'); // first of every year (Friday)
@@ -129,7 +130,7 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
     protected function assertScheduledEventDispatch(string $uuid): void
     {
         try {
-            Event::assertDispatched(ScheduledReportDispatched::class, fn ($event) => $this->eventsUuidMatches($event, $uuid));
+            Event::assertDispatched(ScheduledReportDispatched::class, fn($event) => $this->eventsUuidMatches($event, $uuid));
         } catch (\Exception $exception) {
             $this->fail(
                 sprintf('Failed asserting event was dispatched for %s', $uuid)
@@ -140,7 +141,7 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
     protected function assertScheduledEventNotDispatched(string $uuid): void
     {
         try {
-            Event::assertNotDispatched(ScheduledReportDispatched::class, fn ($event) => $this->eventsUuidMatches($event, $uuid, true));
+            Event::assertNotDispatched(ScheduledReportDispatched::class, fn($event) => $this->eventsUuidMatches($event, $uuid, true));
         } catch (\Exception $exception) {
             $this->fail(
                 sprintf('Failed asserting event was NOT dispatched for %s', $uuid)

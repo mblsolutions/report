@@ -3,11 +3,12 @@
 namespace MBLSolutions\Report\Tests\Feature;
 
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ManageSettingsControllerTest extends LaravelTestCase
 {
 
-    /** @test **/
+    #[Test]
     public function can_get_manage_report_settings(): void
     {
         $response = $this->getJson(route('report.manage.settings'));

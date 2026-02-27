@@ -19,6 +19,7 @@ use MBLSolutions\Report\Repositories\ManageReportRepository;
 use MBLSolutions\Report\Tests\Fakes\Middleware\FakeMiddleware;
 use MBLSolutions\Report\Tests\Fakes\User;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ManageReportRepositoryTest extends LaravelTestCase
 {
@@ -33,7 +34,7 @@ class ManageReportRepositoryTest extends LaravelTestCase
         $this->repository = new ManageReportRepository;
     }
 
-    /** @test **/
+    #[Test]
     public function can_store_a_new_report(): void
     {
         $request = new Request([
@@ -130,7 +131,7 @@ class ManageReportRepositoryTest extends LaravelTestCase
         ]);
     }
 
-    /** @test **/
+    #[Test]
     public function storing_a_new_report_fires_event(): void
     {
         Event::fake();
@@ -153,7 +154,7 @@ class ManageReportRepositoryTest extends LaravelTestCase
         });
     }
 
-    /** @test **/
+    #[Test]
     public function can_update_a_report(): void
     {
         $report = factory(Report::class)->create();
@@ -274,8 +275,8 @@ class ManageReportRepositoryTest extends LaravelTestCase
             'deleted_at' => '2019-01-01 00:00:00'
         ]);
     }
-    
-    /** @test **/
+
+    #[Test]
     public function updating_a_new_report_fires_event(): void
     {
         Event::fake();
@@ -300,7 +301,7 @@ class ManageReportRepositoryTest extends LaravelTestCase
         });
     }
 
-    /** @test **/
+    #[Test]
     public function can_delete_a_report(): void
     {
         $report = factory(Report::class)->create();
@@ -314,7 +315,7 @@ class ManageReportRepositoryTest extends LaravelTestCase
     }
 
 
-    /** @test **/
+    #[Test]
     public function deleting_a_report_fires_event(): void
     {
         Event::fake();
@@ -328,7 +329,7 @@ class ManageReportRepositoryTest extends LaravelTestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function when_creating_a_report_if_exception_is_thrown_on_relation_transaction_is_rolled_back(): void
     {
         $request = new Request([
@@ -406,7 +407,7 @@ class ManageReportRepositoryTest extends LaravelTestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function when_updating_a_report_if_exception_is_thrown_on_relation_transaction_is_rolled_back(): void
     {
         $report = factory(Report::class)->create([

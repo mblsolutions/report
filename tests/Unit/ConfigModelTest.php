@@ -6,11 +6,12 @@ use MBLSolutions\Report\Driver\Export\PrintExport;
 use MBLSolutions\Report\Models\ReportSelectField;
 use MBLSolutions\Report\Support\ConfigModel;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ConfigModelTest extends LaravelTestCase
 {
 
-    /** @test **/
+    #[Test]
     public function can_create_a_report_select_field_model(): void
     {
         $configModel = new ReportSelectField;
@@ -18,7 +19,7 @@ class ConfigModelTest extends LaravelTestCase
         $this->assertInstanceOf(ConfigModel::class, $configModel);
     }
 
-    /** @test **/
+    #[Test]
     public function can_get_all_config_models(): void
     {
         $configModel = new ReportSelectField();
@@ -28,7 +29,7 @@ class ConfigModelTest extends LaravelTestCase
         ], $configModel->all()->toArray());
     }
 
-    /** @test **/
+    #[Test]
     public function can_format_namespace_name(): void
     {
         $configModel = new ReportSelectField();
@@ -36,7 +37,7 @@ class ConfigModelTest extends LaravelTestCase
         $this->assertEquals('User', $configModel->formatName('\App\User'));
     }
 
-    /** @test **/
+    #[Test]
     public function can_format_class_name(): void
     {
         $configModel = new ReportSelectField();
@@ -44,7 +45,7 @@ class ConfigModelTest extends LaravelTestCase
         $this->assertEquals('Auth User', $configModel->formatClassName('\App\AuthUser'));
     }
 
-    /** @test **/
+    #[Test]
     public function if_class_has_name_property_use_that_when_formatting_class_name(): void
     {
         $configModel = new ReportSelectField();

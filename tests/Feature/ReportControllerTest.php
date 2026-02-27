@@ -9,11 +9,12 @@ use MBLSolutions\Report\Models\ReportExportDrivers;
 use MBLSolutions\Report\Tests\Fakes\ExportDriver\FakeExportDriver;
 use MBLSolutions\Report\Tests\Fakes\User;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class ReportControllerTest extends LaravelTestCase
 {
 
-    /** @test **/
+    #[Test]
     public function can_view_report_index(): void
     {
         factory(Report::class)->create(['name' => 'Test Report']);
@@ -21,16 +22,16 @@ class ReportControllerTest extends LaravelTestCase
         $response = $this->getJson(route('report.index'));
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'data' => [
-                         [
-                             'name' => 'Test Report',
-                         ]
-                     ],
-                 ]);
+            ->assertJson([
+                'data' => [
+                    [
+                        'name' => 'Test Report',
+                    ]
+                ],
+            ]);
     }
 
-    /** @test **/
+    #[Test]
     public function can_view_all_reports(): void
     {
         factory(Report::class)->create(['name' => 'Test Report']);
@@ -47,7 +48,7 @@ class ReportControllerTest extends LaravelTestCase
             ]);
     }
 
-    /** @test **/
+    #[Test]
     public function can_show_report(): void
     {
         $report = factory(Report::class)->create(['name' => 'Test Report']);
@@ -55,14 +56,14 @@ class ReportControllerTest extends LaravelTestCase
         $response = $this->getJson(route('report.show', ['report' => $report->getKey()]));
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'data' => [
-                         'name' => 'Test Report',
-                     ],
-                 ]);
+            ->assertJson([
+                'data' => [
+                    'name' => 'Test Report',
+                ],
+            ]);
     }
 
-    /** @test **/
+    #[Test]
     public function can_render_a_report(): void
     {
         $report = factory(Report::class)->create();
@@ -71,8 +72,8 @@ class ReportControllerTest extends LaravelTestCase
 
         $response->assertStatus(200);
     }
-    
-    /** @test **/
+
+    #[Test]
     public function can_generate_report_export_uri(): void
     {
         $report = factory(Report::class)->create();
@@ -82,7 +83,7 @@ class ReportControllerTest extends LaravelTestCase
         $response->assertStatus(200);
     }
 
-    /** @test **/
+    #[Test]
     public function can_export_report(): void
     {
         $report = factory(Report::class)->create();
@@ -96,7 +97,7 @@ class ReportControllerTest extends LaravelTestCase
         $response->assertStatus(200);
     }
 
-    /** @test **/
+    #[Test]
     public function can_export_report_authorises_use(): void
     {
         Auth::login(new User);
@@ -112,7 +113,7 @@ class ReportControllerTest extends LaravelTestCase
         $response->assertStatus(200);
     }
 
-    /** @test **/
+    #[Test]
     public function export_report_with_invalid_or_modified_signature_returns_unauthorized(): void
     {
         $report = factory(Report::class)->create();
@@ -126,7 +127,7 @@ class ReportControllerTest extends LaravelTestCase
         $response->assertStatus(401);
     }
 
-    /** @test **/
+    #[Test]
     public function can_view_report_preview(): void
     {
         Auth::login(new User());
@@ -138,7 +139,7 @@ class ReportControllerTest extends LaravelTestCase
         $response->assertStatus(200);
     }
 
-    /** @test **/
+    #[Test]
     public function returns_sql_for_admins(): void
     {
         $adminUser = new User();

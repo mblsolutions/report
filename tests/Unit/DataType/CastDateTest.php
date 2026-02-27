@@ -4,11 +4,12 @@ namespace MBLSolutions\Report\Tests\Unit\DataType;
 
 use MBLSolutions\Report\DataType\CastDate;
 use MBLSolutions\Report\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class CastDateTest extends UnitTestCase
 {
 
-    /** @test */
+    #[Test]
     public function can_cast_value_as_data_type(): void
     {
         $type = new CastDate();
@@ -16,7 +17,7 @@ class CastDateTest extends UnitTestCase
         $this->assertEquals('2019-01-01', $type->cast('01/01/2019'));
     }
 
-    /** @test **/
+    #[Test]
     public function return_raw_value_if_value_cannot_be_cast(): void
     {
         $type = new CastDate();

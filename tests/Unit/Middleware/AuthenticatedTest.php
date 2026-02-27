@@ -9,6 +9,7 @@ use MBLSolutions\Report\Middleware\Authenticated;
 use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Tests\Fakes\User;
 use MBLSolutions\Report\Tests\LaravelTestCase;
+use PHPUnit\Framework\Attributes\Test;
 
 class AuthenticatedTest extends LaravelTestCase
 {
@@ -22,7 +23,7 @@ class AuthenticatedTest extends LaravelTestCase
         $this->user = new User;
     }
 
-    /** @test **/
+    #[Test]
     public function can_handle_middleware(): void
     {
         $middleware = new Authenticated($this->user);
@@ -34,7 +35,7 @@ class AuthenticatedTest extends LaravelTestCase
         $this->assertEquals($builder, $middleware->handle($builder));
     }
 
-    /** @test **/
+    #[Test]
     public function if_user_not_authenticated_exception_thrown(): void
     {
         $this->expectException(UnauthorizedException::class);
@@ -46,7 +47,7 @@ class AuthenticatedTest extends LaravelTestCase
        $middleware->handle($builder);
     }
 
-    /** @test **/
+    #[Test]
     public function can_check_if_field_should_be_shown(): void
     {
         $middleware = new Authenticated();

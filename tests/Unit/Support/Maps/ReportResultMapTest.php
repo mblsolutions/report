@@ -10,11 +10,12 @@ use MBLSolutions\Report\Support\Maps\ReportResultMap;
 use MBLSolutions\Report\Tests\LaravelTestCase;
 use ReflectionMethod;
 use stdClass;
+use PHPUnit\Framework\Attributes\Test;
 
 class ReportResultMapTest extends LaravelTestCase
 {
 
-    /** @test **/
+    #[Test]
     public function can_map_report_result_and_format(): void
     {
         $selects = new Collection([
@@ -35,7 +36,7 @@ class ReportResultMapTest extends LaravelTestCase
         $this->assertEquals('John Doe', $map->format($selects)->user_name);
     }
     
-    /** @test **/
+    #[Test]
     public function map_result_with_invalid_type_casts_data_as_string_by_default(): void
     {
         $method = new ReflectionMethod(ReportResultMap::class, 'getAttributeFormatter');
