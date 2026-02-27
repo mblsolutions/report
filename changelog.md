@@ -1,3 +1,7 @@
+## v5.2.8
+
++ Update for PHP 8.4 support
+
 ## v5.2.7
 
 + Add Laravel 12 support
