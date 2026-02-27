@@ -3,7 +3,6 @@
 namespace MBLSolutions\Report\Jobs;
 
 use Exception;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
@@ -26,10 +25,10 @@ class RenderReport extends RenderReportJob
      * @param string $uuid
      * @param Report $report
      * @param array $request
-     * @param null $authenticatable
+     * @param mixed $authenticatable
      * @param ScheduledReport|null $schedule
      */
-    public function __construct(string $uuid, Report $report, array $request = [], ?Authenticatable $authenticatable = null, ?ScheduledReport $schedule = null)
+    public function __construct(string $uuid, Report $report, array $request = [], mixed $authenticatable = null, ?ScheduledReport $schedule = null)
     {
         $this->report = $report;
         $this->request = $request;

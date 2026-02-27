@@ -3,7 +3,6 @@
 namespace MBLSolutions\Report\Jobs;
 
 use Exception;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use MBLSolutions\Report\Driver\QueuedExport\CsvQueuedExport;
@@ -18,7 +17,7 @@ class ProcessReportExportChunk extends RenderReportJob
 {
     public int $chunk;
 
-    public function __construct(Report $report, ReportJob $reportJob, array $request, int $chunk, ?Authenticatable $authenticatable = null)
+    public function __construct(Report $report, ReportJob $reportJob, array $request, int $chunk, mixed $authenticatable = null)
     {
         $this->report = $report;
         $this->reportJob = $reportJob;

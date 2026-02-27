@@ -50,7 +50,7 @@ class BuildReportService
      * @param bool $paginate
      * @param mixed|null $authenticatable
      */
-    public function __construct(Report $report, array $parameters = [], bool $paginate = true, ?Authenticatable $authenticatable = null)
+    public function __construct(Report $report, array $parameters = [], bool $paginate = true, mixed $authenticatable = null)
     {
         $this->paginate = $paginate;
         $this->report = $report;
@@ -118,13 +118,13 @@ class BuildReportService
      * @param Collection|array $parameters
      * @return Collection
      */
-    public  function getFormattedParameters($parameters): Collection
+    public function getFormattedParameters($parameters): Collection
     {
         if (is_array($parameters)) {
             $parameters = new Collection($parameters);
         }
 
-        return $parameters->map(fn ($value, $alias) => $this->formatParameters($value, $alias));
+        return $parameters->map(fn($value, $alias) => $this->formatParameters($value, $alias));
     }
 
     /**
@@ -174,7 +174,7 @@ class BuildReportService
                 $namespace = $field->getAttribute('model');
 
                 if (new $namespace instanceof Model) {
-                    $model = $namespace::where($field->getAttribute('model_select_value'),  '=', $value)->first();
+                    $model = $namespace::where($field->getAttribute('model_select_value'), '=', $value)->first();
 
                     return $model ? $model->getAttribute($field->getAttribute('model_select_name')) : $value;
                 }
