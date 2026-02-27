@@ -7,8 +7,7 @@ use MBLSolutions\Report\Models\ReportConnection;
 
 class ConnectionController
 {
-    /** @var ReportConnection $connection */
-    protected $connection;
+    protected ReportConnection $connection;
 
     /**
      * Connection Controller

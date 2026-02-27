@@ -7,8 +7,7 @@ use MBLSolutions\Report\Models\ReportMiddlewareOptions;
 
 class ReportMiddlewareController
 {
-    /** @var ReportMiddlewareOptions $middleware */
-    protected $middleware;
+    protected ReportMiddlewareOptions $middleware;
 
     /**
      * Report Middleware

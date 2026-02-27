@@ -14,8 +14,7 @@ use MBLSolutions\Report\Services\ExportReportService;
 
 class ReportController
 {
-    /** @var ReportRepository $repository */
-    protected $repository;
+    protected ReportRepository $repository;
 
     /**
      * Report Controller

@@ -12,11 +12,9 @@ use MBLSolutions\Report\Models\ReportExportDrivers;
 
 class ExportReportService
 {
-    /** @var Report $report */
-    protected $report;
+    protected Report $report;
 
-    /** @var Request $request */
-    protected $request;
+    protected Request $request;
 
     /**
      * Export Report Service

@@ -16,7 +16,7 @@ class CastTitleCaseString implements ReportDataType
      */
     public function cast($value): string
     {
-        return (string) ucwords($value);
+        return (string) ucwords($value ?? '');
     }
 
 }

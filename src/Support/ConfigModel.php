@@ -6,11 +6,9 @@ use Illuminate\Support\Collection;
 
 abstract class ConfigModel
 {
-    /** @var string $key */
-    protected $key;
+    protected string $key;
 
-    /** @var Collection $models */
-    protected $models;
+    protected Collection $models;
 
     /**
      * Config Model Instance

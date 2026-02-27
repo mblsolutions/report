@@ -7,8 +7,7 @@ use MBLSolutions\Report\Models\ReportSelectField;
 
 class ModelController
 {
-    /** @var ReportSelectField $model */
-    protected $model;
+    protected ReportSelectField $model;
 
     /**
      * ModelController constructor.

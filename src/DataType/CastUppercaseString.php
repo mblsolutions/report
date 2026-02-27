@@ -16,7 +16,7 @@ class CastUppercaseString implements ReportDataType
      */
     public function cast($value): string
     {
-        return (string) strtoupper($value);
+        return (string) strtoupper($value ?? '');
     }
 
 }

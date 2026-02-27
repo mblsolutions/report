@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report\Jobs;
 
 use Exception;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;

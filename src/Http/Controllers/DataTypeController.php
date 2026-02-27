@@ -7,8 +7,7 @@ use MBLSolutions\Report\Models\ReportDataType;
 
 class DataTypeController
 {
-    /** @var ReportDataType $dataType */
-    protected $dataType;
+    protected ReportDataType $dataType;
 
     /**
      * Data Type Controller

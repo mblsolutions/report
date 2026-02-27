@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report\Jobs;
 
 use Exception;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use MBLSolutions\Report\Driver\QueuedExport\CsvQueuedExport;
@@ -125,9 +126,11 @@ class ProcessReportExportChunk extends RenderReportJob
 
         if ($job->getAttribute('processed') !== $job->getAttribute('total')) {
             throw new RuntimeException(
-                sprintf('Unable to complete report export; processed count %d does not match total count %d',
+                sprintf(
+                    'Unable to complete report export; processed count %d does not match total count %d',
                     $job->getAttribute('processed'),
-                    $job->getAttribute('total'))
+                    $job->getAttribute('total')
+                )
             );
         }
 

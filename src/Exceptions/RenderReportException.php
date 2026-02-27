@@ -8,8 +8,7 @@ use Throwable;
 
 class RenderReportException extends Exception
 {
-    /** @var BuildReportService $service */
-    protected $service;
+    protected BuildReportService $service;
 
     /**
      * Report Render Exception
@@ -22,9 +21,7 @@ class RenderReportException extends Exception
     {
         $this->service = $service;
 
-        parent::__construct($message, null, $previous);
-
-        $this->code = $code;
+        parent::__construct($message, (int)$code, $previous);
     }
 
     /**
