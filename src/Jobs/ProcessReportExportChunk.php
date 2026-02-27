@@ -17,7 +17,7 @@ class ProcessReportExportChunk extends RenderReportJob
 {
     public int $chunk;
 
-    public function __construct(Report $report, ReportJob $reportJob, array $request, int $chunk, $authenticatable = null)
+    public function __construct(Report $report, ReportJob $reportJob, array $request, int $chunk, ?Authenticatable $authenticatable = null)
     {
         $this->report = $report;
         $this->reportJob = $reportJob;

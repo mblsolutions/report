@@ -28,7 +28,7 @@ class RenderReport extends RenderReportJob
      * @param null $authenticatable
      * @param ScheduledReport|null $schedule
      */
-    public function __construct(string $uuid, Report $report, array $request = [], $authenticatable = null, ScheduledReport $schedule = null)
+    public function __construct(string $uuid, Report $report, array $request = [], ?Authenticatable $authenticatable = null, ?ScheduledReport $schedule = null)
     {
         $this->report = $report;
         $this->request = $request;

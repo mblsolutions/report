@@ -59,7 +59,7 @@ abstract class RenderReportJob implements ShouldQueue
      * @param string|null $query
      * @throws Exception
      */
-    protected function handleJobException(Exception $exception, string $query = null): void
+    protected function handleJobException(Exception $exception, ?string $query = null): void
     {
         $data = [
             'status' => JobStatus::FAILED,

@@ -39,7 +39,7 @@ class ScheduledReportRepository extends PackageReportRepository
         return $this->builder()->whereIn('scheduled_reports.frequency', $frequencies->toArray())->get();
     }
 
-    public function paginate(int $limit = null): LengthAwarePaginator
+    public function paginate(?int $limit = null): LengthAwarePaginator
     {
         return $this->builder()->orderByDesc('scheduled_reports.updated_at')->paginate($limit ?? null);
     }

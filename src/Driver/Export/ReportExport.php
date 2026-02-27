@@ -10,7 +10,9 @@ use MBLSolutions\Report\Support\Maps\ReportResultMap;
 abstract class ReportExport implements ExportDriver
 {
     /** @var array $protectedKeys */
-    protected CONST PROTECTED_KEYS = ['signature', 'driver', 'expires', 'format', 'uid'];
+    protected const PROTECTED_KEYS = ['signature', 'driver', 'expires', 'format', 'uid'];
+
+    protected string $name;
 
     /**
      * Get Export Driver Name

@@ -18,7 +18,7 @@ class RenderReportException extends Exception
      * @param $code
      * @param Throwable|null $previous
      */
-    public function __construct(BuildReportService $service, $message = '', $code = 0, Throwable $previous = null)
+    public function __construct(BuildReportService $service, $message = '', $code = 0, ?Throwable $previous = null)
     {
         $this->service = $service;
 

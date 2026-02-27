@@ -15,7 +15,7 @@ abstract class ReportMiddleware implements ReportMiddlewareContract
      *
      * @param Authenticatable|null $authenticatable
      */
-    public function __construct(Authenticatable $authenticatable = null)
+    public function __construct(?Authenticatable $authenticatable = null)
     {
         $this->authenticatable = $authenticatable;
     }

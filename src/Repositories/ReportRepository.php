@@ -18,7 +18,7 @@ class ReportRepository extends PackageReportRepository
                     ->get();
     }
 
-    public function paginate(int $limit = null): LengthAwarePaginator
+    public function paginate(?int $limit = null): LengthAwarePaginator
     {
         return $this->builder()
                     ->where('active', '=', true)

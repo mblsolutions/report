@@ -50,7 +50,7 @@ class BuildReportService
      * @param bool $paginate
      * @param mixed|null $authenticatable
      */
-    public function __construct(Report $report, array $parameters = [], bool $paginate = true, $authenticatable = null)
+    public function __construct(Report $report, array $parameters = [], bool $paginate = true, ?Authenticatable $authenticatable = null)
     {
         $this->paginate = $paginate;
         $this->report = $report;
@@ -528,7 +528,7 @@ class BuildReportService
      *
      * @return mixed
      */
-    private function data(int $offset = 0, int $limit = null)
+    private function data(int $offset = 0, ?int $limit = null)
     {
         if ($limit) {
             $this->query = $this->query->offset($offset)->limit($limit);

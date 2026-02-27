@@ -48,7 +48,7 @@ class ManageReportController
      * @param int|null $id
      * @return ReportResource
      */
-    public function show($id = null): ReportResource
+    public function show(int|string|null $id = null): ReportResource
     {
         return new ReportResource($this->repository->findOrNew($id));
     }

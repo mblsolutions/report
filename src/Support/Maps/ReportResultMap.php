@@ -9,6 +9,7 @@ use MBLSolutions\Report\DataType\CastString;
 
 class ReportResultMap
 {
+    private mixed $attributes;
 
     /**
      * Format Report Result Data

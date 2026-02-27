@@ -13,6 +13,8 @@ abstract class QueuedReportExport implements QueuedExportDriver
 
     protected int $limit;
 
+    protected string $name;
+
     /**
      * Queued Report Export
      *

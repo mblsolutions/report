@@ -20,7 +20,7 @@ class ReportJobRepository extends PackageReportRepository
      * @param int|null $limit
      * @return LengthAwarePaginator
      */
-    public function paginate(int $limit = null): LengthAwarePaginator
+    public function paginate(?int $limit = null): LengthAwarePaginator
     {
         return $this->builder()
                     ->whereBetween('report_jobs.created_at', [
@@ -37,7 +37,7 @@ class ReportJobRepository extends PackageReportRepository
      * @param int|null $limit
      * @return Collection
      */
-    public function pendingJobs(int $limit = null): Collection
+    public function pendingJobs(?int $limit = null): Collection
     {
         return $this->builder()
             ->whereBetween('report_jobs.created_at', [
