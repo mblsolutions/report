@@ -78,7 +78,7 @@ class ReportControllerTest extends LaravelTestCase
     {
         $report = factory(Report::class)->create();
 
-        $response = $this->actingAs(new User)->postJson(route('report.export', ['report' => $report->getKey()]));
+        $response = $this->actingAs(new User)->postJson(route('report.export.generate', ['report' => $report->getKey()]));
 
         $response->assertStatus(200);
     }

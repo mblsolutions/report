@@ -1,3 +1,7 @@
+## v5.2.9
+
++ Fix route name collision for report export
+
 ## v5.2.8
 
 + Update for PHP 8.4 support

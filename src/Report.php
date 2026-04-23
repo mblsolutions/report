@@ -95,7 +95,7 @@ class Report
             Route::post('report/{report}', 'ReportController@render')->name('render');
             Route::post('report/{report}/preview', 'ReportController@preview')->name('preview');
 
-            Route::post('report/{report}/export', 'ReportController@generateExport')->name('export');
+            Route::post('report/{report}/export', 'ReportController@generateExport')->name('export.generate');
         });
     }
 
