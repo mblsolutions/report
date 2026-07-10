@@ -1,3 +1,8 @@
+## v6.0.0
+
++ Fix issue with numeric/decimal fields not being formatted in queued exports (CSV, TSV, XLSX, XLS, ODS)
++ Fix issue with numeric/decimal fields not being formatted in report previews
+
 ## v5.2.9
 
 + Fix route name collision for report export

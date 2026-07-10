@@ -547,7 +547,11 @@ class BuildReportService
                 return $results;
             }
 
-            return $this->query->get();
+            return $this->query->get()->transform(function ($attributes) {
+                $map = new ReportResultMap($attributes);
+
+                return $map->format($this->report->selects);
+            });
         }
 
         return false;
