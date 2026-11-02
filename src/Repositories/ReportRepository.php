@@ -26,6 +26,17 @@ class ReportRepository extends PackageReportRepository
                     ->paginate($limit ?? 25);
     }
 
+    /**
+     * Admin only reports are hidden from non-admins, as in the list
+     *
+     * @param Report $report
+     * @return bool
+     */
+    public function isHiddenFromUser(Report $report): bool
+    {
+        return $report->admin_only && $this->canCheckIfAdmin() && $this->authenticatableIsNotAdmin();
+    }
+
     public function builder(): Builder
     {
         return Report::query()

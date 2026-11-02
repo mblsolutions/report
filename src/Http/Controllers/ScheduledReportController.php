@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use MBLSolutions\Report\Http\Resources\ScheduledReportCollection;
 use MBLSolutions\Report\Http\Resources\ScheduledReportResource;
+use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ScheduledReport;
+use MBLSolutions\Report\Repositories\ReportRepository;
 use MBLSolutions\Report\Repositories\ScheduledReportRepository;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 
@@ -53,6 +55,8 @@ class ScheduledReportController
             'limit' => 'nullable|integer',
         ]);
 
+        $this->abortIfReportHidden($request);
+
         $schedule = new ScheduledReport(array_merge($request->only(self::FIELDS), [
             'uuid' => Str::uuid(),
             'authenticatable_id' => optional(Auth::user())->getKey(),
@@ -90,6 +94,8 @@ class ScheduledReportController
             'limit' => 'nullable|integer',
         ]);
 
+        $this->abortIfReportHidden($request);
+
         return new ScheduledReportResource(
             $this->repository->update($request->only(self::FIELDS), $schedule->getKey())
         );
@@ -107,6 +113,17 @@ class ScheduledReportController
         $schedule->delete();
 
         return new JsonResponse(null, 204);
+    }
+
+    /**
+     * Non-admins can't schedule admin only reports
+     *
+     * @param Request $request
+     * @return void
+     */
+    protected function abortIfReportHidden(Request $request): void
+    {
+        abort_if(app(ReportRepository::class)->isHiddenFromUser(Report::findOrFail($request->get('report_id'))), 404);
     }
 
     /**
