@@ -5,6 +5,7 @@ namespace MBLSolutions\Report\Tests\Feature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use MBLSolutions\Report\Models\Report;
+use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportExportDrivers;
 use MBLSolutions\Report\Tests\Fakes\ExportDriver\FakeExportDriver;
 use MBLSolutions\Report\Tests\Fakes\User;
@@ -165,6 +166,27 @@ class ReportControllerTest extends LaravelTestCase
 
         $response->assertStatus(200);
         $this->assertArrayNotHasKey('raw', $response->json());
+    }
+
+    #[Test]
+    public function render_does_not_run_injected_sql(): void
+    {
+        $this->createFakeUser(2);
+
+        $report = factory(Report::class)->create(['where' => "users.name = '{name}'"]);
+
+        factory(ReportField::class)->create([
+            'report_id' => $report->id,
+            'type' => 'text',
+            'alias' => 'name',
+        ]);
+
+        $response = $this->postJson(route('report.render', ['report' => $report->getKey()]), [
+            'name' => "x' OR '1'='1",
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertSame(0, $response->json('data.total'));
     }
 
 }
