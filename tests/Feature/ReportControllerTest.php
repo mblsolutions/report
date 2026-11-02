@@ -189,4 +189,44 @@ class ReportControllerTest extends LaravelTestCase
         $this->assertSame(0, $response->json('data.total'));
     }
 
+    #[Test]
+    public function export_link_uses_the_logged_in_user_id(): void
+    {
+        [$user, $other] = $this->createFakeUser(2)->all();
+
+        $report = factory(Report::class)->create();
+        $otherReport = factory(Report::class)->create();
+
+        $this->actingAs($user);
+
+        $link = $report->getExportLink(new Request([
+            'uid' => $other->getKey(),
+            'report' => $otherReport->getKey(),
+            'driver' => ReportExportDrivers::hashDriverValue(FakeExportDriver::class),
+        ]));
+
+        parse_str(parse_url($link, PHP_URL_QUERY), $query);
+
+        $this->assertEquals($user->getKey(), $query['uid']);
+        $this->assertStringContainsString('/report/' . $report->getKey() . '/export', $link);
+    }
+
+    #[Test]
+    public function invalid_signature_does_not_log_the_guest_in(): void
+    {
+        config(['auth.providers.users.model' => User::class]);
+
+        $user = $this->createFakeUser();
+
+        $report = factory(Report::class)->create();
+
+        $this->get(route('report.export', [
+            'report' => $report->getKey(),
+            'uid' => $user->getKey(),
+            'signature' => 'not-valid',
+        ]))->assertStatus(401);
+
+        $this->assertGuest();
+    }
+
 }

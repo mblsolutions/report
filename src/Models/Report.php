@@ -98,12 +98,11 @@ class Report extends Model
      */
     public function getExportLink(Request $request): string
     {
-        $params = array_merge([
-                'report' => $this->id,
-                'uid' => auth()->user()->id
-            ],
-            $request->except('signature')
-        );
+        // Server values win over the request
+        $params = array_merge($request->except('signature'), [
+            'report' => $this->id,
+            'uid' => auth()->user()->id
+        ]);
 
         return app(GenerateReportExportUri::class)->__invoke($params);
     }

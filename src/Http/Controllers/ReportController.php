@@ -102,13 +102,13 @@ class ReportController
      */
     public function export(Report $report, Request $request)
     {
-        if (auth()->guest()) {
-            Auth::loginUsingId($request->get('uid'));
-        }
-
-        // Check that request has a valid url signature
+        // Check that request has a valid url signature before any login
         if (!$request->hasValidSignature()) {
             abort(401);
+        }
+
+        if (auth()->guest()) {
+            Auth::loginUsingId($request->get('uid'));
         }
 
         return (new ExportReportService($report, $request))->handle();
