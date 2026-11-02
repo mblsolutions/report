@@ -123,7 +123,10 @@ class ScheduledReportController
      */
     protected function abortIfReportHidden(Request $request): void
     {
-        abort_if(app(ReportRepository::class)->isHiddenFromUser(Report::findOrFail($request->get('report_id'))), 404);
+        // Same source as only(): the body wins over the query string
+        $report = Report::find($request->input('report_id'));
+
+        abort_if($report && app(ReportRepository::class)->isHiddenFromUser($report), 404);
     }
 
     /**

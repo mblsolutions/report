@@ -53,6 +53,31 @@ class AdminOnlyReportTest extends LaravelTestCase
         $this->assertReportRoutesReturn($user, $report, [200, 200, 200, 200, 200, 202, 201, 200]);
     }
 
+    #[Test]
+    public function schedule_check_uses_the_same_report_id_as_the_save(): void
+    {
+        $user = $this->userWithAdmin(false);
+        $normal = factory(Report::class)->create(['admin_only' => false]);
+        $hidden = factory(Report::class)->create(['admin_only' => true]);
+
+        $body = [
+            'report_id' => $hidden->getKey(),
+            'parameters' => ['export_driver' => CsvQueuedExport::class],
+            'frequency' => ReportSchedule::MONTHLY,
+        ];
+
+        $this->actingAs($user)
+            ->postJson(route('report.schedule.create', ['report_id' => $normal->getKey()]), $body)
+            ->assertStatus(404);
+
+        $existing = factory(ScheduledReport::class)->create(['authenticatable_id' => $user->getKey()]);
+
+        $this->patchJson(route('report.schedule.update', ['schedule' => $existing->getKey(), 'report_id' => $normal->getKey()]), $body)
+            ->assertStatus(404);
+
+        $this->assertSame(0, ScheduledReport::query()->where('report_id', $hidden->getKey())->count());
+    }
+
     /**
      * Statuses in order: show, render, preview, generate export, signed export,
      * queue render, schedule create, schedule update
