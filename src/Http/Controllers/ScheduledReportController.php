@@ -15,6 +15,9 @@ use MBLSolutions\Report\Support\Enums\ReportSchedule;
 
 class ScheduledReportController
 {
+    /** Fields a user may set; owner and uuid come from the server */
+    private const FIELDS = ['report_id', 'parameters', 'frequency', 'limit', 'recipients'];
+
     /** @var ScheduledReportRepository $repository */
     protected ScheduledReportRepository $repository;
 
@@ -50,10 +53,10 @@ class ScheduledReportController
             'limit' => 'nullable|integer',
         ]);
 
-        $schedule = new ScheduledReport(array_merge([
+        $schedule = new ScheduledReport(array_merge($request->only(self::FIELDS), [
             'uuid' => Str::uuid(),
             'authenticatable_id' => optional(Auth::user())->getKey(),
-        ], $request->toArray()));
+        ]));
 
         $schedule->save();
 
@@ -88,7 +91,7 @@ class ScheduledReportController
         ]);
 
         return new ScheduledReportResource(
-            $this->repository->update($request->toArray(), $schedule->getKey())
+            $this->repository->update($request->only(self::FIELDS), $schedule->getKey())
         );
     }
 
