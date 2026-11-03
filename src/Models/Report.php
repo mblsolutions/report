@@ -98,8 +98,9 @@ class Report extends Model
      */
     public function getExportLink(Request $request): string
     {
-        // Server values win over the request
-        $params = array_merge($request->except('signature'), [
+        // Only named keys: Laravel adds numeric keys to the URL as raw text.
+        // Server values win over the request.
+        $params = array_merge(array_filter($request->except('signature'), 'is_string', ARRAY_FILTER_USE_KEY), [
             'report' => $this->id,
             'uid' => auth()->user()->id
         ]);

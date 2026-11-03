@@ -229,4 +229,30 @@ class ReportControllerTest extends LaravelTestCase
         $this->assertGuest();
     }
 
+    #[Test]
+    public function numeric_request_keys_cannot_add_raw_text_to_the_export_link(): void
+    {
+        config(['auth.providers.users.model' => User::class]);
+
+        [$user, $other] = $this->createFakeUser(2)->all();
+
+        $report = factory(Report::class)->create();
+
+        $this->actingAs($user);
+
+        $link = $report->getExportLink(new Request([
+            0 => 'uid=' . $other->getKey() . '&expires=0',
+            'driver' => ReportExportDrivers::hashDriverValue(FakeExportDriver::class),
+        ]));
+
+        $this->assertSame(1, substr_count($link, 'uid='));
+        $this->assertStringNotContainsString('expires=0', $link);
+
+        // A guest following the link is logged in as the link owner only
+        $this->app['auth']->forgetGuards();
+
+        $this->get($link)->assertStatus(200);
+        $this->assertAuthenticatedAs($user);
+    }
+
 }
