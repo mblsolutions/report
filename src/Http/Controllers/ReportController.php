@@ -114,7 +114,12 @@ class ReportController
         }
 
         if (auth()->guest()) {
-            Auth::loginUsingId($request->get('uid'));
+            // Only a single signed id from the query string
+            $uid = $request->query('uid');
+
+            abort_unless(is_scalar($uid), 401);
+
+            Auth::loginUsingId($uid);
         }
 
         abort_if($this->repository->isHiddenFromUser($report), 404);

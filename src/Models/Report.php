@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use MBLSolutions\Report\GenerateReportExportUri;
 
 class Report extends Model
@@ -98,14 +99,32 @@ class Report extends Model
      */
     public function getExportLink(Request $request): string
     {
-        // Only named keys: Laravel adds numeric keys to the URL as raw text.
-        // Server values win over the request.
-        $params = array_merge(array_filter($request->except('signature'), 'is_string', ARRAY_FILTER_USE_KEY), [
+        // Keep plain named keys only. Numeric keys go into the URL as raw text,
+        // and keys PHP reads back as uid/expires (e.g. "uid[0]") could replace them.
+        $params = array_filter($request->except('signature'), static function ($key) {
+            return is_string($key) && !preg_match('/[\[\0]/', $key) && !in_array(
+                str_replace([' ', '.'], '_', ltrim($key, ' ')), ['report', 'uid', 'expires', 'signature'], true
+            );
+        }, ARRAY_FILTER_USE_KEY);
+
+        $uid = auth()->user()->id;
+
+        // Server values win over the request
+        $params = array_merge($params, [
             'report' => $this->id,
-            'uid' => auth()->user()->id
+            'uid' => $uid
         ]);
 
-        return app(GenerateReportExportUri::class)->__invoke($params);
+        $link = app(GenerateReportExportUri::class)->__invoke($params);
+
+        // Backstop: PHP must read back our uid and a single expires from the link
+        parse_str((string) parse_url($link, PHP_URL_QUERY), $query);
+
+        if (($query['uid'] ?? null) !== ($uid === null ? null : (string) $uid) || !is_scalar($query['expires'] ?? '')) {
+            throw new InvalidArgumentException('Export link parameters are not allowed.');
+        }
+
+        return $link;
     }
 
     public function getSlug(): string

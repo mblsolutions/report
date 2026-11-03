@@ -4,6 +4,8 @@ namespace MBLSolutions\Report\Tests\Feature;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
+use MBLSolutions\Report\GenerateReportExportUri;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportExportDrivers;
@@ -253,6 +255,80 @@ class ReportControllerTest extends LaravelTestCase
 
         $this->get($link)->assertStatus(200);
         $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function keys_that_php_reads_as_uid_or_expires_are_left_out_of_the_export_link(): void
+    {
+        config(['auth.providers.users.model' => User::class]);
+
+        [$user, $other] = $this->createFakeUser(2)->all();
+
+        $report = factory(Report::class)->create();
+
+        $this->actingAs($user);
+
+        $link = $report->getExportLink(new Request([
+            'uid[0]' => (string) $other->getKey(),
+            ' uid' => (string) $other->getKey(),
+            "uid\0x" => (string) $other->getKey(),
+            'expires[0]' => '0',
+            'driver' => ReportExportDrivers::hashDriverValue(FakeExportDriver::class),
+        ]));
+
+        $this->assertSame(1, substr_count($link, 'uid'));
+        $this->assertStringNotContainsString('expires%5B', $link);
+
+        $this->app['auth']->forgetGuards();
+
+        $this->get($link)->assertStatus(200);
+        $this->assertAuthenticatedAs($user);
+    }
+
+    #[Test]
+    public function signed_link_with_an_array_uid_does_not_log_the_guest_in(): void
+    {
+        config(['auth.providers.users.model' => User::class]);
+
+        $user = $this->createFakeUser();
+
+        $report = factory(Report::class)->create();
+
+        $link = URL::temporarySignedRoute('report.export', now()->addHour(), [
+            'report' => $report->getKey(),
+            'uid' => [(string) $user->getKey()],
+            'driver' => ReportExportDrivers::hashDriverValue(FakeExportDriver::class),
+        ]);
+
+        $this->get($link)->assertStatus(401);
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function export_link_is_refused_if_php_would_read_another_uid(): void
+    {
+        [$user, $other] = $this->createFakeUser(2)->all();
+
+        $report = factory(Report::class)->create();
+
+        $this->app->instance(GenerateReportExportUri::class, new class($other->getKey()) extends GenerateReportExportUri {
+            public function __construct(private int $otherId)
+            {
+            }
+
+            public function __invoke(array $params, ?\Illuminate\Support\Carbon $carbon = null): string
+            {
+                return parent::__invoke($params, $carbon) . '&uid=' . $this->otherId;
+            }
+        });
+
+        $this->actingAs($user);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $report->getExportLink(new Request([
+            'driver' => ReportExportDrivers::hashDriverValue(FakeExportDriver::class),
+        ]));
     }
 
 }
