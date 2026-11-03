@@ -1,3 +1,10 @@
+## v5.2.10
+
++ Bind report parameter values instead of pasting them into the SQL
++ Set the schedule owner on the server and only save known schedule fields
++ Sign export links with the real user and check the signature before login
++ Hide admin only reports from non-admins on single report routes
+
 ## v5.2.9
 
 + Fix route name collision for report export

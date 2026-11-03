@@ -61,6 +61,8 @@ class ReportController
      */
     public function show(Report $report): ReportResource
     {
+        abort_if($this->repository->isHiddenFromUser($report), 404);
+
         return new ReportResource($report);
     }
 
@@ -73,6 +75,8 @@ class ReportController
      */
     public function render(Report $report, Request $request)
     {
+        abort_if($this->repository->isHiddenFromUser($report), 404);
+
         $service = new BuildReportService($report, $request->toArray());
 
         return $service->render();
@@ -87,6 +91,8 @@ class ReportController
      */
     public function generateExport(Report $report, Request $request): array
     {
+        abort_if($this->repository->isHiddenFromUser($report), 404);
+
         return [
             'uri' => $report->getExportLink($request)
         ];
@@ -102,14 +108,21 @@ class ReportController
      */
     public function export(Report $report, Request $request)
     {
-        if (auth()->guest()) {
-            Auth::loginUsingId($request->get('uid'));
-        }
-
-        // Check that request has a valid url signature
+        // Check that request has a valid url signature before any login
         if (!$request->hasValidSignature()) {
             abort(401);
         }
+
+        if (auth()->guest()) {
+            // Only a single signed id from the query string
+            $uid = $request->query('uid');
+
+            abort_unless(is_scalar($uid), 401);
+
+            Auth::loginUsingId($uid);
+        }
+
+        abort_if($this->repository->isHiddenFromUser($report), 404);
 
         return (new ExportReportService($report, $request))->handle();
     }
@@ -123,6 +136,8 @@ class ReportController
      */
     public function preview(Report $report, Request $request)
     {
+        abort_if($this->repository->isHiddenFromUser($report), 404);
+
         $service = new BuildReportService($report, $request->toArray(), false);
 
         return $service->renderPreview(config('report.preview_limit'));

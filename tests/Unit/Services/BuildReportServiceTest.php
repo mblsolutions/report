@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report\Tests\Unit\Services;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use InvalidArgumentException;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
@@ -17,6 +18,7 @@ use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportMiddleware;
 use MBLSolutions\Report\Models\ReportSelect;
 use MBLSolutions\Report\Services\BuildReportService;
+use MBLSolutions\Report\Support\Builder\ChunkIncrementalResults;
 use MBLSolutions\Report\Tests\Fakes\User;
 use MBLSolutions\Report\Tests\LaravelTestCase;
 use PHPUnit\Framework\Attributes\Test;
@@ -563,7 +565,8 @@ class BuildReportServiceTest extends LaravelTestCase
 
         $service->render();
 
-        $this->assertEquals("select users.id AS 'user_id' from \"users\" where users.id = 'replaced_value'", $service->getRawQuery());
+        $this->assertEquals("select users.id AS 'user_id' from \"users\" where users.id = ?", $service->getRawQuery());
+        $this->assertSame(['replaced_value'], $service->query()->getBindings());
     }
 
     #[Test]
@@ -735,10 +738,13 @@ class BuildReportServiceTest extends LaravelTestCase
 
         $service = new BuildReportService($this->report, ['users_created_date' => '2019-01-01 00:00:00']);
 
+        $query = $service->buildReportQuery();
+
         $this->assertEquals(
-            'select users.id AS \'User ID\' from "users" left join "posts" on "users"."id" = "posts"."user_id" where users.created_at >= \'2019-01-01 00:00:00\' and users.id < 100 group by users.created_at having users.id < 100 order by users.created_at desc',
-            $service->buildReportQuery()->toSql()
+            'select users.id AS \'User ID\' from "users" left join "posts" on "users"."id" = "posts"."user_id" where users.created_at >= ? and users.id < 100 group by users.created_at having users.id < 100 order by users.created_at desc',
+            $query->toSql()
         );
+        $this->assertSame(['2019-01-01 00:00:00'], $query->getBindings());
     }
 
     #[Test]
@@ -784,6 +790,177 @@ class BuildReportServiceTest extends LaravelTestCase
 
         $this->assertNotInstanceOf(LengthAwarePaginator::class, $method->invoke($service));
         $this->assertInstanceOf(Collection::class, $method->invoke($service));
+    }
+
+    #[Test]
+    public function parameter_values_are_bound_not_pasted(): void
+    {
+        $this->createFakeUser(2);
+
+        $report = $this->reportWithWhere("users.name = '{name}'", ['name' => 'text']);
+
+        $query = (new BuildReportService($report, ['name' => "x' OR '1'='1"]))->buildReportQuery();
+
+        $this->assertEquals('select * from "users" where users.name = ?', $query->toSql());
+        $this->assertSame(["x' OR '1'='1"], $query->getBindings());
+        $this->assertCount(0, $query->get());
+    }
+
+    #[Test]
+    public function placeholder_inside_quoted_text_binds_the_whole_literal(): void
+    {
+        $report = $this->reportWithWhere(
+            "users.created_at >= '{from} 00:00:00' AND users.created_at < LEFT('{from}', 10) AND users.name <> \"x\"",
+            ['from' => 'date']
+        );
+
+        $query = (new BuildReportService($report, ['from' => '2019-01-01']))->buildReportQuery();
+
+        $this->assertEquals(
+            'select * from "users" where users.created_at >= ? AND users.created_at < LEFT(?, 10) AND users.name <> "x"',
+            $query->toSql()
+        );
+        $this->assertSame(['2019-01-01 00:00:00', '2019-01-01'], $query->getBindings());
+    }
+
+    #[Test]
+    public function escaped_quotes_in_a_bound_literal_are_undone(): void
+    {
+        $report = $this->reportWithWhere("users.name = 'it''s {x}'", ['x' => 'text']);
+
+        $query = (new BuildReportService($report, ['x' => 'abc']))->buildReportQuery();
+
+        $this->assertEquals('select * from "users" where users.name = ?', $query->toSql());
+        $this->assertSame(["it's abc"], $query->getBindings());
+    }
+
+    #[Test]
+    public function bare_placeholder_binds_whole_numbers_as_int(): void
+    {
+        $users = $this->createFakeUser(2);
+        $id = $users->first()->id;
+
+        $report = $this->reportWithWhere('users.id = {id}', ['id' => 'number']);
+
+        $query = (new BuildReportService($report, ['id' => (string) $id]))->buildReportQuery();
+
+        $this->assertEquals('select * from "users" where users.id = ?', $query->toSql());
+        $this->assertSame([$id], $query->getBindings());
+        $this->assertCount(1, $query->get());
+
+        $query = (new BuildReportService(Report::find($report->id), ['id' => $id . ' OR 1=1']))->buildReportQuery();
+
+        $this->assertSame([$id . ' OR 1=1'], $query->getBindings());
+        $this->assertCount(0, $query->get());
+    }
+
+    #[Test]
+    public function placeholder_match_is_case_insensitive_and_supports_double_braces(): void
+    {
+        $report = $this->reportWithWhere('users.id = {brand} OR users.id = {{brand}}', ['Brand' => 'select']);
+
+        $query = (new BuildReportService($report, ['Brand' => '7']))->buildReportQuery();
+
+        $this->assertEquals('select * from "users" where users.id = ? OR users.id = ?', $query->toSql());
+        $this->assertSame([7, 7], $query->getBindings());
+    }
+
+    #[Test]
+    public function dollar_signs_in_values_stay_literal(): void
+    {
+        $report = $this->reportWithWhere("users.name = '{name}'", ['name' => 'text']);
+
+        $query = (new BuildReportService($report, ['name' => 'a$1\\1b']))->buildReportQuery();
+
+        $this->assertSame(['a$1\\1b'], $query->getBindings());
+    }
+
+    #[Test]
+    public function null_field_is_removed_and_the_rest_still_bind_in_order(): void
+    {
+        $report = $this->reportWithWhere(
+            "users.id = {a} AND users.name = '{b}' AND users.name <> '{c}'",
+            ['a' => 'number', 'b' => 'text', 'c' => 'text']
+        );
+
+        $query = (new BuildReportService($report, ['a' => '1', 'b' => null, 'c' => 'z']))->buildReportQuery();
+
+        $this->assertEquals('select * from "users" where users.id = ? AND users.name <> ?', $query->toSql());
+        $this->assertSame([1, 'z'], $query->getBindings());
+    }
+
+    #[Test]
+    public function array_parameter_values_are_rejected(): void
+    {
+        $report = $this->reportWithWhere('users.id = {id}', ['id' => 'number']);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        (new BuildReportService($report, ['id' => [1, 2]]))->buildReportQuery();
+    }
+
+    #[Test]
+    public function building_twice_on_the_same_report_keeps_the_template(): void
+    {
+        $report = $this->reportWithWhere("users.name = '{name}'", ['name' => 'text']);
+
+        (new BuildReportService($report, ['name' => 'first']))->buildReportQuery();
+        $query = (new BuildReportService($report, ['name' => 'second']))->buildReportQuery();
+
+        $this->assertSame(['second'], $query->getBindings());
+        $this->assertEquals("users.name = '{name}'", $report->where);
+    }
+
+    #[Test]
+    public function preview_group_by_wrapper_keeps_bindings(): void
+    {
+        $users = $this->createFakeUser(2);
+
+        $report = $this->reportWithWhere("users.name = '{name}'", ['name' => 'text'], ['groupby' => 'users.name']);
+
+        factory(ReportSelect::class)->create([
+            'report_id' => $report->id,
+            'column' => 'users.name',
+            'alias' => 'user_name',
+        ]);
+
+        $result = (new BuildReportService($report, ['name' => $users->first()->name], false))->renderPreview(10);
+
+        $this->assertCount(1, $result->get('data'));
+    }
+
+    #[Test]
+    public function chunk_count_keeps_bindings(): void
+    {
+        $users = $this->createFakeUser(2);
+
+        $report = $this->reportWithWhere("users.name = '{name}'", ['name' => 'text']);
+
+        $service = new BuildReportService($report, ['name' => $users->first()->name], false);
+
+        $this->assertEquals(1, (new ChunkIncrementalResults($service->buildReportQuery(), 5))->getTotalResultsForChunk(0));
+    }
+
+    /**
+     * Report on users with the given WHERE and fields (alias => type)
+     */
+    protected function reportWithWhere(string $where, array $fields, array $attributes = []): Report
+    {
+        $report = factory(Report::class)->create(array_merge([
+            'table' => 'users',
+            'where' => $where,
+        ], $attributes));
+
+        foreach ($fields as $alias => $type) {
+            factory(ReportField::class)->create([
+                'report_id' => $report->id,
+                'label' => $alias,
+                'type' => $type,
+                'alias' => $alias,
+            ]);
+        }
+
+        return $report;
     }
 
 }

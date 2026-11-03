@@ -11,6 +11,7 @@ use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Repositories\ReportJobRepository;
+use MBLSolutions\Report\Repositories\ReportRepository;
 use MBLSolutions\Report\Services\QueuedReportExportService;
 use MBLSolutions\Report\Support\Report\RenderJobUuidGenerator;
 
@@ -64,6 +65,8 @@ class QueuedReportController
      */
     public function render(Report $report, Request $request): JsonResponse
     {
+        abort_if(app(ReportRepository::class)->isHiddenFromUser($report), 404);
+
         $data = app(RenderJobUuidGenerator::class)->__invoke();
 
         Bus::dispatch(new RenderReport($data->get('uuid'), $report, $request->toArray(), Auth::id()));

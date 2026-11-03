@@ -9,12 +9,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use MBLSolutions\Report\Http\Resources\ScheduledReportCollection;
 use MBLSolutions\Report\Http\Resources\ScheduledReportResource;
+use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ScheduledReport;
+use MBLSolutions\Report\Repositories\ReportRepository;
 use MBLSolutions\Report\Repositories\ScheduledReportRepository;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 
 class ScheduledReportController
 {
+    /** Fields a user may set; owner and uuid come from the server */
+    private const FIELDS = ['report_id', 'parameters', 'frequency', 'limit', 'recipients'];
+
     /** @var ScheduledReportRepository $repository */
     protected ScheduledReportRepository $repository;
 
@@ -50,10 +55,12 @@ class ScheduledReportController
             'limit' => 'nullable|integer',
         ]);
 
-        $schedule = new ScheduledReport(array_merge([
+        $this->abortIfReportHidden($request);
+
+        $schedule = new ScheduledReport(array_merge($request->only(self::FIELDS), [
             'uuid' => Str::uuid(),
             'authenticatable_id' => optional(Auth::user())->getKey(),
-        ], $request->toArray()));
+        ]));
 
         $schedule->save();
 
@@ -87,8 +94,10 @@ class ScheduledReportController
             'limit' => 'nullable|integer',
         ]);
 
+        $this->abortIfReportHidden($request);
+
         return new ScheduledReportResource(
-            $this->repository->update($request->toArray(), $schedule->getKey())
+            $this->repository->update($request->only(self::FIELDS), $schedule->getKey())
         );
     }
 
@@ -104,6 +113,20 @@ class ScheduledReportController
         $schedule->delete();
 
         return new JsonResponse(null, 204);
+    }
+
+    /**
+     * Non-admins can't schedule admin only reports
+     *
+     * @param Request $request
+     * @return void
+     */
+    protected function abortIfReportHidden(Request $request): void
+    {
+        // Same source as only(): the body wins over the query string
+        $report = Report::find($request->input('report_id'));
+
+        abort_if($report && app(ReportRepository::class)->isHiddenFromUser($report), 404);
     }
 
     /**

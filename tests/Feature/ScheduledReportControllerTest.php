@@ -71,4 +71,43 @@ class ScheduledReportControllerTest extends LaravelTestCase
         ]))->assertStatus(204);
     }
 
+    #[Test]
+    public function create_ignores_owner_and_uuid_from_request(): void
+    {
+        [$owner, $other] = $this->createFakeUser(2)->all();
+
+        $this->actingAs($owner)->postJson(route('report.schedule.create'), [
+            'report_id' => factory(Report::class)->create()->getKey(),
+            'parameters' => ['export_driver' => CsvQueuedExport::class],
+            'frequency' => ReportSchedule::MONTHLY,
+            'uuid' => 'forged-uuid',
+            'authenticatable_id' => $other->getKey(),
+        ])->assertStatus(201);
+
+        $schedule = ScheduledReport::query()->firstOrFail();
+
+        $this->assertEquals($owner->getKey(), $schedule->getAttribute('authenticatable_id'));
+        $this->assertNotEquals('forged-uuid', $schedule->getKey());
+    }
+
+    #[Test]
+    public function update_ignores_owner_from_request(): void
+    {
+        [$owner, $other] = $this->createFakeUser(2)->all();
+
+        $schedule = factory(ScheduledReport::class)->create(['authenticatable_id' => $owner->getKey()]);
+
+        $this->actingAs($owner)->patchJson(route('report.schedule.update', ['schedule' => $schedule->getKey()]), [
+            'report_id' => $schedule->getAttribute('report_id'),
+            'parameters' => ['export_driver' => CsvQueuedExport::class],
+            'frequency' => ReportSchedule::WEEKLY,
+            'authenticatable_id' => $other->getKey(),
+        ])->assertStatus(200);
+
+        $schedule->refresh();
+
+        $this->assertEquals($owner->getKey(), $schedule->getAttribute('authenticatable_id'));
+        $this->assertEquals(ReportSchedule::WEEKLY, $schedule->getAttribute('frequency'));
+    }
+
 }

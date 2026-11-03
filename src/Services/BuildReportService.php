@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use InvalidArgumentException;
 use MBLSolutions\Report\Driver\Export\ReportExport;
 use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Events\ReportRendered;
@@ -392,34 +393,186 @@ class BuildReportService
      */
     protected function addWhere(): void
     {
-        $this->report->fields->each(function (ReportField $field) {
-            $this->report->where = $this->replaceParameter($field->alias, $this->parameters->get($field->alias), $this->report->where);
+        // Work on a copy so the report model keeps its placeholders
+        $where = $this->report->where;
+        $values = [];
+
+        $this->report->fields->each(function (ReportField $field) use (&$where, &$values) {
+            $value = $this->parameters->get($field->alias);
+
+            if ($value == null) {
+                $where = $this->replaceParameter($field->alias, $value, $where);
+            } elseif (!is_scalar($value)) {
+                throw new InvalidArgumentException(sprintf('Report parameter [%s] must be a single value.', $field->alias));
+            } else {
+                $values[$field->alias] = $value;
+            }
         });
 
-        if ($this->checkWhereIsNotEmpty()) {
-            $this->query->whereRaw($this->cleanWhereSyntax());
+        if ($this->checkWhereIsNotEmpty($where)) {
+            [$sql, $bindings] = $this->bindParameters($this->cleanWhereSyntax($where), $values);
+
+            $this->query->whereRaw($sql, $bindings);
         }
+    }
+
+    /**
+     * Swap {alias} placeholders for ? and collect the values as bindings.
+     * A quoted literal holding a placeholder becomes one ? bound to the filled-in text.
+     *
+     * @param string $where
+     * @param array $values
+     * @return array
+     */
+    protected function bindParameters(string $where, array $values): array
+    {
+        if ($values === []) {
+            return [$where, []];
+        }
+
+        $lookup = [];
+
+        foreach ($values as $alias => $value) {
+            $lookup[strtolower($alias)] ??= $value;
+        }
+
+        $aliases = implode('|', array_map(static fn ($alias) => preg_quote($alias, '/'), array_keys($values)));
+        $placeholder = '\{\{(' . $aliases . ')\}\}|\{(' . $aliases . ')\}';
+        $valueFor = static fn (array $match) => $lookup[strtolower(($match[1] ?? '') !== '' ? $match[1] : $match[2])];
+
+        $sql = '';
+        $bindings = [];
+        $length = strlen($where);
+        $i = 0;
+
+        while ($i < $length) {
+            $char = $where[$i];
+
+            if ($char === "'" || $char === '"' || $char === '`') {
+                $end = $this->findClosingQuote($where, $i);
+                $literal = substr($where, $i, $end - $i + 1);
+
+                if ($char !== '`' && $end < $length) {
+                    $count = 0;
+                    $text = preg_replace_callback(
+                        '/' . $placeholder . '/i',
+                        static fn ($match) => (string) $valueFor($match),
+                        $this->unescapeLiteral(substr($literal, 1, -1), $char),
+                        -1,
+                        $count
+                    );
+
+                    if ($count > 0) {
+                        $sql .= '?';
+                        $bindings[] = $text;
+                        $i = $end + 1;
+                        continue;
+                    }
+                }
+
+                $sql .= $literal;
+                $i = $end + 1;
+                continue;
+            }
+
+            if ($char === '{' && preg_match('/\G(?:' . $placeholder . ')/i', $where, $match, 0, $i)) {
+                $sql .= '?';
+                $bindings[] = $this->bareValue($valueFor($match));
+                $i += strlen($match[0]);
+                continue;
+            }
+
+            $sql .= $char;
+            $i++;
+        }
+
+        return [$sql, $bindings];
+    }
+
+    /**
+     * Index of the closing quote, or the string length if it is never closed
+     *
+     * @param string $where
+     * @param int $start
+     * @return int
+     */
+    protected function findClosingQuote(string $where, int $start): int
+    {
+        $quote = $where[$start];
+        $length = strlen($where);
+
+        for ($i = $start + 1; $i < $length; $i++) {
+            if ($where[$i] === '\\' && $quote !== '`') {
+                $i++;
+                continue;
+            }
+
+            if ($where[$i] === $quote) {
+                if (($where[$i + 1] ?? '') === $quote) {
+                    $i++;
+                    continue;
+                }
+
+                return $i;
+            }
+        }
+
+        return $length;
+    }
+
+    /**
+     * Undo SQL escapes so the bound text matches what the literal meant
+     *
+     * @param string $text
+     * @param string $quote
+     * @return string
+     */
+    protected function unescapeLiteral(string $text, string $quote): string
+    {
+        return preg_replace_callback(
+            '/\\\\([\\\\\'"])|' . preg_quote($quote . $quote, '/') . '/',
+            static fn ($match) => $match[1] ?? $quote,
+            $text
+        );
+    }
+
+    /**
+     * Bind whole numbers as int, as they acted when pasted into the SQL
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function bareValue($value)
+    {
+        if (is_string($value) && preg_match('/^(-?)0*(\d+)$/', $value, $match)
+            && (string) (int) $value === ($match[2] === '0' ? '0' : $match[1] . $match[2])) {
+            return (int) $value;
+        }
+
+        return $value;
     }
 
     /**
      * Check if where statement is not empty
      *
+     * @param string|null $where
      * @return bool
      */
-    protected function checkWhereIsNotEmpty(): bool
+    protected function checkWhereIsNotEmpty(?string $where = null): bool
     {
-        return !empty(preg_replace('/\s+/', '', $this->report->where));
+        return !empty(preg_replace('/\s+/', '', $where ?? $this->report->where));
     }
 
     /**
      * Clean Where syntax, removing keywords post replacement
      * .e.g WHERE AND users.id = 1
      *
+     * @param string|null $where
      * @return string
      */
-    protected function cleanWhereSyntax(): string
+    protected function cleanWhereSyntax(?string $where = null): string
     {
-        return trim(preg_replace('/\A(\s*)(AND|OR|IN)(?=\s)/i', '', $this->report->where, 1));
+        return trim(preg_replace('/\A(\s*)(AND|OR|IN)(?=\s)/i', '', $where ?? $this->report->where, 1));
     }
 
     /**
