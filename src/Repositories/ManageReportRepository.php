@@ -15,6 +15,7 @@ use MBLSolutions\Report\Events\ReportCreated;
 use MBLSolutions\Report\Events\ReportDestroyed;
 use MBLSolutions\Report\Events\ReportUpdated;
 use MBLSolutions\Report\Models\Report;
+use MBLSolutions\Report\Models\ReportConnection;
 use MBLSolutions\Report\Models\ReportDataType;
 use MBLSolutions\Report\Models\ReportFieldType;
 use MBLSolutions\Report\Models\ReportMiddlewareOptions;
@@ -240,7 +241,7 @@ class ManageReportRepository
         return [
             'name' => 'required|string|max:100',
             'description' => 'required|string|max:255',
-            'connection' => 'required|string|max:100',
+            'connection' => ['required', 'string', 'max:100', Rule::in(ReportConnection::allowed())],
             'display_limit' => 'required|numeric|between:25,500',
             'table' => 'required|string|max:128',
             'where' => 'nullable',

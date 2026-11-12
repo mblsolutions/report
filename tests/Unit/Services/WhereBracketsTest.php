@@ -13,6 +13,13 @@ use PHPUnit\Framework\Attributes\Test;
 
 class WhereBracketsTest extends LaravelTestCase
 {
+    /** {@inheritdoc} **/
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAsAdmin();
+    }
 
     #[Test]
     public function the_report_where_cannot_get_around_a_middleware_filter(): void

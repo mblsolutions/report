@@ -5,6 +5,7 @@ namespace MBLSolutions\Report\Services;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -14,9 +15,11 @@ use InvalidArgumentException;
 use MBLSolutions\Report\Driver\Export\ReportExport;
 use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Events\ReportRendered;
+use MBLSolutions\Report\Exceptions\UnauthorizedException;
 use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
 use MBLSolutions\Report\Middleware\ReportMiddleware;
 use MBLSolutions\Report\Models\Report;
+use MBLSolutions\Report\Models\ReportConnection;
 use MBLSolutions\Report\Models\ReportExportDrivers;
 use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportFieldType;
@@ -51,6 +54,7 @@ class BuildReportService
      * @param array $parameters
      * @param bool $paginate
      * @param mixed|null $authenticatable
+     * @throws UnauthorizedException
      */
     public function __construct(Report $report, array $parameters = [], bool $paginate = true, mixed $authenticatable = null)
     {
@@ -61,7 +65,42 @@ class BuildReportService
 
         $this->fields = $this->report->fields;
 
-        $this->query = DB::connection($this->report->connection)->table($this->report->table);
+        $this->query = DB::connection($this->reportConnection())->table($this->report->table);
+    }
+
+    /**
+     * The fixed report connection, or the report's own if it is allowed.
+     * MySQL runs on a copy with a per-query time limit, so the app's own connection is never changed.
+     *
+     * @return string
+     * @throws UnauthorizedException
+     */
+    protected function reportConnection(): string
+    {
+        $name = config('report.connection') ?: ($this->report->connection ?: config('database.default'));
+
+        if (! config('report.connection') && ! in_array($name, ReportConnection::allowed(), true)) {
+            throw new UnauthorizedException('This report connection is not allowed.');
+        }
+
+        $config = config('database.connections.' . $name);
+
+        if (($config['driver'] ?? null) !== 'mysql') {
+            return $name;
+        }
+
+        $seconds = (int) (app()->runningInConsole() ? config('report.timeout.queued', 300) : config('report.timeout.screen', 60));
+        $copy = $name . '-report-' . $seconds;
+
+        if (config('database.connections.' . $copy) === null) {
+            $initCommand = class_exists(\Pdo\Mysql::class) ? \Pdo\Mysql::ATTR_INIT_COMMAND : \PDO::MYSQL_ATTR_INIT_COMMAND;
+
+            $config['options'] = [$initCommand => 'SET SESSION max_execution_time=' . ($seconds * 1000)] + ($config['options'] ?? []);
+
+            config(['database.connections.' . $copy => $config]);
+        }
+
+        return $copy;
     }
 
     /**
@@ -71,6 +110,14 @@ class BuildReportService
      */
     public function render(): Collection
     {
+        $cap = (int) config('report.max_rows.export', 50000);
+
+        abort_if(
+            $this->paginate && Paginator::resolveCurrentPage() * $this->report->display_limit > $cap,
+            422,
+            sprintf('This report has more than %s rows. Use the queued export.', number_format($cap))
+        );
+
         $this->buildReportQuery();
 
         $result = new Collection([
@@ -284,6 +331,7 @@ class BuildReportService
      */
     public function buildReportQuery(array $except = [], $preview = false): Builder
     {
+        $this->checkRunnerMayRunReport($except);
 
         if (!in_array('join', $except, true) && $this->report->joins->count()) {
             $this->addJoins();
@@ -357,7 +405,7 @@ class BuildReportService
                 $this->query->limit(config('report.preview_results_limit', 15000));
 
                 // Wrap the query inside another SELECT with GROUP BY
-                $this->query = DB::table(DB::raw("({$this->query->toSql()}) AS query_data"))
+                $this->query = $this->query->getConnection()->table(DB::raw("({$this->query->toSql()}) AS query_data"))
                     ->mergeBindings($this->query);
 
                 $this->query->groupBy(...$groupby_alias);
@@ -369,6 +417,30 @@ class BuildReportService
         }
 
         return $this->query;
+    }
+
+    /**
+     * Non-admins may only run reports that carry a tenant middleware
+     *
+     * @param array $except
+     * @return void
+     * @throws UnauthorizedException
+     */
+    protected function checkRunnerMayRunReport(array $except = []): void
+    {
+        if ($this->userCountsAsAdmin($this->getAuthenticatable())) {
+            return;
+        }
+
+        $tenantMiddleware = config('report.tenant_middleware', []);
+
+        $hasTenantMiddleware = ! in_array('middleware', $except, true) && $this->report->middleware->contains(
+            static fn ($row) => in_array($row->middleware, $tenantMiddleware, true)
+        );
+
+        if (! $hasTenantMiddleware) {
+            throw new UnauthorizedException('You are not allowed to run this report.');
+        }
     }
 
     /**
@@ -754,11 +826,18 @@ class BuildReportService
      * Get the Authenticatable Model
      *
      * @return Authenticatable|Model|null
+     * @throws UnauthorizedException
      */
     public function getAuthenticatable()
     {
         if ($this->authenticatable && $authModel = config('report.authenticatable_model')) {
-            return $authModel::find($this->authenticatable);
+            $user = $authModel::find($this->authenticatable);
+
+            if ($user === null) {
+                throw new UnauthorizedException('The user for this report run could not be found.');
+            }
+
+            return $user;
         }
 
         return Auth::user();

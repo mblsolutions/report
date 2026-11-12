@@ -9,6 +9,7 @@ use MBLSolutions\Report\GenerateReportExportUri;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportExportDrivers;
+use MBLSolutions\Report\Models\ReportMiddleware;
 use MBLSolutions\Report\Tests\Fakes\ExportDriver\FakeExportDriver;
 use MBLSolutions\Report\Tests\Fakes\User;
 use MBLSolutions\Report\Tests\LaravelTestCase;
@@ -69,6 +70,8 @@ class ReportControllerTest extends LaravelTestCase
     #[Test]
     public function can_render_a_report(): void
     {
+        $this->actingAsAdmin();
+
         $report = factory(Report::class)->create();
 
         $response = $this->postJson(route('report.render', ['report' => $report->getKey()]));
@@ -95,7 +98,7 @@ class ReportControllerTest extends LaravelTestCase
             'driver' => ReportExportDrivers::hashDriverValue(FakeExportDriver::class)
         ]);
 
-        $response = $this->actingAs(new User)->get($report->getExportLink($request));
+        $response = $this->actingAs($this->savedAdmin())->get($report->getExportLink($request));
 
         $response->assertStatus(200);
     }
@@ -103,7 +106,7 @@ class ReportControllerTest extends LaravelTestCase
     #[Test]
     public function can_export_report_authorises_use(): void
     {
-        Auth::login(new User);
+        Auth::login($this->savedAdmin());
 
         $report = factory(Report::class)->create();
 
@@ -135,9 +138,10 @@ class ReportControllerTest extends LaravelTestCase
     {
         Auth::login(new User());
 
-        $response = $this->postJson(route('report.preview', [
-            'report' => factory(Report::class)->create()
-        ]), []);
+        $report = factory(Report::class)->create();
+        factory(ReportMiddleware::class)->create(['report_id' => $report->getKey()]);
+
+        $response = $this->postJson(route('report.preview', ['report' => $report]), []);
 
         $response->assertStatus(200);
     }
@@ -162,9 +166,10 @@ class ReportControllerTest extends LaravelTestCase
 
         Auth::login($nonAdminUser);
 
-        $response = $this->postJson(route('report.preview', [
-            'report' => factory(Report::class)->create()
-        ]), []);
+        $report = factory(Report::class)->create();
+        factory(ReportMiddleware::class)->create(['report_id' => $report->getKey()]);
+
+        $response = $this->postJson(route('report.preview', ['report' => $report]), []);
 
         $response->assertStatus(200);
         $this->assertArrayNotHasKey('raw', $response->json());
@@ -174,6 +179,7 @@ class ReportControllerTest extends LaravelTestCase
     public function render_does_not_run_injected_sql(): void
     {
         $this->createFakeUser(2);
+        $this->actingAsAdmin();
 
         $report = factory(Report::class)->create(['where' => "users.name = '{name}'"]);
 
@@ -237,6 +243,7 @@ class ReportControllerTest extends LaravelTestCase
         config(['auth.providers.users.model' => User::class]);
 
         [$user, $other] = $this->createFakeUser(2)->all();
+        $user->setIsAdmin();
 
         $report = factory(Report::class)->create();
 
@@ -250,11 +257,14 @@ class ReportControllerTest extends LaravelTestCase
         $this->assertSame(1, substr_count($link, 'uid='));
         $this->assertStringNotContainsString('expires=0', $link);
 
-        // A guest following the link is logged in as the link owner only
+        // The link works for its owner only, and never logs a guest in
         $this->app['auth']->forgetGuards();
 
-        $this->get($link)->assertStatus(200);
-        $this->assertAuthenticatedAs($user);
+        $this->get($link)->assertStatus(401);
+        $this->assertGuest();
+
+        $this->actingAs($other)->get($link)->assertStatus(403);
+        $this->actingAs($user)->get($link)->assertStatus(200);
     }
 
     #[Test]
@@ -263,6 +273,7 @@ class ReportControllerTest extends LaravelTestCase
         config(['auth.providers.users.model' => User::class]);
 
         [$user, $other] = $this->createFakeUser(2)->all();
+        $user->setIsAdmin();
 
         $report = factory(Report::class)->create();
 
@@ -281,8 +292,11 @@ class ReportControllerTest extends LaravelTestCase
 
         $this->app['auth']->forgetGuards();
 
-        $this->get($link)->assertStatus(200);
-        $this->assertAuthenticatedAs($user);
+        $this->get($link)->assertStatus(401);
+        $this->assertGuest();
+
+        $this->actingAs($other)->get($link)->assertStatus(403);
+        $this->actingAs($user)->get($link)->assertStatus(200);
     }
 
     #[Test]
@@ -302,6 +316,14 @@ class ReportControllerTest extends LaravelTestCase
 
         $this->get($link)->assertStatus(401);
         $this->assertGuest();
+    }
+
+    private function savedAdmin(): User
+    {
+        $user = $this->createFakeUser();
+        $user->setIsAdmin();
+
+        return $user;
     }
 
     #[Test]

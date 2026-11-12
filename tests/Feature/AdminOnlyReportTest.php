@@ -8,6 +8,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use MBLSolutions\Report\Driver\QueuedExport\CsvQueuedExport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportExportDrivers;
+use MBLSolutions\Report\Models\ReportMiddleware;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 use MBLSolutions\Report\Tests\Fakes\ExportDriver\FakeExportDriver;
@@ -50,6 +51,7 @@ class AdminOnlyReportTest extends LaravelTestCase
     {
         $user = $this->userWithAdmin(false);
         $report = factory(Report::class)->create(['admin_only' => false]);
+        factory(ReportMiddleware::class)->create(['report_id' => $report->getKey()]);
 
         $this->assertReportRoutesReturn($user, $report, [200, 200, 200, 200, 200, 202, 201, 200]);
     }

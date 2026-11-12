@@ -109,19 +109,16 @@ class ReportController
      */
     public function export(Report $report, Request $request)
     {
-        // Check that request has a valid url signature before any login
         if (!$request->hasValidSignature()) {
             abort(401);
         }
 
-        if (auth()->guest()) {
-            // Only a single signed id from the query string
-            $uid = $request->query('uid');
+        // The link only works for the signed-in user it was made for
+        abort_if(Auth::guest(), 401);
 
-            abort_unless(is_scalar($uid), 401);
+        $uid = $request->query('uid');
 
-            Auth::loginUsingId($uid);
-        }
+        abort_unless(is_scalar($uid) && (string) $uid === (string) Auth::id(), 403);
 
         abort_if($this->repository->isHiddenFromUser($report), 404);
 

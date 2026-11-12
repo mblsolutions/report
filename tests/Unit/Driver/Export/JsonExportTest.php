@@ -19,6 +19,8 @@ class JsonExportTest extends LaravelTestCase
     {
         parent::setUp();
 
+        $this->actingAsAdmin();
+
         $this->report = factory(Report::class)->create();
     }
 

@@ -17,7 +17,7 @@ class ReportConnection extends ConfigModel
      */
     public function all(): Collection
     {
-        $connections = $this->models->map(function (array $connection, string $key) {
+        $connections = $this->models->only(static::allowed())->map(function (array $connection, string $key) {
             return [
                 'value' => $key,
                 'name' => $this->formatName($key),
@@ -26,6 +26,24 @@ class ReportConnection extends ConfigModel
         });
 
         return $connections->sortBy('name');
+    }
+
+    /**
+     * Connections reports may use: report.allowed_connections, else the default connection
+     *
+     * @return array
+     */
+    public static function allowed(): array
+    {
+        $allowed = config('report.allowed_connections');
+
+        if (is_string($allowed)) {
+            $allowed = explode(',', $allowed);
+        }
+
+        $allowed = array_values(array_filter(array_map('trim', (array) $allowed)));
+
+        return $allowed ?: [config('database.default')];
     }
 
     /**

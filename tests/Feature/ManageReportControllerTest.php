@@ -127,6 +127,8 @@ class ManageReportControllerTest extends LaravelTestCase
     #[Test]
     public function can_test_if_a_report_is_successful(): void
     {
+        $this->actingAsAdmin();
+
         $report = factory(Report::class)->create();
 
         $response = $this->postJson(route('report.manage.test', ['report' => $report->getKey()]));

@@ -21,6 +21,8 @@ class LaravelTestCase extends OTBTestCase
     {
         parent::setUp();
 
+        User::$adminIds = [];
+
         DB::setDefaultConnection('sqlite');
 
         $this->setupEnvVariables();
@@ -60,6 +62,7 @@ class LaravelTestCase extends OTBTestCase
         $app['config']->set('report.scheduled_date_end', $config['scheduled_date_end']);
         $app['config']->set('report.chunk_limit', 5);
         $app['config']->set('report.link_expiration', $config['link_expiration']);
+        $app['config']->set('report.tenant_middleware', [FakeMiddleware::class]);
     }
 
     /**
@@ -114,6 +117,21 @@ class LaravelTestCase extends OTBTestCase
         $this->app['config']->set('app.key', 'base64:KMRokGdMt+pgOmbRD+oiKwmfZiKAVxR6KkZ4KuiIo90=');
     }
 
+
+    /**
+     * Act as an admin that is not saved, so user row counts stay the same
+     *
+     * @return User
+     */
+    protected function actingAsAdmin(): User
+    {
+        $admin = new User(['name' => 'admin']);
+        $admin->setIsAdmin();
+
+        $this->actingAs($admin);
+
+        return $admin;
+    }
 
     /**
      * Create Fake Users for testing
