@@ -41,7 +41,7 @@ php artisan migrate
 2. Admin checks need the user model to implement `IsAuthenticatableAnAdmin`. Without it, every user is a non-admin.
 3. Non-admins can only run reports that carry a middleware listed in `tenant_middleware`. An empty list means no non-admin runs.
 4. Runs whose saved user can't be loaded fail.
-5. Signed export links need the signed-in user named in the link. Guests get 401, other users 403.
+5. Signed export links need the signed-in user named in the link. Guests get 401, other users 403. If your frontend opens the link in a new tab, that tab must be signed in to the app that serves the link; otherwise download the file through your backend or use the queued export.
 6. Reports run only on `allowed_connections` (default: the app's default connection).
 7. MySQL per-query timeouts: 60 s on screen and direct exports, 300 s queued.
 8. On-screen pages and direct CSV, JSON and Print exports stop at 50,000 rows (422; use the queued export).
