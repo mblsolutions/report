@@ -14,6 +14,7 @@ use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Services\BuildReportService;
 use MBLSolutions\Report\Support\Builder\ChunkIncrementalResults;
 use MBLSolutions\Report\Support\Enums\JobStatus;
+use Throwable;
 
 abstract class RenderReportJob implements ShouldQueue
 {
@@ -31,6 +32,9 @@ abstract class RenderReportJob implements ShouldQueue
     public array $request;
 
     public int $limit = 50000;
+
+    /** Run once; a retry would start a second copy of the same export */
+    public $tries = 1;
 
     /**
      * Get the Service
@@ -50,6 +54,20 @@ abstract class RenderReportJob implements ShouldQueue
     public function getChunkIncrementalResultsHelper(): ChunkIncrementalResults
     {
         return new ChunkIncrementalResults($this->getBuildReportService()->buildReportQuery(), $this->limit);
+    }
+
+    /**
+     * The worker stopped the job (e.g. it timed out): mark it failed
+     *
+     * @param Throwable $exception
+     * @return void
+     */
+    public function failed(Throwable $exception): void
+    {
+        $this->reportJob->update([
+            'status' => JobStatus::FAILED,
+            'exception' => $exception->getMessage(),
+        ]);
     }
 
     /**

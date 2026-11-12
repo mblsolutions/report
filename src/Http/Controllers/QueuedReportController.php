@@ -4,6 +4,7 @@ namespace MBLSolutions\Report\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Validation\Rule;
@@ -15,6 +16,7 @@ use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Repositories\ReportJobRepository;
 use MBLSolutions\Report\Repositories\ReportRepository;
 use MBLSolutions\Report\Services\QueuedReportExportService;
+use MBLSolutions\Report\Support\Enums\JobStatus;
 use MBLSolutions\Report\Support\Report\RenderJobUuidGenerator;
 
 class QueuedReportController
@@ -73,11 +75,33 @@ class QueuedReportController
             'export_driver' => ['sometimes', Rule::in(config('report.queued_export_drivers', []))],
         ]);
 
+        abort_if(
+            $this->pendingJobsForUser() >= (int) config('report.max_pending_jobs', 5),
+            429,
+            'Too many of your reports are still running. Try again when one has finished.'
+        );
+
         $data = app(RenderJobUuidGenerator::class)->__invoke();
 
         Bus::dispatch(new RenderReport($data->get('uuid'), $report, $request->toArray(), Auth::id()));
 
         return new JsonResponse($data, 202);
+    }
+
+    /**
+     * The signed-in user's jobs that are waiting or running, from the last hour
+     *
+     * @return int
+     */
+    protected function pendingJobsForUser(): int
+    {
+        $id = Auth::id();
+
+        return ReportJob::query()
+            ->where('authenticatable_id', $id === null ? null : (string) $id)
+            ->whereIn('status', [JobStatus::SCHEDULED, JobStatus::RUNNING])
+            ->where('created_at', '>=', Carbon::now()->subHour())
+            ->count();
     }
 
     /**

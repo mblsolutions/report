@@ -268,8 +268,8 @@ class ManageReportRepository
                 'required_if:fields.*.type,select',
                 Rule::in(array_merge([null], (new ReportSelectField)->all()->pluck('value')->toArray()))
             ],
-            'fields.*.model_select_name' => 'required_if:fields.*.type,select',
-            'fields.*.model_select_value' => 'required_if:fields.*.type,select',
+            'fields.*.model_select_name' => ['nullable', 'required_if:fields.*.type,select', Rule::in(ReportSelectField::columns())],
+            'fields.*.model_select_value' => ['nullable', 'required_if:fields.*.type,select', Rule::in(ReportSelectField::columns())],
             // Selects Validation
             'selects.*.column' => 'required|string',
             'selects.*.alias' => 'required|string|max:50',

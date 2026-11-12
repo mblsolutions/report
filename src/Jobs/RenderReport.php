@@ -7,10 +7,12 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use MBLSolutions\Report\Events\ReportRenderStarted;
+use MBLSolutions\Report\Exceptions\UnauthorizedException;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportFieldType;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Models\ScheduledReport;
+use MBLSolutions\Report\Repositories\ReportRepository;
 use MBLSolutions\Report\Services\BuildReportService;
 use MBLSolutions\Report\Support\Builder\ChunkIncrementalResults;
 use MBLSolutions\Report\Support\Enums\JobStatus;
@@ -47,6 +49,8 @@ class RenderReport extends RenderReportJob
     public function handle(): void
     {
         try {
+            $this->checkOwnerCanStillSeeReport();
+
             if ($this->schedule) {
                 $this->updateRequestForSchedule($this->report->fields);
             }
@@ -70,6 +74,21 @@ class RenderReport extends RenderReportJob
 
         } catch (Exception $exception) {
             $this->handleJobException($exception);
+        }
+    }
+
+    /**
+     * The report may have been turned off, or made admin only, since the job was queued
+     *
+     * @return void
+     * @throws UnauthorizedException
+     */
+    protected function checkOwnerCanStillSeeReport(): void
+    {
+        $owner = $this->getBuildReportService()->getAuthenticatable();
+
+        if (app(ReportRepository::class)->isHiddenFromUser($this->report, $owner)) {
+            throw new UnauthorizedException('This report is not available.');
         }
     }
 

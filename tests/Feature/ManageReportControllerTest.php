@@ -8,6 +8,13 @@ use PHPUnit\Framework\Attributes\Test;
 
 class ManageReportControllerTest extends LaravelTestCase
 {
+    /** {@inheritdoc} **/
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['report.management_enabled' => true]);
+    }
 
     #[Test]
     public function can_view_manage_report_index(): void

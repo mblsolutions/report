@@ -12,6 +12,8 @@ use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Repositories\ScheduledReportRepository;
+use RuntimeException;
+use Throwable;
 
 class DispatchScheduledReportsCommand extends Command
 {
@@ -39,16 +41,25 @@ class DispatchScheduledReportsCommand extends Command
                 sprintf('Running Schedule for Report %s', $schedule->getKey())
             );
 
-            $uuid = Str::uuid();
-            $report = Report::find($schedule->getAttribute('report_id'));
+            // One bad schedule must not stop the rest
+            try {
+                $uuid = Str::uuid();
+                $report = Report::find($schedule->getAttribute('report_id'));
 
-            Bus::dispatch(
-                new RenderReport(
-                    $uuid, $report, $schedule->getAttribute('parameters'), $schedule->getAttribute('authenticatable_id'), $schedule
-                )
-            );
+                if ($report === null) {
+                    throw new RuntimeException(sprintf('Scheduled report %s has no report.', $schedule->getKey()));
+                }
 
-            Event::dispatch(new ScheduledReportDispatched($schedule));
+                Bus::dispatch(
+                    new RenderReport(
+                        $uuid, $report, $schedule->getAttribute('parameters'), $schedule->getAttribute('authenticatable_id'), $schedule
+                    )
+                );
+
+                Event::dispatch(new ScheduledReportDispatched($schedule));
+            } catch (Throwable $exception) {
+                report($exception);
+            }
         });
 
         return 0;

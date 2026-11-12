@@ -230,6 +230,10 @@ class BuildReportService
             case ReportFieldType::SELECT:
                 $namespace = $field->getAttribute('model');
 
+                if ($this->fieldIsHiddenFromRunner($field)) {
+                    return $value;
+                }
+
                 if (new $namespace instanceof Model) {
                     $model = $namespace::where($field->getAttribute('model_select_value'), '=', $value)->first();
 
@@ -246,6 +250,21 @@ class BuildReportService
         }
 
         return $value;
+    }
+
+    /**
+     * A report middleware hides this field from the runner, e.g. a tenant's own account
+     *
+     * @param ReportField $field
+     * @return bool
+     */
+    protected function fieldIsHiddenFromRunner(ReportField $field): bool
+    {
+        $user = $this->getAuthenticatable();
+
+        return $this->report->middleware->contains(
+            static fn ($row) => ! (new $row->middleware($user))->field($field)
+        );
     }
 
     /**
