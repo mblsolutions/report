@@ -12,6 +12,16 @@ abstract class PackageReportRepository extends EloquentRepository
     use HandlesAuthenticatable;
 
     /**
+     * The signed-in user is an admin
+     *
+     * @return bool
+     */
+    public function signedInUserIsAdmin(): bool
+    {
+        return $this->authenticatableIsAdmin();
+    }
+
+    /**
      * The signed-in user owns the job or schedule, or is an admin
      *
      * @param Model $model

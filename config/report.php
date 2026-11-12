@@ -215,7 +215,7 @@ return [
     |
     */
 
-    'link_expiration' => env('REPORT_LINK_EXPIRATION', 6),
+    'link_expiration' => env('REPORT_LINK_EXPIRATION', 3),
 
     /*
     |--------------------------------------------------------------------------

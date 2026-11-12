@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report\Services;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\Paginator;
@@ -122,7 +123,7 @@ class BuildReportService
 
         $result = new Collection([
             'headings' => $this->headings(),
-            'data' => $this->data(),
+            'data' => $data = $this->data(),
             'totals' => false,
             'drivers' => $this->exportDrivers(),
         ]);
@@ -131,7 +132,7 @@ class BuildReportService
             $result->put('raw', $this->getRawQuery());
         }
 
-        Event::dispatch(new ReportRendered($this->report));
+        $this->dispatchRenderedEvent($data);
 
         return $result;
     }
@@ -148,7 +149,7 @@ class BuildReportService
 
         $result = new Collection([
             'headings' => $this->headings(),
-            'data' => $this->data(0, $limit),
+            'data' => $data = $this->data(0, $limit),
             'totals' => false,
             'drivers' => $this->exportDrivers(),
             'parameters' => $this->getFormattedParameters($this->parameters),
@@ -159,9 +160,27 @@ class BuildReportService
             $result->put('raw', $this->getRawQuery());
         }
 
-        Event::dispatch(new ReportRendered($this->report));
+        $this->dispatchRenderedEvent($data);
 
         return $result;
+    }
+
+    /**
+     * Tell listeners who ran the report, with which parameters, and how many rows it had
+     *
+     * @param mixed $data
+     * @return void
+     */
+    protected function dispatchRenderedEvent($data): void
+    {
+        $rows = $data instanceof LengthAwarePaginator ? $data->total() : ($data ? count($data) : 0);
+
+        Event::dispatch(new ReportRendered(
+            $this->report,
+            optional($this->getAuthenticatable())->getAuthIdentifier(),
+            $this->parameters->except(['signature', 'expires', 'uid', 'driver'])->all(),
+            $rows
+        ));
     }
 
     /**

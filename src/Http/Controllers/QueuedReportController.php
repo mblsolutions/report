@@ -127,6 +127,8 @@ class QueuedReportController
     {
         abort_unless($this->repository->isOwnerOrAdmin($job), 404);
 
+        abort_if($job->created_at->lt(Carbon::now()->subDays($this->repository->days)), 410, 'This report has expired.');
+
         $service = new QueuedReportExportService($job);
 
         return new JsonResponse($service->getExportResponse(), 200);

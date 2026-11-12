@@ -19,6 +19,8 @@ class DispatchScheduledReportsCommandTest extends LaravelTestCase
     {
         parent::setUp();
 
+        config(['report.schedules.enabled' => true]);
+
         Bus::fake();
 
         $this->report = factory(Report::class)->create();

@@ -5,6 +5,7 @@ namespace MBLSolutions\Report\Driver\Export;
 use Illuminate\Support\Collection;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Services\BuildReportService;
+use MBLSolutions\Report\Support\SpreadsheetCell;
 
 class CsvExport extends ReportExport
 {
@@ -23,7 +24,7 @@ class CsvExport extends ReportExport
         $service = $this->getReportBuilder($report, $params);
 
         return response()->streamDownload(function () use ($service, $params) {
-            $this->buildCsvExport($service, (bool) $params['format']);
+            $this->buildCsvExport($service, (bool) ($params['format'] ?? false));
         }, $report->name . '_' . time() . '.csv');
     }
 
@@ -53,7 +54,7 @@ class CsvExport extends ReportExport
      */
     protected function getHeadings(BuildReportService $service): self
     {
-        print $service->headings()->implode(',') . PHP_EOL;
+        $this->printCsvLine($service->headings()->all());
 
         return $this;
     }
@@ -73,12 +74,28 @@ class CsvExport extends ReportExport
                 $chunk = $this->formatResults($service, $chunk);
             }
 
-            $chunk->each(static function ($row) {
-                print (new Collection($row))->implode(',') . PHP_EOL;
+            $chunk->each(function ($row) {
+                $this->printCsvLine(array_map([SpreadsheetCell::class, 'guard'], (array) $row));
             });
         });
 
         return $this;
+    }
+
+    /**
+     * Print one quoted CSV line
+     *
+     * @param array $cells
+     * @return void
+     * @codeCoverageIgnore
+     */
+    protected function printCsvLine(array $cells): void
+    {
+        $output = fopen('php://output', 'wb');
+
+        fputcsv($output, $cells, ',', '"', '');
+
+        fclose($output);
     }
 
 }

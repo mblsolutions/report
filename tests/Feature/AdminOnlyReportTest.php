@@ -26,6 +26,8 @@ class AdminOnlyReportTest extends LaravelTestCase
 
         Excel::fake();
         Bus::fake();
+
+        config(['report.schedules.admin_only' => false]);
     }
 
     #[Test]

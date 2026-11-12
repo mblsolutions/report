@@ -3,6 +3,8 @@
 namespace MBLSolutions\Report\Services;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use MBLSolutions\Report\Events\ReportExported;
 use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
@@ -39,11 +41,16 @@ class ExportReportService
     {
         $driver = $this->getDriver();
 
-        $this->countRows();
+        $rows = $this->countRows();
 
         $result = $driver->export($this->report, $this->request->toArray());
 
-        Event::dispatch(new ReportExported($this->report));
+        Event::dispatch(new ReportExported(
+            $this->report,
+            Auth::id(),
+            (new Collection($this->request->toArray()))->except(['signature', 'expires', 'uid', 'driver'])->all(),
+            $rows
+        ));
 
         return $result;
     }

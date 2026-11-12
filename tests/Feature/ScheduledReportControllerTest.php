@@ -11,6 +11,13 @@ use PHPUnit\Framework\Attributes\Test;
 
 class ScheduledReportControllerTest extends LaravelTestCase
 {
+    /** {@inheritdoc} **/
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['report.schedules.admin_only' => false]);
+    }
 
     #[Test]
     public function can_view_scheduled_report_index(): void

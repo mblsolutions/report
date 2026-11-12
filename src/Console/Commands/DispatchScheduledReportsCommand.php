@@ -32,6 +32,12 @@ class DispatchScheduledReportsCommand extends Command
 
     public function handle(): int
     {
+        if (! config('report.schedules.enabled', false)) {
+            $this->info('Report schedules are turned off (report.schedules.enabled).');
+
+            return 0;
+        }
+
         $repository = new ScheduledReportRepository();
 
         $this->info('Running Report Schedules');
@@ -55,6 +61,9 @@ class DispatchScheduledReportsCommand extends Command
                         $uuid, $report, $schedule->getAttribute('parameters'), $schedule->getAttribute('authenticatable_id'), $schedule
                     )
                 );
+
+                // Set without touching updated_at, which orders the schedule list
+                ScheduledReport::query()->whereKey($schedule->getKey())->toBase()->update(['last_run' => Carbon::now()]);
 
                 Event::dispatch(new ScheduledReportDispatched($schedule));
             } catch (Throwable $exception) {
