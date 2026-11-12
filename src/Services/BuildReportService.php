@@ -735,10 +735,13 @@ class BuildReportService
      * @param $value
      * @param $subject
      * @return string|string[]|null
+     * @throws InvalidArgumentException when a value is given
      */
     public function replaceParameter(string $field, $value, $subject)
     {
         if ($value == null) {
+            $field = preg_quote($field, '/');
+
             preg_match_all("/([a-z._]+)(\s?)(>=|<=|=|<|>|!=|<>)(\s?)(\\'?)(\{{$field}\})(\s?)([0-9:]*)(\\'?)/", $subject, $matches);
 
             foreach ($matches[0] as $match) {
@@ -761,7 +764,8 @@ class BuildReportService
             return $subject;
         }
 
-        return preg_replace("/(\{{$field}\}|\{\{{$field}\}\})/i", $value, $subject);
+        // Values are bound in addWhere(), never pasted into the SQL
+        throw new InvalidArgumentException('replaceParameter() only removes empty parameters.');
     }
 
     /**

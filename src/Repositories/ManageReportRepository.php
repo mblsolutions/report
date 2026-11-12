@@ -32,7 +32,7 @@ class ManageReportRepository
      */
     public function paginate($limit = 25): LengthAwarePaginator
     {
-        return Report::paginate($limit);
+        return Report::paginate($limit === null ? null : min($limit, 100));
     }
 
     /**

@@ -41,7 +41,7 @@ class ScheduledReportRepository extends PackageReportRepository
 
     public function paginate(?int $limit = null): LengthAwarePaginator
     {
-        return $this->builder()->orderByDesc('scheduled_reports.updated_at')->paginate($limit ?? null);
+        return $this->builder()->orderByDesc('scheduled_reports.updated_at')->paginate($limit === null ? null : min($limit, 100));
     }
 
     public function builder(): Builder

@@ -24,7 +24,7 @@ class ReportRepository extends PackageReportRepository
         return $this->builder()
                     ->where('active', '=', true)
                     ->orderBy('name')
-                    ->paginate($limit ?? 25);
+                    ->paginate(min($limit ?? 25, 100));
     }
 
     /**

@@ -413,13 +413,13 @@ class BuildReportServiceTest extends LaravelTestCase
         $method = new \ReflectionMethod(BuildReportService::class, 'replaceParameter');
         $method->setAccessible(true);
 
-        $this->assertEquals(
-            'users.created_at > \'2019-01-01 00:00:00\'',
-            $method->invoke(
-                $service,
-                'users_created_at',
-                '2019-01-01 00:00:00', 'users.created_at > \'{users_created_at}\''
-            )
+        // Values are bound, not pasted, so a value is refused
+        $this->expectException(InvalidArgumentException::class);
+
+        $method->invoke(
+            $service,
+            'users_created_at',
+            '2019-01-01 00:00:00', 'users.created_at > \'{users_created_at}\''
         );
     }
 
