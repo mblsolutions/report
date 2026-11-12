@@ -85,6 +85,7 @@ class RenderReport extends RenderReportJob
             'uuid' => $uuid,
             'report_id' => $this->report->getKey(),
             'status' => JobStatus::SCHEDULED,
+            'authenticatable_id' => $this->authenticatable,
         ]);
 
         $model->save();

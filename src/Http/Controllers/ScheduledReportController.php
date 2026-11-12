@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use MBLSolutions\Report\Http\Resources\ScheduledReportCollection;
 use MBLSolutions\Report\Http\Resources\ScheduledReportResource;
 use MBLSolutions\Report\Models\Report;
@@ -53,6 +54,7 @@ class ScheduledReportController
             'parameters' => 'required',
             'frequency' => 'required',
             'limit' => 'nullable|integer',
+            'parameters.export_driver' => ['sometimes', Rule::in(config('report.queued_export_drivers', []))],
         ]);
 
         $this->abortIfReportHidden($request);
@@ -75,6 +77,8 @@ class ScheduledReportController
      */
     public function show(ScheduledReport $schedule): ScheduledReportResource
     {
+        abort_unless($this->repository->isOwnerOrAdmin($schedule), 404);
+
         return new ScheduledReportResource($schedule);
     }
 
@@ -92,6 +96,7 @@ class ScheduledReportController
             'parameters' => 'required',
             'frequency' => 'required',
             'limit' => 'nullable|integer',
+            'parameters.export_driver' => ['sometimes', Rule::in(config('report.queued_export_drivers', []))],
         ]);
 
         $this->abortIfReportHidden($request);
@@ -110,6 +115,8 @@ class ScheduledReportController
      */
     public function destroy(ScheduledReport $schedule): JsonResponse
     {
+        abort_unless($this->repository->isOwnerOrAdmin($schedule), 404);
+
         $schedule->delete();
 
         return new JsonResponse(null, 204);

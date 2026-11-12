@@ -71,11 +71,14 @@ class QueuedReportControllerTest extends LaravelTestCase
     #[Test]
     public function can_view_job_status(): void
     {
+        $user = $this->createFakeUser();
+
         factory(ReportJob::class)->create([
-            'uuid' => '931c1666-a70f-422b-aefe-925ab8b59aeb'
+            'uuid' => '931c1666-a70f-422b-aefe-925ab8b59aeb',
+            'authenticatable_id' => $user->getKey(),
         ]);
 
-        $this->getJson(route('report.queue.job', [
+        $this->actingAs($user)->getJson(route('report.queue.job', [
             'job' => '931c1666-a70f-422b-aefe-925ab8b59aeb'
         ]))->assertStatus(200);
     }
@@ -85,11 +88,14 @@ class QueuedReportControllerTest extends LaravelTestCase
     {
         Storage::fake();
 
+        $user = $this->createFakeUser();
+
         factory(ReportJob::class)->create([
-            'uuid' => '931c1666-a70f-422b-aefe-925ab8b59aeb'
+            'uuid' => '931c1666-a70f-422b-aefe-925ab8b59aeb',
+            'authenticatable_id' => $user->getKey(),
         ]);
 
-        $this->getJson(route('report.queue.export', ['job' => '931c1666-a70f-422b-aefe-925ab8b59aeb']))->assertStatus(200);
+        $this->actingAs($user)->getJson(route('report.queue.export', ['job' => '931c1666-a70f-422b-aefe-925ab8b59aeb']))->assertStatus(200);
     }
 
 }

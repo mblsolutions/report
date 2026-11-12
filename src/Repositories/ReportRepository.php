@@ -2,6 +2,7 @@
 
 namespace MBLSolutions\Report\Repositories;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -27,21 +28,26 @@ class ReportRepository extends PackageReportRepository
     }
 
     /**
-     * Admin only reports are hidden from non-admins, as in the list
+     * Inactive reports are hidden from everyone. Admin only reports are hidden from non-admins, as in the list
      *
      * @param Report $report
+     * @param Authenticatable|null $user defaults to the signed-in user
      * @return bool
      */
-    public function isHiddenFromUser(Report $report): bool
+    public function isHiddenFromUser(Report $report, ?Authenticatable $user = null): bool
     {
-        return $report->admin_only && $this->canCheckIfAdmin() && $this->authenticatableIsNotAdmin();
+        if (! $report->active) {
+            return true;
+        }
+
+        return $report->admin_only && ! $this->userCountsAsAdmin($user ?? $this->getAuthenticatedUser());
     }
 
     public function builder(): Builder
     {
         return Report::query()
             ->selectRaw('reports.*')
-            ->when($this->canCheckIfAdmin() && $this->authenticatableIsNotAdmin(), function (Builder $builder) {
+            ->when($this->authenticatableIsNotAdmin(), function (Builder $builder) {
                 $builder->where('reports.admin_only', '=', false);
             });
     }

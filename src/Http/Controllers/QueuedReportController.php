@@ -6,7 +6,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Validation\Rule;
 use MBLSolutions\Report\Http\Resources\ReportJobIndexCollection;
+use MBLSolutions\Report\Http\Resources\ReportJobIndexResource;
 use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
@@ -67,6 +69,10 @@ class QueuedReportController
     {
         abort_if(app(ReportRepository::class)->isHiddenFromUser($report), 404);
 
+        $request->validate([
+            'export_driver' => ['sometimes', Rule::in(config('report.queued_export_drivers', []))],
+        ]);
+
         $data = app(RenderJobUuidGenerator::class)->__invoke();
 
         Bus::dispatch(new RenderReport($data->get('uuid'), $report, $request->toArray(), Auth::id()));
@@ -82,7 +88,9 @@ class QueuedReportController
      */
     public function job(ReportJob $job): JsonResponse
     {
-        return new JsonResponse($job, 200);
+        abort_unless($this->repository->isOwnerOrAdmin($job), 404);
+
+        return new JsonResponse((new ReportJobIndexResource($job))->resolve(), 200);
     }
 
     /**
@@ -93,6 +101,8 @@ class QueuedReportController
      */
     public function export(ReportJob $job): JsonResponse
     {
+        abort_unless($this->repository->isOwnerOrAdmin($job), 404);
+
         $service = new QueuedReportExportService($job);
 
         return new JsonResponse($service->getExportResponse(), 200);

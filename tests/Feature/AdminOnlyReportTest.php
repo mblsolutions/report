@@ -11,6 +11,7 @@ use MBLSolutions\Report\Models\ReportExportDrivers;
 use MBLSolutions\Report\Models\ScheduledReport;
 use MBLSolutions\Report\Support\Enums\ReportSchedule;
 use MBLSolutions\Report\Tests\Fakes\ExportDriver\FakeExportDriver;
+use MBLSolutions\Report\Tests\Fakes\PlainUser;
 use MBLSolutions\Report\Tests\Fakes\User;
 use MBLSolutions\Report\Tests\LaravelTestCase;
 use PHPUnit\Framework\Attributes\Test;
@@ -76,6 +77,35 @@ class AdminOnlyReportTest extends LaravelTestCase
             ->assertStatus(404);
 
         $this->assertSame(0, ScheduledReport::query()->where('report_id', $hidden->getKey())->count());
+    }
+
+    #[Test]
+    public function inactive_reports_give_404_on_every_route_for_admins_too(): void
+    {
+        foreach ([false, true] as $admin) {
+            $report = factory(Report::class)->create(['active' => false]);
+
+            $this->assertReportRoutesReturn($this->userWithAdmin($admin), $report, [404, 404, 404, 404, 404, 404, 404, 404]);
+        }
+
+        $this->assertSame(0, ScheduledReport::query()->whereIn('report_id', Report::query()->where('active', false)->pluck('id'))->count());
+    }
+
+    #[Test]
+    public function users_without_the_admin_interface_cannot_list_or_run_admin_only_reports(): void
+    {
+        $user = new PlainUser(['name' => 'plain']);
+        $user->save();
+
+        $report = factory(Report::class)->create(['admin_only' => true, 'name' => 'Admin Report']);
+
+        $this->actingAs($user);
+
+        $this->getJson(route('report.index'))->assertStatus(200)->assertJsonMissing(['name' => 'Admin Report']);
+        $this->getJson(route('report.all'))->assertStatus(200)->assertJsonMissing(['name' => 'Admin Report']);
+        $this->getJson(route('report.show', ['report' => $report->getKey()]))->assertStatus(404);
+        $this->postJson(route('report.render', ['report' => $report->getKey()]))->assertStatus(404);
+        $this->postJson(route('report.queue.render', ['report' => $report->getKey()]))->assertStatus(404);
     }
 
     /**

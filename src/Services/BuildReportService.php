@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use MBLSolutions\Report\Driver\Export\ReportExport;
 use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Events\ReportRendered;
+use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
 use MBLSolutions\Report\Middleware\ReportMiddleware;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportExportDrivers;
@@ -77,8 +78,11 @@ class BuildReportService
             'data' => $this->data(),
             'totals' => false,
             'drivers' => $this->exportDrivers(),
-            'raw' => $this->getRawQuery()
         ]);
+
+        if ($this->authenticatableIsAdmin()) {
+            $result->put('raw', $this->getRawQuery());
+        }
 
         Event::dispatch(new ReportRendered($this->report));
 
@@ -134,10 +138,15 @@ class BuildReportService
      * @param mixed|null $value
      * @param $alias
      * @return array
+     * @throws UnknownExportDriverException
      */
     protected function formatParameters($value, $alias): ?array
     {
         if ($alias === 'export_driver') {
+            if (! in_array($value, config('report.queued_export_drivers', []), true)) {
+                throw new UnknownExportDriverException('Supplied driver could not be found.');
+            }
+
             /** @var QueuedReportExport|ReportExport $driver */
             $driver = new $value;
 
@@ -412,7 +421,41 @@ class BuildReportService
         if ($this->checkWhereIsNotEmpty($where)) {
             [$sql, $bindings] = $this->bindParameters($this->cleanWhereSyntax($where), $values);
 
-            $this->query->whereRaw($sql, $bindings);
+            $this->checkWhereIsSelfContained($sql);
+
+            // Brackets keep the report WHERE apart from middleware filters
+            $this->query->whereRaw('(' . $sql . ')', $bindings);
+        }
+    }
+
+    /**
+     * Refuse a WHERE that could close its brackets early or hide text in a comment
+     *
+     * @param string $where
+     * @return void
+     */
+    protected function checkWhereIsSelfContained(string $where): void
+    {
+        $depth = 0;
+        $length = strlen($where);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $where[$i];
+            $pair = substr($where, $i, 2);
+
+            if ($char === "'" || $char === '"' || $char === '`') {
+                $i = $this->findClosingQuote($where, $i);
+            } elseif ($char === '#' || $pair === '--' || $pair === '/*') {
+                throw new InvalidArgumentException('The report WHERE can not contain comments.');
+            } elseif ($char === '(') {
+                $depth++;
+            } elseif ($char === ')' && --$depth < 0) {
+                break;
+            }
+        }
+
+        if ($depth !== 0) {
+            throw new InvalidArgumentException('The report WHERE has unbalanced brackets.');
         }
     }
 

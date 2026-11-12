@@ -11,6 +11,26 @@ abstract class PackageReportRepository extends EloquentRepository
 {
     use HandlesAuthenticatable;
 
+    /**
+     * The signed-in user owns the job or schedule, or is an admin
+     *
+     * @param Model $model
+     * @return bool
+     */
+    public function isOwnerOrAdmin(Model $model): bool
+    {
+        $user = $this->getAuthenticatedUser();
+
+        if ($user === null) {
+            return false;
+        }
+
+        $owner = $model->getAttribute('authenticatable_id');
+
+        return $this->userCountsAsAdmin($user)
+            || ($owner !== null && (string) $owner === (string) $user->getAuthIdentifier());
+    }
+
     protected function authNameQuery(Builder $builder, Model $authModel, string $join): Builder
     {
         return $builder->selectRaw(

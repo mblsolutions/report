@@ -52,6 +52,7 @@ class LaravelTestCase extends OTBTestCase
         $app['config']->set(
             'report.export_drivers', array_merge($config['export_drivers'], [FakeExportDriver::class])
         );
+        $app['config']->set('report.queued_export_drivers', $config['queued_export_drivers']);
         $app['config']->set('report.filesystem', $config['filesystem']);
         $app['config']->set('report.filesystem_path', $config['filesystem_path']);
         $app['config']->set('report.preview_limit', $config['preview_limit']);

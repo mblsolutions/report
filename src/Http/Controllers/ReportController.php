@@ -4,6 +4,7 @@ namespace MBLSolutions\Report\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
 use MBLSolutions\Report\Http\Resources\ReportIndexCollection;
 use MBLSolutions\Report\Http\Resources\ReportResource;
@@ -137,6 +138,10 @@ class ReportController
     public function preview(Report $report, Request $request)
     {
         abort_if($this->repository->isHiddenFromUser($report), 404);
+
+        $request->validate([
+            'export_driver' => ['sometimes', Rule::in(config('report.queued_export_drivers', []))],
+        ]);
 
         $service = new BuildReportService($report, $request->toArray(), false);
 
