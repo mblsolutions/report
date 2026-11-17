@@ -11,7 +11,6 @@ use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
 use MBLSolutions\Report\Interfaces\ExportDriver;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportExportDrivers;
-use MBLSolutions\Report\Support\Builder\ChunkIncrementalResults;
 
 class ExportReportService
 {
@@ -64,15 +63,15 @@ class ExportReportService
     {
         $cap = (int) config('report.max_rows.export', 50000);
 
-        $counter = new ChunkIncrementalResults(
-            (new BuildReportService($this->report, $this->request->toArray()))->buildReportQuery(),
-            $cap
-        );
+        $query = (new BuildReportService($this->report, $this->request->toArray()))->buildReportQuery();
 
-        $rows = $counter->getTotalResultsForChunk(0);
+        // Count result rows (keeps the select list, so an aggregate is one row), up to cap + 1
+        $rows = $query->getConnection()->query()
+            ->fromSub($query->cloneWithout(['orders', 'limit', 'offset'])->cloneWithoutBindings(['order'])->limit($cap + 1), 'report_rows')
+            ->count();
 
         abort_if(
-            $counter->hasMoreResults(0),
+            $rows > $cap,
             422,
             sprintf('This report has more than %s rows. Use the queued export.', number_format($cap))
         );

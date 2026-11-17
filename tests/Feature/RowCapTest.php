@@ -5,11 +5,13 @@ namespace MBLSolutions\Report\Tests\Feature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use MBLSolutions\Report\DataType\CastString;
 use MBLSolutions\Report\Driver\Export\CsvExport;
 use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportExportDrivers;
 use MBLSolutions\Report\Models\ReportJob;
+use MBLSolutions\Report\Models\ReportSelect;
 use MBLSolutions\Report\Support\Builder\ChunkIncrementalResults;
 use MBLSolutions\Report\Support\Enums\JobStatus;
 use MBLSolutions\Report\Tests\Fakes\User;
@@ -48,6 +50,51 @@ class RowCapTest extends LaravelTestCase
         config(['report.max_rows.export' => 5]);
 
         $this->actingAs($this->admin)->get($this->exportLink())->assertStatus(200);
+    }
+
+    #[Test]
+    public function a_direct_export_counts_result_rows_not_source_rows(): void
+    {
+        config(['report.max_rows.export' => 3]);
+
+        $this->actingAs($this->admin);
+
+        // One result row from 5 source rows
+        $report = factory(Report::class)->create();
+        factory(ReportSelect::class)->create([
+            'report_id' => $report->getKey(),
+            'column' => 'COUNT(DISTINCT users.id)',
+            'alias' => 'users',
+            'type' => CastString::class,
+        ]);
+
+        $link = $report->getExportLink(new Request([
+            'driver' => ReportExportDrivers::hashDriverValue(CsvExport::class),
+        ]));
+
+        $this->assertSame("users\n5\n", $this->get($link)->assertStatus(200)->streamedContent());
+    }
+
+    #[Test]
+    public function a_direct_export_over_the_cap_is_refused_when_grouped(): void
+    {
+        config(['report.max_rows.export' => 3]);
+
+        $this->actingAs($this->admin);
+
+        $report = factory(Report::class)->create(['groupby' => 'users.id']);
+        factory(ReportSelect::class)->create([
+            'report_id' => $report->getKey(),
+            'column' => 'COUNT(*)',
+            'alias' => 'rows',
+            'type' => CastString::class,
+        ]);
+
+        $link = $report->getExportLink(new Request([
+            'driver' => ReportExportDrivers::hashDriverValue(CsvExport::class),
+        ]));
+
+        $this->getJson($link)->assertStatus(422);
     }
 
     #[Test]
