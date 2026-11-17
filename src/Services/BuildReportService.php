@@ -18,6 +18,7 @@ use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Events\ReportRendered;
 use MBLSolutions\Report\Exceptions\UnauthorizedException;
 use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
+use MBLSolutions\Report\Interfaces\PopulatesReportOption;
 use MBLSolutions\Report\Middleware\ReportMiddleware;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportConnection;
@@ -26,6 +27,7 @@ use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportFieldType;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportSelect;
+use MBLSolutions\Report\Models\ReportSelectField;
 use MBLSolutions\Report\Support\HandlesAuthenticatable;
 use MBLSolutions\Report\Support\Maps\ReportResultMap;
 
@@ -253,10 +255,16 @@ class BuildReportService
                     return $value;
                 }
 
-                if (new $namespace instanceof Model) {
-                    $model = $namespace::where($field->getAttribute('model_select_value'), '=', $value)->first();
+                $valueColumn = $field->getAttribute('model_select_value');
+                $nameColumn = $field->getAttribute('model_select_name');
 
-                    return $model ? $model->getAttribute($field->getAttribute('model_select_name')) : $value;
+                // Take the label only from the options the runner can pick from
+                if (is_scalar($value) && is_a($namespace, Model::class, true) && is_a($namespace, PopulatesReportOption::class, true)
+                    && ! array_diff([$valueColumn, $nameColumn], ReportSelectField::columns())) {
+                    $option = $this->runnerOptions($namespace, $valueColumn, $nameColumn)
+                        ->first(static fn ($option) => (string) data_get($option, $valueColumn) === (string) $value);
+
+                    return $option ? data_get($option, $nameColumn) : $value;
                 }
 
                 return $value;
@@ -269,6 +277,38 @@ class BuildReportService
         }
 
         return $value;
+    }
+
+    /**
+     * The field's options as the runner sees them. In a queued run, the owner is signed in just for this call.
+     *
+     * @param string $namespace
+     * @param string $valueColumn
+     * @param string $nameColumn
+     * @return Collection
+     */
+    protected function runnerOptions(string $namespace, string $valueColumn, string $nameColumn): Collection
+    {
+        $runner = $this->getAuthenticatable();
+
+        if (! $runner instanceof Authenticatable) {
+            return new Collection();
+        }
+
+        $guard = Auth::guard();
+        $signedIn = $guard->user();
+
+        if ($signedIn !== null && $signedIn->getAuthIdentifier() == $runner->getAuthIdentifier()) {
+            return $namespace::options($valueColumn, $nameColumn);
+        }
+
+        $guard->setUser($runner);
+
+        try {
+            return $namespace::options($valueColumn, $nameColumn);
+        } finally {
+            $signedIn ? $guard->setUser($signedIn) : $guard->forgetUser();
+        }
     }
 
     /**

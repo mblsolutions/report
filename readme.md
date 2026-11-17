@@ -49,7 +49,7 @@ php artisan migrate
 10. Report editing (manage store, update, destroy and test) is off unless `management_enabled` is true.
 11. Schedules: `report:schedule` does nothing until `schedules.enabled` is true. Create and update are admin-only. `recipients`, `frequency` and `parameters` are validated.
 12. `render()` has no `raw` SQL for non-admins. Job details hide SQL and error text from non-admins.
-13. Select field columns must be in `select_columns` (on save and for options).
+13. Select field columns must be in `select_columns` (on save, for options and for labels). A chosen value's label comes only from the model's `options()`, as the runner sees them; other values are shown as sent.
 14. Export file links last 3 days. Jobs older than 28 days give 410.
 15. Direct CSV exports are quoted. In direct CSV and queued exports, text cells starting with `= + - @`, tab or CR get a leading `'`.
 16. List `limit` is at most 100.
@@ -199,6 +199,10 @@ To enable select options when creating/rendering reports, you must add the avail
 `report.php` config file. Any models added to this array will be available when creating new report fields.
 
 Models added to the array should implement the `\MBLSolutions\Report\Interfaces\PopulatesReportOption` interface
+
+`options($value, $name)` must return items keyed by the field's value and name columns. The label shown for a chosen
+value comes from the same list, so scope it to the signed-in user (`auth()->user()`). Queued and scheduled runs sign in
+the job owner while `options()` runs.
 
 Please Note: We recommend that large record sets are not used as select types, due to usability/browser performance issues.
 

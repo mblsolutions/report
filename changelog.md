@@ -15,7 +15,7 @@ Breaking changes. See "Upgrading to 6.0" in the readme.
 + Check report access again when queued and scheduled jobs run. One failing schedule no longer stops the rest
 + Limit pending queued reports per user
 + Turn report editing off unless enabled in config
-+ Limit select field columns
++ Limit select field columns. Take select parameter labels only from the field's options, as the runner sees them
 + Mark report jobs failed when the worker stops them. Report jobs run once
 + Validate schedules. Only admins can create and edit them, and they only run when enabled in config
 + Export file links last 3 days. Jobs older than 28 days have no links

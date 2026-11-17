@@ -11,6 +11,6 @@ class OptionUser extends User implements PopulatesReportOption
 
     public static function options(string $value = 'id', string $name = 'name'): Collection
     {
-        return static::query()->get()->map(fn ($user) => ['value' => $user->{$value}, 'name' => $user->{$name}]);
+        return static::query()->get()->map(fn ($user) => [$value => $user->{$value}, $name => $user->{$name}]);
     }
 }
