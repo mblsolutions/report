@@ -3,6 +3,7 @@
 namespace MBLSolutions\Report\Support\Builder;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection;
 
 class ChunkIncrementalResults
@@ -29,14 +30,14 @@ class ChunkIncrementalResults
      * Get the total Results for the current chunk
      *
      * @param int $offset
-     * @param string|array $columns
+     * @param string|array|null $columns defaults to "select 1"
      * @return int
      */
-    public function getTotalResultsForChunk(int $offset, $columns = ['*']): int
+    public function getTotalResultsForChunk(int $offset, $columns = null): int
     {
         $builder = $this->cleanBuilderForResultCount();
 
-        $this->result = $builder->limit($this->getLimit())->offset($offset)->get($columns);
+        $this->result = $builder->limit($this->getLimit())->offset($offset)->get($columns ?? [new Expression('1')]);
 
         $count = $this->result->count();
 
@@ -47,10 +48,10 @@ class ChunkIncrementalResults
      * Determine if the builder has more results
      *
      * @param int $offset
-     * @param string|array $columns
+     * @param string|array|null $columns
      * @return bool
      */
-    public function hasMoreResults(int $offset, $columns = ['*']): bool
+    public function hasMoreResults(int $offset, $columns = null): bool
     {
         if ($this->result === null) {
             $this->getTotalResultsForChunk($offset, $columns);

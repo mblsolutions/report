@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use MBLSolutions\Report\Driver\QueuedExport\CsvQueuedExport;
 use MBLSolutions\Report\Events\ReportChunkComplete;
 use MBLSolutions\Report\Events\ReportRenderComplete;
+use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Support\Enums\JobStatus;
@@ -90,6 +91,10 @@ class ProcessReportExportChunk extends RenderReportJob
         );
 
         $namespace = $this->request['export_driver'] ?? CsvQueuedExport::class;
+
+        if (isset($this->request['export_driver']) && ! in_array($namespace, config('report.queued_export_drivers', []), true)) {
+            throw new UnknownExportDriverException('Supplied driver could not be found.');
+        }
 
         $export = new $namespace($service, $this->getOffset(), $this->limit);
 

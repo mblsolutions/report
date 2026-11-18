@@ -29,6 +29,8 @@ class RenderReportJobTest extends LaravelTestCase
     {
         parent::setUp();
 
+        $this->actingAsAdmin();
+
         $this->report = factory(Report::class)->create();
 
         factory(ReportField::class)->state('datetime')->create([

@@ -212,10 +212,125 @@ return [
     |--------------------------------------------------------------------------
     |
     | The length of time that an export link may remain valid in days.
+    | Jobs older than 28 days have no links.
     |
     */
 
-    'link_expiration' => env('REPORT_LINK_EXPIRATION', 6),
+    'link_expiration' => env('REPORT_LINK_EXPIRATION', 3),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tenant Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Report middleware that limits rows to the user's own data. Non-admins can
+    | only run reports that carry one of these. An empty list means only admins
+    | can run reports. Admins are users whose model implements
+    | \MBLSolutions\Report\Interfaces\IsAuthenticatableAnAdmin.
+    |
+    */
+
+    'tenant_middleware' => [
+        // \App\Report\Middleware\UserAccount::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Query Timeouts
+    |--------------------------------------------------------------------------
+    |
+    | Seconds each report query may run on a MySQL connection: on screen and
+    | direct exports, and in queued jobs. Reports run on a copy of the
+    | connection, so the app's own queries are not affected.
+    |
+    */
+
+    'timeout' => [
+        'screen' => env('REPORT_TIMEOUT_SCREEN', 60),
+        'queued' => env('REPORT_TIMEOUT_QUEUED', 300),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Row Limits
+    |--------------------------------------------------------------------------
+    |
+    | The most rows an on-screen page or a direct CSV, JSON or Print export may
+    | reach. Larger reports must use the queued export, which has no limit.
+    |
+    */
+
+    'max_rows' => [
+        'export' => env('REPORT_MAX_EXPORT_ROWS', 50000),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Report Connections
+    |--------------------------------------------------------------------------
+    |
+    | Connections reports may use (comma separated). Empty means the default
+    | connection only. If "connection" is set, every report runs on it.
+    |
+    */
+
+    'allowed_connections' => array_filter(explode(',', env('REPORT_ALLOWED_CONNECTIONS', ''))),
+
+    'connection' => env('REPORT_CONNECTION'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pending Queued Reports
+    |--------------------------------------------------------------------------
+    |
+    | How many queued reports a user may have waiting or running (from the
+    | last hour) before new ones are refused with 429.
+    |
+    */
+
+    'max_pending_jobs' => env('REPORT_MAX_PENDING_JOBS', 5),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Report Editing
+    |--------------------------------------------------------------------------
+    |
+    | Creating, editing, deleting and testing reports is off unless this is
+    | true. Listing and showing reports still work.
+    |
+    */
+
+    'management_enabled' => env('REPORT_MANAGEMENT_ENABLED', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Select Field Columns
+    |--------------------------------------------------------------------------
+    |
+    | Columns a select field may use for its value and name.
+    |
+    */
+
+    'select_columns' => ['id', 'uuid', 'slug', 'sku', 'urn', 'name'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scheduled Reports
+    |--------------------------------------------------------------------------
+    |
+    | "enabled": report:schedule only runs schedules when this is true.
+    | "admin_only": only admins can create and edit schedules. Owners can
+    | still delete their own.
+    | "recipient_domains": email domains recipients must use (comma
+    | separated). Empty allows any domain.
+    |
+    */
+
+    'schedules' => [
+        'enabled' => env('REPORT_SCHEDULES', false),
+        'admin_only' => true,
+        'recipient_domains' => array_filter(explode(',', env('REPORT_RECIPIENT_DOMAINS', ''))),
+    ],
 
     /*
     |--------------------------------------------------------------------------

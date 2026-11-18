@@ -2,11 +2,13 @@
 
 namespace MBLSolutions\Report\Http\Controllers;
 
+use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use MBLSolutions\Report\Http\Resources\ScheduledReportCollection;
 use MBLSolutions\Report\Http\Resources\ScheduledReportResource;
 use MBLSolutions\Report\Models\Report;
@@ -48,12 +50,9 @@ class ScheduledReportController
      */
     public function create(Request $request): ScheduledReportResource
     {
-        $request->validate([
-            'report_id' => 'required|exists:reports,id',
-            'parameters' => 'required',
-            'frequency' => 'required',
-            'limit' => 'nullable|integer',
-        ]);
+        $this->abortUnlessAllowedToEdit();
+
+        $request->validate($this->rules());
 
         $this->abortIfReportHidden($request);
 
@@ -75,6 +74,8 @@ class ScheduledReportController
      */
     public function show(ScheduledReport $schedule): ScheduledReportResource
     {
+        abort_unless($this->repository->isOwnerOrAdmin($schedule), 404);
+
         return new ScheduledReportResource($schedule);
     }
 
@@ -87,12 +88,9 @@ class ScheduledReportController
      */
     public function update(ScheduledReport $schedule, Request $request): ScheduledReportResource
     {
-        $request->validate([
-            'report_id' => 'required|exists:reports,id',
-            'parameters' => 'required',
-            'frequency' => 'required',
-            'limit' => 'nullable|integer',
-        ]);
+        $this->abortUnlessAllowedToEdit();
+
+        $request->validate($this->rules());
 
         $this->abortIfReportHidden($request);
 
@@ -110,9 +108,68 @@ class ScheduledReportController
      */
     public function destroy(ScheduledReport $schedule): JsonResponse
     {
+        abort_unless($this->repository->isOwnerOrAdmin($schedule), 404);
+
         $schedule->delete();
 
         return new JsonResponse(null, 204);
+    }
+
+    /**
+     * Create and update rules
+     *
+     * @return array
+     */
+    protected function rules(): array
+    {
+        return [
+            'report_id' => ['required', Rule::exists('reports', 'id')->withoutTrashed()],
+            'parameters' => 'required|array',
+            'frequency' => ['required', Rule::in(ReportSchedule::all()->values()->all())],
+            'limit' => 'nullable|integer',
+            'recipients' => ['bail', 'nullable', 'string', fn ($attribute, $value, $fail) => $this->checkRecipients($value, $fail)],
+            'parameters.export_driver' => ['sometimes', Rule::in(config('report.queued_export_drivers', []))],
+        ];
+    }
+
+    /**
+     * Comma separated emails, on schedules.recipient_domains when it is set
+     *
+     * @param string $value
+     * @param Closure $fail
+     * @return void
+     */
+    protected function checkRecipients(string $value, Closure $fail): void
+    {
+        $domains = config('report.schedules.recipient_domains', []);
+        $domains = array_filter(array_map(
+            static fn ($domain) => strtolower(trim($domain)),
+            is_string($domains) ? explode(',', $domains) : (array) $domains
+        ));
+
+        foreach (array_filter(array_map('trim', explode(',', $value)), static fn ($email) => $email !== '') as $email) {
+            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $fail('Each recipient must be an email address.');
+
+                return;
+            }
+
+            if ($domains && ! in_array(strtolower(substr(strrchr($email, '@'), 1)), $domains, true)) {
+                $fail('Each recipient must use an allowed email domain.');
+
+                return;
+            }
+        }
+    }
+
+    /**
+     * Only admins can create or edit schedules, unless schedules.admin_only is false
+     *
+     * @return void
+     */
+    protected function abortUnlessAllowedToEdit(): void
+    {
+        abort_if(config('report.schedules.admin_only', true) && ! $this->repository->signedInUserIsAdmin(), 403);
     }
 
     /**

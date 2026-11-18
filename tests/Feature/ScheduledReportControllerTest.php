@@ -11,6 +11,13 @@ use PHPUnit\Framework\Attributes\Test;
 
 class ScheduledReportControllerTest extends LaravelTestCase
 {
+    /** {@inheritdoc} **/
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['report.schedules.admin_only' => false]);
+    }
 
     #[Test]
     public function can_view_scheduled_report_index(): void
@@ -35,9 +42,11 @@ class ScheduledReportControllerTest extends LaravelTestCase
     #[Test]
     public function can_show_scheduled_report(): void
     {
-        $schedule = factory(ScheduledReport::class)->create();
+        $user = $this->createFakeUser();
 
-        $this->getJson(route('report.schedule.show', [
+        $schedule = factory(ScheduledReport::class)->create(['authenticatable_id' => $user->getKey()]);
+
+        $this->actingAs($user)->getJson(route('report.schedule.show', [
             'schedule' => $schedule->getKey(),
         ]))->assertStatus(200);
     }
@@ -66,8 +75,10 @@ class ScheduledReportControllerTest extends LaravelTestCase
     #[Test]
     public function can_delete_scheduled_report(): void
     {
-        $this->deleteJson(route('report.schedule.destroy', [
-            'schedule' => factory(ScheduledReport::class)->create()
+        $user = $this->createFakeUser();
+
+        $this->actingAs($user)->deleteJson(route('report.schedule.destroy', [
+            'schedule' => factory(ScheduledReport::class)->create(['authenticatable_id' => $user->getKey()])
         ]))->assertStatus(204);
     }
 

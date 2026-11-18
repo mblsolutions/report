@@ -33,6 +33,8 @@ class BuildReportServiceTest extends LaravelTestCase
     {
         parent::setUp();
 
+        $this->actingAsAdmin();
+
         $this->report = factory(Report::class)->create([
             'table' => 'users',
             'where' => null,
@@ -188,7 +190,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $method->invoke($service);
 
         $this->assertEquals(
-            'select * from "users" where users.created_at >= \'2019-01-01 00:00:00\'',
+            'select * from "users" where (users.created_at >= \'2019-01-01 00:00:00\')',
             $service->getRawQuery()
         );
     }
@@ -411,13 +413,13 @@ class BuildReportServiceTest extends LaravelTestCase
         $method = new \ReflectionMethod(BuildReportService::class, 'replaceParameter');
         $method->setAccessible(true);
 
-        $this->assertEquals(
-            'users.created_at > \'2019-01-01 00:00:00\'',
-            $method->invoke(
-                $service,
-                'users_created_at',
-                '2019-01-01 00:00:00', 'users.created_at > \'{users_created_at}\''
-            )
+        // Values are bound, not pasted, so a value is refused
+        $this->expectException(InvalidArgumentException::class);
+
+        $method->invoke(
+            $service,
+            'users_created_at',
+            '2019-01-01 00:00:00', 'users.created_at > \'{users_created_at}\''
         );
     }
 
@@ -565,7 +567,7 @@ class BuildReportServiceTest extends LaravelTestCase
 
         $service->render();
 
-        $this->assertEquals("select users.id AS 'user_id' from \"users\" where users.id = ?", $service->getRawQuery());
+        $this->assertEquals("select users.id AS 'user_id' from \"users\" where (users.id = ?)", $service->getRawQuery());
         $this->assertSame(['replaced_value'], $service->query()->getBindings());
     }
 
@@ -741,7 +743,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $query = $service->buildReportQuery();
 
         $this->assertEquals(
-            'select users.id AS \'User ID\' from "users" left join "posts" on "users"."id" = "posts"."user_id" where users.created_at >= ? and users.id < 100 group by users.created_at having users.id < 100 order by users.created_at desc',
+            'select users.id AS \'User ID\' from "users" left join "posts" on "users"."id" = "posts"."user_id" where (users.created_at >= ?) and users.id < 100 group by users.created_at having users.id < 100 order by users.created_at desc',
             $query->toSql()
         );
         $this->assertSame(['2019-01-01 00:00:00'], $query->getBindings());
@@ -801,7 +803,7 @@ class BuildReportServiceTest extends LaravelTestCase
 
         $query = (new BuildReportService($report, ['name' => "x' OR '1'='1"]))->buildReportQuery();
 
-        $this->assertEquals('select * from "users" where users.name = ?', $query->toSql());
+        $this->assertEquals('select * from "users" where (users.name = ?)', $query->toSql());
         $this->assertSame(["x' OR '1'='1"], $query->getBindings());
         $this->assertCount(0, $query->get());
     }
@@ -817,7 +819,7 @@ class BuildReportServiceTest extends LaravelTestCase
         $query = (new BuildReportService($report, ['from' => '2019-01-01']))->buildReportQuery();
 
         $this->assertEquals(
-            'select * from "users" where users.created_at >= ? AND users.created_at < LEFT(?, 10) AND users.name <> "x"',
+            'select * from "users" where (users.created_at >= ? AND users.created_at < LEFT(?, 10) AND users.name <> "x")',
             $query->toSql()
         );
         $this->assertSame(['2019-01-01 00:00:00', '2019-01-01'], $query->getBindings());
@@ -830,7 +832,7 @@ class BuildReportServiceTest extends LaravelTestCase
 
         $query = (new BuildReportService($report, ['x' => 'abc']))->buildReportQuery();
 
-        $this->assertEquals('select * from "users" where users.name = ?', $query->toSql());
+        $this->assertEquals('select * from "users" where (users.name = ?)', $query->toSql());
         $this->assertSame(["it's abc"], $query->getBindings());
     }
 
@@ -844,7 +846,7 @@ class BuildReportServiceTest extends LaravelTestCase
 
         $query = (new BuildReportService($report, ['id' => (string) $id]))->buildReportQuery();
 
-        $this->assertEquals('select * from "users" where users.id = ?', $query->toSql());
+        $this->assertEquals('select * from "users" where (users.id = ?)', $query->toSql());
         $this->assertSame([$id], $query->getBindings());
         $this->assertCount(1, $query->get());
 
@@ -861,7 +863,7 @@ class BuildReportServiceTest extends LaravelTestCase
 
         $query = (new BuildReportService($report, ['Brand' => '7']))->buildReportQuery();
 
-        $this->assertEquals('select * from "users" where users.id = ? OR users.id = ?', $query->toSql());
+        $this->assertEquals('select * from "users" where (users.id = ? OR users.id = ?)', $query->toSql());
         $this->assertSame([7, 7], $query->getBindings());
     }
 
@@ -885,7 +887,7 @@ class BuildReportServiceTest extends LaravelTestCase
 
         $query = (new BuildReportService($report, ['a' => '1', 'b' => null, 'c' => 'z']))->buildReportQuery();
 
-        $this->assertEquals('select * from "users" where users.id = ? AND users.name <> ?', $query->toSql());
+        $this->assertEquals('select * from "users" where (users.id = ? AND users.name <> ?)', $query->toSql());
         $this->assertSame([1, 'z'], $query->getBindings());
     }
 

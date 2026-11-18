@@ -61,6 +61,8 @@ class ManageReportController
      */
     public function store(Request $request)
     {
+        $this->abortUnlessManagementEnabled();
+
         $validator = $this->repository->validateReportRequest($request);
 
         if ($validator->fails()) {
@@ -85,6 +87,8 @@ class ManageReportController
      */
     public function update(Report $report, Request $request)
     {
+        $this->abortUnlessManagementEnabled();
+
         $validator = $this->repository->validateReportRequest($request);
 
         if ($validator->fails()) {
@@ -108,7 +112,19 @@ class ManageReportController
      */
     public function destroy(Report $report): ReportResource
     {
+        $this->abortUnlessManagementEnabled();
+
         return new ReportResource($this->repository->delete($report));
+    }
+
+    /**
+     * Report editing is off unless report.management_enabled is true
+     *
+     * @return void
+     */
+    protected function abortUnlessManagementEnabled(): void
+    {
+        abort_unless(config('report.management_enabled', false), 403, 'Report editing is turned off.');
     }
 
     /**
@@ -120,6 +136,8 @@ class ManageReportController
      */
     public function test(Report $report, Request $request)
     {
+        $this->abortUnlessManagementEnabled();
+
         try {
             $start = microtime(true);
 

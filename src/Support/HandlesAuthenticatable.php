@@ -64,10 +64,18 @@ trait HandlesAuthenticatable
 
     protected function authenticatableIsAdmin(): bool
     {
-        /** @var IsAuthenticatableAnAdmin $auth */
-        $auth = $this->getAuthenticatedUser();
+        return $this->userCountsAsAdmin($this->getAuthenticatedUser());
+    }
 
-        return optional($auth)->isAuthenticatableAnAdmin() ?? false;
+    /**
+     * Only users whose model implements IsAuthenticatableAnAdmin can be admins
+     *
+     * @param mixed $user
+     * @return bool
+     */
+    protected function userCountsAsAdmin($user): bool
+    {
+        return $user instanceof IsAuthenticatableAnAdmin && $user->isAuthenticatableAnAdmin();
     }
 
     protected function authenticatableIsNotAdmin(): bool

@@ -23,7 +23,9 @@ class ReportJobIndexResource extends JsonResource
             'authenticatable_name' => $this->getAttribute('authenticatable_name'),
             'created_at' => $this->getAttribute('created_at'),
             'deleted_at' => $this->getAttribute('deleted_at'),
-            'exception' => $this->getAttribute('exception'),
+            'exception' => $this->authenticatableIsAdmin() || $this->getAttribute('exception') === null
+                ? $this->getAttribute('exception')
+                : 'The report could not be completed.',
             'formatted_parameters' => $this->getAttribute('formatted_parameters'),
             'parameters' => $this->getAttribute('parameters'),
             'processed' => $this->getAttribute('processed'),

@@ -8,6 +8,13 @@ use PHPUnit\Framework\Attributes\Test;
 
 class ManageReportControllerTest extends LaravelTestCase
 {
+    /** {@inheritdoc} **/
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['report.management_enabled' => true]);
+    }
 
     #[Test]
     public function can_view_manage_report_index(): void
@@ -127,6 +134,8 @@ class ManageReportControllerTest extends LaravelTestCase
     #[Test]
     public function can_test_if_a_report_is_successful(): void
     {
+        $this->actingAsAdmin();
+
         $report = factory(Report::class)->create();
 
         $response = $this->postJson(route('report.manage.test', ['report' => $report->getKey()]));

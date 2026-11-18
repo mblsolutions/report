@@ -4,15 +4,19 @@ namespace MBLSolutions\Report\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Validation\Rule;
 use MBLSolutions\Report\Http\Resources\ReportJobIndexCollection;
+use MBLSolutions\Report\Http\Resources\ReportJobIndexResource;
 use MBLSolutions\Report\Jobs\RenderReport;
 use MBLSolutions\Report\Models\Report;
 use MBLSolutions\Report\Models\ReportJob;
 use MBLSolutions\Report\Repositories\ReportJobRepository;
 use MBLSolutions\Report\Repositories\ReportRepository;
 use MBLSolutions\Report\Services\QueuedReportExportService;
+use MBLSolutions\Report\Support\Enums\JobStatus;
 use MBLSolutions\Report\Support\Report\RenderJobUuidGenerator;
 
 class QueuedReportController
@@ -67,11 +71,37 @@ class QueuedReportController
     {
         abort_if(app(ReportRepository::class)->isHiddenFromUser($report), 404);
 
+        $request->validate([
+            'export_driver' => ['sometimes', Rule::in(config('report.queued_export_drivers', []))],
+        ]);
+
+        abort_if(
+            $this->pendingJobsForUser() >= (int) config('report.max_pending_jobs', 5),
+            429,
+            'Too many of your reports are still running. Try again when one has finished.'
+        );
+
         $data = app(RenderJobUuidGenerator::class)->__invoke();
 
         Bus::dispatch(new RenderReport($data->get('uuid'), $report, $request->toArray(), Auth::id()));
 
         return new JsonResponse($data, 202);
+    }
+
+    /**
+     * The signed-in user's jobs that are waiting or running, from the last hour
+     *
+     * @return int
+     */
+    protected function pendingJobsForUser(): int
+    {
+        $id = Auth::id();
+
+        return ReportJob::query()
+            ->where('authenticatable_id', $id === null ? null : (string) $id)
+            ->whereIn('status', [JobStatus::SCHEDULED, JobStatus::RUNNING])
+            ->where('created_at', '>=', Carbon::now()->subHour())
+            ->count();
     }
 
     /**
@@ -82,7 +112,9 @@ class QueuedReportController
      */
     public function job(ReportJob $job): JsonResponse
     {
-        return new JsonResponse($job, 200);
+        abort_unless($this->repository->isOwnerOrAdmin($job), 404);
+
+        return new JsonResponse((new ReportJobIndexResource($job))->resolve(), 200);
     }
 
     /**
@@ -93,6 +125,10 @@ class QueuedReportController
      */
     public function export(ReportJob $job): JsonResponse
     {
+        abort_unless($this->repository->isOwnerOrAdmin($job), 404);
+
+        abort_if($job->created_at->lt(Carbon::now()->subDays($this->repository->days)), 410, 'This report has expired.');
+
         $service = new QueuedReportExportService($job);
 
         return new JsonResponse($service->getExportResponse(), 200);

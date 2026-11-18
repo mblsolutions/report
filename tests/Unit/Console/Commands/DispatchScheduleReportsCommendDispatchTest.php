@@ -21,6 +21,8 @@ class DispatchScheduleReportsCommendDispatchTest extends LaravelTestCase
     {
         parent::setUp();
 
+        config(['report.schedules.enabled' => true]);
+
         Bus::fake();
         Event::fake();
 

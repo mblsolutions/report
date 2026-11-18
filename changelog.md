@@ -1,3 +1,15 @@
+## v6.0.0
+
+Breaking changes. See "Upgrading to 6.0" in the readme.
+
++ Access: only active reports run. Non-admins need a tenant middleware (IsAuthenticatableAnAdmin marks admins). Jobs, downloads and schedules are limited to their owner or an admin, and queued and scheduled runs check access again
++ Queries: the report WHERE is bracketed and checked, connections come from an allowlist, select field columns are limited, and parameter labels come only from the field's options
++ Limits: per-query MySQL timeouts, 50,000 rows on screen and in direct exports, a pending queued job limit per user, and at most 100 rows per list page
++ Exports and links: signed links work only for their user, file links last 3 days, and jobs older than 28 days have none. Direct CSV is quoted with formula cells guarded, and direct JSON is valid
++ Schedules and jobs: schedules are validated and admin-only to create and edit. Report jobs run once and are marked failed when the worker stops them. One failing schedule no longer stops the rest
++ Config switches: report editing and schedules are off until enabled, and queued runs only use the listed queued export drivers
++ Other: SQL and job errors are shown to admins only, events carry the user id, parameters and row count, and replaceParameter() only removes empty parameters
+
 ## v5.2.10
 
 + Bind report parameter values instead of pasting them into the SQL

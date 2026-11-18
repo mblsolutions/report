@@ -3,8 +3,10 @@
 namespace MBLSolutions\Report\Services;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -14,13 +16,18 @@ use InvalidArgumentException;
 use MBLSolutions\Report\Driver\Export\ReportExport;
 use MBLSolutions\Report\Driver\QueuedExport\QueuedReportExport;
 use MBLSolutions\Report\Events\ReportRendered;
+use MBLSolutions\Report\Exceptions\UnauthorizedException;
+use MBLSolutions\Report\Exceptions\UnknownExportDriverException;
+use MBLSolutions\Report\Interfaces\PopulatesReportOption;
 use MBLSolutions\Report\Middleware\ReportMiddleware;
 use MBLSolutions\Report\Models\Report;
+use MBLSolutions\Report\Models\ReportConnection;
 use MBLSolutions\Report\Models\ReportExportDrivers;
 use MBLSolutions\Report\Models\ReportField;
 use MBLSolutions\Report\Models\ReportFieldType;
 use MBLSolutions\Report\Models\ReportJoin;
 use MBLSolutions\Report\Models\ReportSelect;
+use MBLSolutions\Report\Models\ReportSelectField;
 use MBLSolutions\Report\Support\HandlesAuthenticatable;
 use MBLSolutions\Report\Support\Maps\ReportResultMap;
 
@@ -50,6 +57,7 @@ class BuildReportService
      * @param array $parameters
      * @param bool $paginate
      * @param mixed|null $authenticatable
+     * @throws UnauthorizedException
      */
     public function __construct(Report $report, array $parameters = [], bool $paginate = true, mixed $authenticatable = null)
     {
@@ -60,7 +68,42 @@ class BuildReportService
 
         $this->fields = $this->report->fields;
 
-        $this->query = DB::connection($this->report->connection)->table($this->report->table);
+        $this->query = DB::connection($this->reportConnection())->table($this->report->table);
+    }
+
+    /**
+     * The fixed report connection, or the report's own if it is allowed.
+     * MySQL runs on a copy with a per-query time limit, so the app's own connection is never changed.
+     *
+     * @return string
+     * @throws UnauthorizedException
+     */
+    protected function reportConnection(): string
+    {
+        $name = config('report.connection') ?: ($this->report->connection ?: config('database.default'));
+
+        if (! config('report.connection') && ! in_array($name, ReportConnection::allowed(), true)) {
+            throw new UnauthorizedException('This report connection is not allowed.');
+        }
+
+        $config = config('database.connections.' . $name);
+
+        if (($config['driver'] ?? null) !== 'mysql') {
+            return $name;
+        }
+
+        $seconds = (int) (app()->runningInConsole() ? config('report.timeout.queued', 300) : config('report.timeout.screen', 60));
+        $copy = $name . '-report-' . $seconds;
+
+        if (config('database.connections.' . $copy) === null) {
+            $initCommand = class_exists(\Pdo\Mysql::class) ? \Pdo\Mysql::ATTR_INIT_COMMAND : \PDO::MYSQL_ATTR_INIT_COMMAND;
+
+            $config['options'] = [$initCommand => 'SET SESSION max_execution_time=' . ($seconds * 1000)] + ($config['options'] ?? []);
+
+            config(['database.connections.' . $copy => $config]);
+        }
+
+        return $copy;
     }
 
     /**
@@ -70,17 +113,28 @@ class BuildReportService
      */
     public function render(): Collection
     {
+        $cap = (int) config('report.max_rows.export', 50000);
+
+        abort_if(
+            $this->paginate && Paginator::resolveCurrentPage() * $this->report->display_limit > $cap,
+            422,
+            sprintf('This report has more than %s rows. Use the queued export.', number_format($cap))
+        );
+
         $this->buildReportQuery();
 
         $result = new Collection([
             'headings' => $this->headings(),
-            'data' => $this->data(),
+            'data' => $data = $this->data(),
             'totals' => false,
             'drivers' => $this->exportDrivers(),
-            'raw' => $this->getRawQuery()
         ]);
 
-        Event::dispatch(new ReportRendered($this->report));
+        if ($this->authenticatableIsAdmin()) {
+            $result->put('raw', $this->getRawQuery());
+        }
+
+        $this->dispatchRenderedEvent($data);
 
         return $result;
     }
@@ -97,7 +151,7 @@ class BuildReportService
 
         $result = new Collection([
             'headings' => $this->headings(),
-            'data' => $this->data(0, $limit),
+            'data' => $data = $this->data(0, $limit),
             'totals' => false,
             'drivers' => $this->exportDrivers(),
             'parameters' => $this->getFormattedParameters($this->parameters),
@@ -108,9 +162,27 @@ class BuildReportService
             $result->put('raw', $this->getRawQuery());
         }
 
-        Event::dispatch(new ReportRendered($this->report));
+        $this->dispatchRenderedEvent($data);
 
         return $result;
+    }
+
+    /**
+     * Tell listeners who ran the report, with which parameters, and how many rows it had
+     *
+     * @param mixed $data
+     * @return void
+     */
+    protected function dispatchRenderedEvent($data): void
+    {
+        $rows = $data instanceof LengthAwarePaginator ? $data->total() : ($data ? count($data) : 0);
+
+        Event::dispatch(new ReportRendered(
+            $this->report,
+            optional($this->getAuthenticatable())->getAuthIdentifier(),
+            $this->parameters->except(['signature', 'expires', 'uid', 'driver'])->all(),
+            $rows
+        ));
     }
 
     /**
@@ -134,10 +206,15 @@ class BuildReportService
      * @param mixed|null $value
      * @param $alias
      * @return array
+     * @throws UnknownExportDriverException
      */
     protected function formatParameters($value, $alias): ?array
     {
         if ($alias === 'export_driver') {
+            if (! in_array($value, config('report.queued_export_drivers', []), true)) {
+                throw new UnknownExportDriverException('Supplied driver could not be found.');
+            }
+
             /** @var QueuedReportExport|ReportExport $driver */
             $driver = new $value;
 
@@ -174,10 +251,20 @@ class BuildReportService
             case ReportFieldType::SELECT:
                 $namespace = $field->getAttribute('model');
 
-                if (new $namespace instanceof Model) {
-                    $model = $namespace::where($field->getAttribute('model_select_value'), '=', $value)->first();
+                if ($this->fieldIsHiddenFromRunner($field)) {
+                    return $value;
+                }
 
-                    return $model ? $model->getAttribute($field->getAttribute('model_select_name')) : $value;
+                $valueColumn = $field->getAttribute('model_select_value');
+                $nameColumn = $field->getAttribute('model_select_name');
+
+                // Take the label only from the options the runner can pick from
+                if (is_scalar($value) && is_a($namespace, Model::class, true) && is_a($namespace, PopulatesReportOption::class, true)
+                    && ! array_diff([$valueColumn, $nameColumn], ReportSelectField::columns())) {
+                    $option = $this->runnerOptions($namespace, $valueColumn, $nameColumn)
+                        ->first(static fn ($option) => (string) data_get($option, $valueColumn) === (string) $value);
+
+                    return $option ? data_get($option, $nameColumn) : $value;
                 }
 
                 return $value;
@@ -190,6 +277,53 @@ class BuildReportService
         }
 
         return $value;
+    }
+
+    /**
+     * The field's options as the runner sees them. In a queued run, the owner is signed in just for this call.
+     *
+     * @param string $namespace
+     * @param string $valueColumn
+     * @param string $nameColumn
+     * @return Collection
+     */
+    protected function runnerOptions(string $namespace, string $valueColumn, string $nameColumn): Collection
+    {
+        $runner = $this->getAuthenticatable();
+
+        if (! $runner instanceof Authenticatable) {
+            return new Collection();
+        }
+
+        $guard = Auth::guard();
+        $signedIn = $guard->user();
+
+        if ($signedIn !== null && $signedIn->getAuthIdentifier() == $runner->getAuthIdentifier()) {
+            return $namespace::options($valueColumn, $nameColumn);
+        }
+
+        $guard->setUser($runner);
+
+        try {
+            return $namespace::options($valueColumn, $nameColumn);
+        } finally {
+            $signedIn ? $guard->setUser($signedIn) : $guard->forgetUser();
+        }
+    }
+
+    /**
+     * A report middleware hides this field from the runner, e.g. a tenant's own account
+     *
+     * @param ReportField $field
+     * @return bool
+     */
+    protected function fieldIsHiddenFromRunner(ReportField $field): bool
+    {
+        $user = $this->getAuthenticatable();
+
+        return $this->report->middleware->contains(
+            static fn ($row) => ! (new $row->middleware($user))->field($field)
+        );
     }
 
     /**
@@ -275,6 +409,7 @@ class BuildReportService
      */
     public function buildReportQuery(array $except = [], $preview = false): Builder
     {
+        $this->checkRunnerMayRunReport($except);
 
         if (!in_array('join', $except, true) && $this->report->joins->count()) {
             $this->addJoins();
@@ -348,7 +483,7 @@ class BuildReportService
                 $this->query->limit(config('report.preview_results_limit', 15000));
 
                 // Wrap the query inside another SELECT with GROUP BY
-                $this->query = DB::table(DB::raw("({$this->query->toSql()}) AS query_data"))
+                $this->query = $this->query->getConnection()->table(DB::raw("({$this->query->toSql()}) AS query_data"))
                     ->mergeBindings($this->query);
 
                 $this->query->groupBy(...$groupby_alias);
@@ -360,6 +495,30 @@ class BuildReportService
         }
 
         return $this->query;
+    }
+
+    /**
+     * Non-admins may only run reports that carry a tenant middleware
+     *
+     * @param array $except
+     * @return void
+     * @throws UnauthorizedException
+     */
+    protected function checkRunnerMayRunReport(array $except = []): void
+    {
+        if ($this->userCountsAsAdmin($this->getAuthenticatable())) {
+            return;
+        }
+
+        $tenantMiddleware = config('report.tenant_middleware', []);
+
+        $hasTenantMiddleware = ! in_array('middleware', $except, true) && $this->report->middleware->contains(
+            static fn ($row) => in_array($row->middleware, $tenantMiddleware, true)
+        );
+
+        if (! $hasTenantMiddleware) {
+            throw new UnauthorizedException('You are not allowed to run this report.');
+        }
     }
 
     /**
@@ -412,7 +571,41 @@ class BuildReportService
         if ($this->checkWhereIsNotEmpty($where)) {
             [$sql, $bindings] = $this->bindParameters($this->cleanWhereSyntax($where), $values);
 
-            $this->query->whereRaw($sql, $bindings);
+            $this->checkWhereIsSelfContained($sql);
+
+            // Brackets keep the report WHERE apart from middleware filters
+            $this->query->whereRaw('(' . $sql . ')', $bindings);
+        }
+    }
+
+    /**
+     * Refuse a WHERE that could close its brackets early or hide text in a comment
+     *
+     * @param string $where
+     * @return void
+     */
+    protected function checkWhereIsSelfContained(string $where): void
+    {
+        $depth = 0;
+        $length = strlen($where);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $where[$i];
+            $pair = substr($where, $i, 2);
+
+            if ($char === "'" || $char === '"' || $char === '`') {
+                $i = $this->findClosingQuote($where, $i);
+            } elseif ($char === '#' || $pair === '--' || $pair === '/*') {
+                throw new InvalidArgumentException('The report WHERE can not contain comments.');
+            } elseif ($char === '(') {
+                $depth++;
+            } elseif ($char === ')' && --$depth < 0) {
+                break;
+            }
+        }
+
+        if ($depth !== 0) {
+            throw new InvalidArgumentException('The report WHERE has unbalanced brackets.');
         }
     }
 
@@ -582,10 +775,13 @@ class BuildReportService
      * @param $value
      * @param $subject
      * @return string|string[]|null
+     * @throws InvalidArgumentException when a value is given
      */
     public function replaceParameter(string $field, $value, $subject)
     {
         if ($value == null) {
+            $field = preg_quote($field, '/');
+
             preg_match_all("/([a-z._]+)(\s?)(>=|<=|=|<|>|!=|<>)(\s?)(\\'?)(\{{$field}\})(\s?)([0-9:]*)(\\'?)/", $subject, $matches);
 
             foreach ($matches[0] as $match) {
@@ -608,7 +804,8 @@ class BuildReportService
             return $subject;
         }
 
-        return preg_replace("/(\{{$field}\}|\{\{{$field}\}\})/i", $value, $subject);
+        // Values are bound in addWhere(), never pasted into the SQL
+        throw new InvalidArgumentException('replaceParameter() only removes empty parameters.');
     }
 
     /**
@@ -711,11 +908,18 @@ class BuildReportService
      * Get the Authenticatable Model
      *
      * @return Authenticatable|Model|null
+     * @throws UnauthorizedException
      */
     public function getAuthenticatable()
     {
         if ($this->authenticatable && $authModel = config('report.authenticatable_model')) {
-            return $authModel::find($this->authenticatable);
+            $user = $authModel::find($this->authenticatable);
+
+            if ($user === null) {
+                throw new UnauthorizedException('The user for this report run could not be found.');
+            }
+
+            return $user;
         }
 
         return Auth::user();

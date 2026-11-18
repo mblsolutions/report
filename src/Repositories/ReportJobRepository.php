@@ -28,7 +28,7 @@ class ReportJobRepository extends PackageReportRepository
                         Carbon::now()->toDateTimeString()
                     ])
                     ->orderByDesc('report_jobs.created_at')
-                    ->paginate($limit ?? null);
+                    ->paginate($limit === null ? null : min($limit, 100));
     }
 
     /**
@@ -64,7 +64,7 @@ class ReportJobRepository extends PackageReportRepository
                         ]);
                     });
             })
-            ->limit($limit)
+            ->limit($limit === null ? null : min($limit, 100))
             ->orderByDesc('report_jobs.created_at')
             ->get();
     }
