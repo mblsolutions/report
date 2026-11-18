@@ -70,7 +70,7 @@ class JsonExport extends ReportExport
             ],
             'headings' => $service->headings(),
             'params' => (new Collection($params))->except(self::PROTECTED_KEYS),
-        ]))->toJson() . ',';
+        ]))->toJson();
 
         return $this;
     }
@@ -90,7 +90,7 @@ class JsonExport extends ReportExport
                 $chunk = $this->formatResults($service, $chunk);
             }
 
-            print $chunk->toJson() . ',';
+            print ',' . $chunk->toJson();
         });
 
         return $this;

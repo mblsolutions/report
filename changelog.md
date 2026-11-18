@@ -20,6 +20,7 @@ Breaking changes. See "Upgrading to 6.0" in the readme.
 + Validate schedules. Only admins can create and edit them, and they only run when enabled in config
 + Export file links last 3 days. Jobs older than 28 days have no links
 + Quote direct CSV exports. In direct CSV and queued exports, put ' before text cells that start with = + - @, tab or CR
++ Direct JSON exports are valid JSON (no trailing comma)
 + Add the user id, parameters and row count to report events. Scheduled runs set last_run
 + List pages hold at most 100 rows
 + replaceParameter() only removes empty parameters
